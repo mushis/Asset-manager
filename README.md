@@ -24,7 +24,8 @@ The app does the juggling:
       <img src="https://github.com/user-attachments/assets/e40d215b-55a8-4c7c-8e83-d885f216a2b2" alt="Screenshot 3" width="100%">
     </td>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/64cde192-a429-4748-bd0c-82f9b2d48b55" alt="Screenshot 4" width="100%">
+      <img src="https://github.com/user-attachments/assets/2930a888-03b8-4fc9-8c67-e0a323f33c53" alt="Screenshot 3" width="100%">
+">
     </td>
   </tr>
 </table>
