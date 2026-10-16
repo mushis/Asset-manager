@@ -1,0 +1,70 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:QuakeAssetManager"
+             x:Class="QuakeAssetManager.ArchivesView">
+  <Grid ColumnDefinitions="240,4,*,4,280">
+    <DockPanel>
+      <Border DockPanel.Dock="Top" Classes="headerbar">
+        <TextBlock Classes="header" Text="{local:T 'Archives'}" />
+      </Border>
+      <Border DockPanel.Dock="Top" Classes="help">
+        <TextBlock Text="{local:T 'Archives: PAK and PK3 files in your Quake folder. They’re read-only here. Files from qw archives can be copied to Assets: select them and right-click.'}" />
+      </Border>
+      <TreeView x:Name="ArchiveTree" SelectionMode="Single">
+        <TreeView.ItemContainerTheme>
+          <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+            <Setter Property="IsExpanded" Value="True" />
+          </ControlTheme>
+        </TreeView.ItemContainerTheme>
+        <TreeView.ItemTemplate>
+          <TreeDataTemplate x:DataType="local:ArchiveTreeNode" ItemsSource="{Binding Children}">
+            <Grid ColumnDefinitions="Auto,*,Auto" Background="Transparent">
+              <TextBlock Text="{Binding Icon}" Margin="0,0,8,0" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="2" Text="{Binding Badge}" Classes="badge" Margin="8,0,0,0" />
+            </Grid>
+          </TreeDataTemplate>
+        </TreeView.ItemTemplate>
+      </TreeView>
+    </DockPanel>
+
+    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="{DynamicResource SystemControlForegroundBaseLowBrush}" Width="1" />
+
+    <DockPanel Grid.Column="2">
+      <Border DockPanel.Dock="Top" Classes="headerbar">
+        <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+          <TextBlock x:Name="ArchiveHeader" Classes="header" Text="{local:T 'Pick an archive'}" />
+          <TextBox x:Name="FilterBox" Grid.Column="2" Width="170" Watermark="{local:T 'Filter, e.g. textures/'}"
+                   Margin="8,0,0,0" ToolTip.Tip="{local:T 'Show only entries whose path contains this text'}" />
+          <Button x:Name="ExtractSelected" Grid.Column="3" Content="{local:T 'Copy selected'}" Margin="6,0,0,0"
+                  ToolTip.Tip="{local:T 'Copy the selected files to their asset type folders in Assets'}" />
+          <Button x:Name="ExtractAll" Grid.Column="4" Content="{local:T 'Copy all to Assets'}" Margin="6,0,0,0"
+                  ToolTip.Tip="{local:T 'Copy every file of this archive that belongs to a shown asset type to Assets'}" />
+        </Grid>
+      </Border>
+      <Border DockPanel.Dock="Top" Classes="help">
+        <TextBlock Text="{local:T 'Files inside the selected archive. Images and Quake palette files (.mdl skins, .lmp, WAD lumps) can be previewed. Copying puts files in assets\&lt;type&gt;\&lt;archive name&gt;, skips files already in Assets, and shows a summary first.'}" />
+      </Border>
+      <TextBlock x:Name="ExtractNote" DockPanel.Dock="Top" Classes="muted" Margin="10,6" TextWrapping="Wrap" />
+      <ListBox x:Name="EntryList" SelectionMode="Multiple">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="local:ArchiveItem">
+            <Grid ColumnDefinitions="Auto,*,Auto,62,62" Background="Transparent">
+              <Border Classes="thumb">
+                <Image Source="{Binding Thumbnail}" Stretch="Uniform" RenderOptions.BitmapInterpolationMode="None" />
+              </Border>
+              <TextBlock Grid.Column="1" Text="{Binding DisplayPath}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="2" Text="{Binding Badge}" Classes="badge" Margin="8,0" />
+              <TextBlock Grid.Column="3" Text="{Binding SizeText}" Classes="badge" HorizontalAlignment="Right" />
+              <TextBlock Grid.Column="4" Text="{Binding ModifiedText}" Classes="date" ToolTip.Tip="{Binding ModifiedTip}" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <GridSplitter Grid.Column="3" ResizeDirection="Columns" Background="{DynamicResource SystemControlForegroundBaseLowBrush}" Width="1" />
+
+    <local:PreviewPanel x:Name="Preview" Grid.Column="4" />
+  </Grid>
+</UserControl>

@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:QuakeAssetManager"
+             x:Class="QuakeAssetManager.SetupView">
+  <ScrollViewer>
+    <Border HorizontalAlignment="Center" VerticalAlignment="Top" Width="640" Margin="20,24,20,20"
+            Padding="24,20" CornerRadius="10" BorderThickness="1"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+      <StackPanel>
+        <TextBlock x:Name="Title" FontSize="18" FontWeight="SemiBold" />
+        <TextBlock x:Name="Subtitle" Classes="muted" TextWrapping="Wrap" Margin="0,4,0,10" />
+
+        <Border x:Name="Banner" Classes="banner">
+          <TextBlock x:Name="BannerText" TextWrapping="Wrap" />
+        </Border>
+
+        <TabControl x:Name="Tabs" Padding="0,8,0,0">
+          <TabItem Header="{local:T 'General'}">
+            <StackPanel>
+              <TextBlock Classes="muted" Text="{local:T 'Quake folder'}" Margin="0,0,0,4" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="QuakeBox" Watermark="C:\Games\nQuake"
+                         ToolTip.Tip="{local:T 'The folder that contains id1 and qw.'}" />
+                <Button x:Name="QuakeBrowse" Grid.Column="1" Content="{local:T 'Browse…'}" Margin="6,0,0,0" />
+              </Grid>
+              <TextBlock x:Name="QuakeError" Classes="error" Margin="0,4,0,0" />
+              <TextBlock x:Name="QuakeOk" Classes="ok" Margin="0,4,0,0" Text="{local:T 'Found id1 and qw.'}" />
+
+              <Border x:Name="MissingPanel" Classes="banner" Margin="0,8,0,0">
+                <StackPanel Spacing="6">
+                  <TextBlock x:Name="MissingText" TextWrapping="Wrap" />
+                  <Button x:Name="CreateMissing" Content="{local:T 'Create missing folders'}" />
+                </StackPanel>
+              </Border>
+
+              <TextBlock Classes="muted" Text="{local:T 'Assets folder (archive)'}" Margin="0,14,0,4" />
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBox x:Name="AssetsBox" Watermark="C:\Games\nQuake\assets"
+                         ToolTip.Tip="{local:T 'Where the app keeps a copy of every asset. The game does not load this folder.'}" />
+                <Button x:Name="AssetsBrowse" Grid.Column="1" Content="{local:T 'Browse…'}" Margin="6,0,0,0" />
+              </Grid>
+              <TextBlock x:Name="AssetsError" Classes="error" Margin="0,4,0,0" />
+              <TextBlock x:Name="AssetsNote" Classes="muted" Margin="0,4,0,0" TextWrapping="Wrap" />
+
+              <TextBlock Classes="muted" Text="{local:T 'Client'}" Margin="0,14,0,4" />
+              <ComboBox x:Name="ClientBox" HorizontalAlignment="Stretch" PlaceholderText="{local:T 'Choose a client…'}"
+                        ToolTip.Tip="{local:T 'Programs found in the Quake folder.'}" />
+              <TextBlock x:Name="ClientError" Classes="error" Margin="0,4,0,0" />
+
+              <TextBlock Classes="muted" Text="{local:T 'Map to open'}" Margin="0,14,0,4" />
+              <TextBox x:Name="MapBox" Text="dm4" />
+              <TextBlock x:Name="MapError" Classes="error" Margin="0,4,0,0" />
+              <TextBlock x:Name="CommandText" Classes="muted" Margin="0,4,0,0" />
+
+              <TextBlock Classes="muted" Text="{local:T 'Language'}" Margin="0,14,0,4" />
+              <ComboBox x:Name="LanguageBox" HorizontalAlignment="Stretch"
+                        ToolTip.Tip="{local:T 'The language of the app. Folder names, file names and asset type names stay as they are.'}" />
+            </StackPanel>
+          </TabItem>
+
+          <TabItem Header="{local:T 'Asset types'}">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="muted" TextWrapping="Wrap"
+                         Text="{local:T 'Choose which asset types have a tab. Hidden types are still recognised when you drop files. Everything about a type (folders, extensions, valid names, online lists) is in the configuration files below; restart the app after editing them.'}" />
+              <ItemsControl x:Name="TypeList">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="local:TypeRow">
+                    <Border BorderThickness="0,0,0,1" Padding="0,6"
+                            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+                      <Grid ColumnDefinitions="Auto,*">
+                        <CheckBox IsChecked="{Binding Visible}" VerticalAlignment="Top" ToolTip.Tip="{Binding ShowTip}" />
+                        <StackPanel Grid.Column="1" Spacing="2">
+                          <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                          <TextBlock Text="{Binding Description}" Classes="muted" TextWrapping="Wrap" />
+                          <TextBlock Text="{Binding Folders}" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+                        </StackPanel>
+                      </Grid>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock x:Name="ConfigPath" Classes="muted" FontSize="11" TextWrapping="Wrap" />
+              <StackPanel Orientation="Horizontal" Spacing="6">
+                <Button x:Name="OpenConfig" Content="{local:T 'Open configuration folder'}" />
+                <Button x:Name="ShowAll" Content="{local:T 'Show all'}" />
+                <Button x:Name="ShowDefaults" Content="{local:T 'Only the default five'}" />
+                <Button x:Name="RescanSubfolders" Content="{local:T 'Look for subfolders again'}"
+                        ToolTip.Tip="{local:T 'Offer again the subfolders found in the game folders, including ones you skipped'}" />
+              </StackPanel>
+            </StackPanel>
+          </TabItem>
+        </TabControl>
+
+        <Grid ColumnDefinitions="*,Auto" Margin="0,20,0,0">
+          <TextBlock Classes="muted" VerticalAlignment="Center" Text="{local:T 'Enter: save · Tab: next field'}" />
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+            <Button x:Name="CancelButton" Content="{local:T 'Cancel'}" />
+            <Button x:Name="SaveButton" Classes="accent" />
+          </StackPanel>
+        </Grid>
+      </StackPanel>
+    </Border>
+  </ScrollViewer>
+</UserControl>

@@ -1,0 +1,314 @@
+0|# Miten asiakasohjelma löytää tiedoston
+1|• **Hakujärjestys:** ezQuake etsii kansioista `id1`, sitten `ezquake` ja lopuksi `qw`. Myöhemmän kansion tiedosto voittaa.
+2|• **Irralliset tiedostot voittavat:** pelikansiossa irrallinen tiedosto voittaa saman tiedoston, joka on `.pak`- tai `.pk3`-paketissa.
+3|• **Kuvamuodot:** asiakasohjelma kokeilee järjestyksessä `.tga`, `.png`, `.jpg` ja `.pcx`. Ensimmäinen löytynyt voittaa, joten samannimistä `.png`-tiedostoa `.tga`-tiedoston vieressä ei koskaan käytetä.
+4|• **Linkit:** tekstitiedosto `<name>.link` voi osoittaa toiseen kuvaan (sen ensimmäinen rivi on polku kansiossa `textures/`).
+5|• **Erikoismerkit:** tiedostonimissä `*` muuttuu muotoon `#`. Siksi veden, laavan ja liman tekstuurien nimet ovat esimerkiksi `#water1.png`.
+6|• **Hehkukerrokset:** `_luma`-tiedostot lisäävät hehkuvan (fullbright) kerroksen. Niitä käyttävät vain mallien skinit sekä karttojen ja laatikoiden tekstuurit; `_glow`-tiedostoja ei koskaan ladata.
+7|• **Kirjainkoko:** Linuxissa nimissä kirjainkoolla on merkitystä, joten sovellus kopioi tiedostot peliin aina pienillä kirjaimilla.
+8|• **Alikansiot:** tekstuurikansion alikansioita ei ladata (siksi ”original”-kansioilla ei ole vaikutusta).
+9|# Oletuksena näytettävät resurssityypit
+10|• **Models** (`qw/textures/models`): `<model>_<skin>`, esim. `armor_0`, `armor_1`, `armor_2` (panssarilla on 3 skiniä; useimmilla malleilla 1). `_luma` valinnainen. Animoidut skinit käyttävät muotoa `<model>_<skin>_<frame>`; yksinkertaiset esineet muotoa `simple_<model>_<n>`. `eyes.mdl` ei koskaan käytä korvaavia skinejä.
+11|• **BModels** (`qw/textures/bmodels`): terveys- ja ammuslaatikot (`maps/b_*.bsp`), nimetty niiden sisältämien tekstuurien mukaan: `med3_0`, `med100`, `+0_med25` (animaatiokuvat säilyttävät `+0_`-etuliitteen), `shot0sid`, `rockettop`… Yksinkertaiset esineet: `simple_b_bh100_0`.
+12|• **HUD** (`qw/textures/wad`): tilapalkin kuvat tiedostosta `gfx.wad`, kiinteä luettelo: `num_0`..`9`, `anum_0`..`9`, `sb_*`, `face1`..`5`, asekuvakkeet `inv_*`, `ibar`, `sbar`, `scorebar`, `disc`, `ram`, `net`, `turtle`, `backtile`. Ei koskaan ladata: `anum_colon`, `inv_rocket`, `conchars`.
+13|• **Tracker** (`qw/textures/tracker`): frag trackerin asekuvakkeet. Nimet tulevat tiedoston `fragfile.dat` WEAPON_CLASS-riveiltä, esim. `\rl\` lataa tiedoston `textures/tracker/rl`.
+14|• **Particles** (`qw/textures/particles`): yksi tiedosto, `particlefont`: 256×192-kokoinen atlas, joka jaetaan veri-, savu-, laava-, välähdys-, kupla- ja kipinähiukkasiksi.
+15|# Muut resurssityypit (oletuksena piilossa, ota ne käyttöön asetuksista)
+16|• **Crosshairs** (`qw/crosshairs`): mikä tahansa kuvan nimi, valitaan asetuksella `crosshairimage`.
+17|• **Skyboxes** (`qw/env`, myös `gfx/env`): `<sky>` ja perään `rt`, `bk`, `lf`, `ft`, `up`, `dn` (kaikki 6 sivua). Taivaan `_wind.cfg` luetaan vain kansiosta `gfx/env`.
+19|• **Charsets** (`qw/textures/charsets`): konsolin fontit, mikä tahansa nimi, valitaan asetuksella `gl_consolefont`.
+20|• **Levelshots** (`qw/textures/levelshots`): kunkin kartan latauskuva, nimetty kartan mukaan.
+21|• **Skins** (`qw/skins`): pelaajien skinit, mikä tahansa nimi. Kokeilee `.tga`, `.png`, `.jpg` ja sitten `.pcx`; muuten käytetään `base`-skiniä.
+23|# Sovellus ei hallitse näitä
+24|• **Sounds** (`qw/sound`): tarkat polut alikansioineen; `.ogg` ei koskaan korvaa pyydettyä `.wav`-tiedostoa.
+27|• **Map textures** (`qw/textures/<map>/`): haetaan kartan mukaan, sitten karttaryhmän mukaan ja lopuksi kansiosta `textures/`.
+28|Odottamaton virhe:
+29|luetaan…
+30|Tiedostoa {0} ei voitu lukea:
+31|Valitse vasemmalta paketti nähdäksesi sen sisällön.
+32|Täällä on {0} tiedostoa, jotka kuuluvat tunnettuun resurssityyppiin ja voidaan kopioida kohteeseen {1}. Valitse useita pitämällä Ctrl- tai Vaihto-näppäintä painettuna ja napsauta sitten hiiren kakkospainikkeella.
+33|Paketissa ei ole tiedostoja, jotka sovellus tunnistaa.
+34|Vain selaus. Vain qw-kansion paketteja voi kopioida Assets-kansioon.
+35|Liian suuri esikatseltavaksi.
+36|piilotettu
+37|Vain selaus: vain qw-kansion paketteja voi kopioida Assets-kansioon
+38|Kopioi Assets-kansioon: {0}
+41|Kopioi tyyppien omiin kansioihin ({0})
+42|Kopioi vain {0} ({1})
+44|Valituille tiedostoille ei ole tunnettua resurssityyppiä
+45|Kopioi Assets-kansioon
+46|Vain qw-kansion paketteja voi kopioida Assets-kansioon.
+47|Valitse ensin kopioitavat tiedostot.
+48|Roskakori
+49|roskakori
+50|Luotu: {0}.
+51|Aktiivinen
+52|Kansioita ei voitu lukea:
+53|Pelikansiota {0} ei ole vielä olemassa, joten tyypille {1} ei ole ladattu mitään.
+55|Pelikansiossa on piilotettu {0} virheellistä tiedostoa tai kansiota
+56|{0} tiedostoa on suoraan kansiossa {1}; siirrä ne johonkin kansioon
+57|{0} sisältää: {1}. Peli ei lataa alikansioita.
+58|Pelikansiossa ei ole mitään; peli käyttää sisäänrakennettua tekstuuria.
+59|Siirrä Assets-kansioon…
+60|Poista
+61|Avaa kansio
+62|Siirretäänkö {0} kohteeseen: {1}?
+65|Siirretty: {0} → {1}.
+66|Käytä näitä
+67|Nimeä uudelleen…
+68|Käytä tätä tiedostoa
+69|{0} on nyt pelissä.
+70|Siirrä kansioon…
+71|Jokin meni vikaan
+72|Siirrä Assets-kansioon: {0}
+73|Siirrä
+74|Siirretty: {0} → {1}.
+75|Siirrä: {0}
+76|Nimeä uudelleen: {0}
+77|Nimeä uudelleen
+78|Peli ei koskaan lataa nimeä ”{0}”, joten tätä tiedostoa ei voi enää käyttää. Nimetäänkö silti?
+79|Nimetty uudelleen: {0} → {1}.
+80|Luo ensin pelikansio {0}.
+81|Kansiossa ”{0}” ei ole kelvollisia {1}-tiedostoja käytettäväksi.
+83|Kopioitu peliin: {0} kansiosta {1}.
+84|Uusi kansio
+85|Kansio on jo olemassa.
+86|Luo
+87|Enter: {0}
+88|Esc: peruuta
+89|Sarkain: seuraava
+90|Peruuta
+91|OK
+92|Enter tai Esc: sulje
+93|Nykyinen nimi: {0}
+94|Uusi nimi
+95|Nimi
+96|Ehdotettu lähimmän kelvollisen nimen perusteella
+97|Kansion nimi
+98|Kansio:
+99|Tiedoston nimi:
+100|Kansio (valitse tai kirjoita uusi nimi)
+101|Tiedoston nimi
+102|Lisätty lähteestä {0}
+104|Jo Assets-kansiossa
+105|{0} ohitettu
+106|Sovellus ei hallitse
+107|Ohitetut
+108|Virhe:
+109|Näytä ohitetut tiedostot
+110|Mitään ei lisätty: mikään tiedosto ei vastannut nimeä, jonka peli lataa näytetyille resurssityypeille.
+111|Peru tuonti
+112|Älä lisää näitä tiedostoja Assets-kansioon
+113|nimi sopii usealle resurssityypille
+114|Tietoja: Quake Asset Manager
+115|Sulje
+116|Versio {0}
+117|Vibe-koodattu Clauden kanssa
+118|Sovelluksen tarkoitus on auttaa hallitsemaan Quaken resursseja, joita ei voi määrittää asiakasohjelmassa. Resurssit, kuten HUD-kuvakkeet ja mallien tekstuurit, vaativat tietyn tiedostonimen tietyssä kansiossa. Sovellus hoitaa ne luomalla ja säilyttämällä vaihtoehtoisista resursseista kopion toisessa kansiossa ja vaihtamalla Quake-kansiosi resurssit yhdellä napsautuksella.
+119|Toivottavasti siitä on sinulle hyötyä.
+120|Rakkaudella tehnyt mushi
+122|Tietoa QuakeWorldin resursseista
+138|Tiedostoa ei löytynyt
+139|liian suuri esikatseltavaksi
+140|Osoittaa kohteeseen {0}
+141|Ei esikatselua: Quaken palettia (gfx/palette.lmp) ei löytynyt.
+142|Kuvaa ei voitu lukea.
+143|Tälle tiedostotyypille ei ole esikatselua.
+145|ei ladata
+146|virheellinen
+147|Peli ei lataa alikansioita. Napsauta hiiren kakkospainikkeella siirtääksesi sen Assets-kansioon tai poistaaksesi sen.
+148|Peli ei koskaan lataa tätä nimeä. Napsauta hiiren kakkospainikkeella siirtääksesi sen Assets-kansioon tai poistaaksesi sen.
+151|sisäkkäinen · ei käytettävissä
+152|pelissä
+153|Vaihtoehtokansio. Napsauta hiiren kakkospainikkeella käyttääksesi kaikkia sen tiedostoja, nimetäksesi sen uudelleen tai poistaaksesi sen.
+154|Sisäkkäisten kansioiden tiedostoja ei voi käyttää. Siirrä ne vaihtoehtokansioon.
+155|Napsauta hiiren kakkospainikkeella ja valitse ”Käytä tätä tiedostoa” kopioidaksesi sen peliin.
+156|Peli ei koskaan lataa tätä nimeä. Napsauta hiiren kakkospainikkeella nimetäksesi sen uudelleen, siirtääksesi tai poistaaksesi sen.
+157|kopioi Assets-kansioon
+158|vain selaus
+159|WAD-osa
+160|PAK-tiedostot eivät tallenna päivämääriä
+161|Eilen
+162|Viime viikolla
+163|Viime kuussa
+164|Viime vuonna
+165|1 tiedosto
+168|{0} tiedostoa
+169|Testaa
+170|Asetukset
+171|Asetuksia ei voitu tallentaa:
+172|Quake-kansiota ei voitu lukea
+173|Quaken palettia ei löytynyt, joten PAK-kuvia ei voi esikatsella.
+174|Määritykset
+175|Keskeneräinen tuonti
+176|Tuontia lähteestä ”{0}” ei vahvistettu ennen sovelluksen sulkemista ({1}). Lisätäänkö tiedostot Assets-kansioon?
+177|Lisää Assets-kansioon
+178|Luetaan tiedostoja…
+179|Lähteestä {0} ei lisätty mitään.
+180|Tuonti
+181|Tiedostoja ei voitu lukea:
+182|Lisätty Assets-kansioon: {0} lähteestä {1}.
+183|Joitakin tiedostoja ei voitu siirtää Assets-kansioon:
+186|kopioitu Assets-kansioon: {0} ({1} oli jo siellä).
+187|Tämän Quake-kansion ensimmäinen tarkistus:
+188|Tarkistus:
+189|kaikki on jo Assets-kansiossa.
+190|Uudet kansiot: {0}.
+191|Kopioitu pelikansiosta Assets-kansioon: {0}.
+192|Uusia tiedostoja ei voitu kopioida Assets-kansioon:
+193|Tarkista ensin asetukset:
+194|Käynnistetty: {0}
+195|Ohjelmaa {0} ei voitu käynnistää:
+196|Verkossa: tyypin {0} resurssit sivustolta {1}. Valitse resurssi nähdäksesi tiedot ja valitse sitten Lataa Assets-kansioon. Mitään ei lisätä ennen kuin painat yhteenvedossa OK.
+197|Valitse kohde nähdäksesi sen tiedot.
+198|Tyypille {0} ei ole vielä verkkolähdettä.
+199|Sivustolla {0} ei ole luetteloa tyypille {1}. Luetteloita voi lisätä tämän tyypin kohtaan ”online” tiedostossa asset-types.json.
+200|Täällä ei ole vielä mitään.
+201|Tämä sivuston luettelo on tyhjä.
+202|Ladataan tietoja…
+203|Avaa sivu selaimessa
+204|{0} latausta
+205|Lataa uudelleen Assets-kansioon
+206|Lataa Assets-kansioon
+207|Ladataan: {0}…
+208|Lataa
+209|Sivustoon {0} ei saada nyt yhteyttä.
+210|Tarkista internetyhteys ja yritä uudelleen.
+211|Sivusto {0} palautti sivun, jota sovellus ei tunnista.
+212|Sivusto on ehkä muuttunut; sovellus täytyy päivittää, jotta se osaa lukea sen.
+213|Valitse tiedosto esikatsellaksesi sitä.
+214|Muokattu {0}
+215|Pelikansio: {0} · Assets-kansio: {1} · Nimet: {2}
+216|Näytä tämä resurssityyppi välilehtenä
+217|Valitse Quake-kansiosi
+218|Valitse Assets-kansio
+219|Quake Asset Managerin käyttöönotto
+220|Kaikki asetukset ovat pakollisia. Voit käyttää sovellusta, kun kaikki kentät on täytetty.
+221|Kaikki asetukset ovat pakollisia.
+222|Tallenna ja jatka
+223|Määrityskansio: {0}
+224|Jokainen resurssityyppi saa tänne oman kansionsa.
+225|Kansio luodaan, kun tallennat.
+226|Quake-kansiosta ei löytynyt ohjelmia.
+227|Suorittaa: {0} +map {1}
+228|Näitä pelikansioita ei ole vielä olemassa, joten niiden välilehdet eivät voi näyttää mitään:
+229|1 asetus tarvitsee vielä arvon.
+230|{0} asetusta tarvitsee vielä arvon.
+231|Kansioita ei voitu luoda:
+232|Tätä kansiota ei voi luoda:
+233|Puuttuvat pelikansiot
+234|Näitä pelikansioita ei ole olemassa:
+235|Luodaanko ne nyt? Voit luoda ne myöhemmin myös kultakin välilehdeltä.
+236|Paketit
+237|Paketit: Quake-kansiosi PAK- ja PK3-tiedostot. Ne ovat täällä vain luku -tilassa. qw-pakettien tiedostoja voi kopioida Assets-kansioon: valitse ne ja napsauta hiiren kakkospainikkeella.
+238|Valitse paketti
+239|Suodata, esim. textures/
+240|Näytä vain kohteet, joiden polku sisältää tämän tekstin
+241|Kopioi valitut
+242|Kopioi valitut tiedostot tyyppiensä kansioihin Assets-kansiossa
+243|Kopioi kaikki Assets-kansioon
+244|Kopioi Assets-kansioon kaikki paketin tiedostot, jotka kuuluvat näytettyyn resurssityyppiin
+245|Valitun paketin tiedostot. Kuvia ja Quaken palettia käyttäviä tiedostoja (.mdl-skinit, .lmp, WAD-osat) voi esikatsella. Kopiointi vie tiedostot kansioon assets\<type>\<archive name>, ohittaa jo Assets-kansiossa olevat ja näyttää ensin yhteenvedon.
+246|Avaa kansio tiedostonhallinnassa
+247|Näytä virheelliset
+248|Näytä myös tiedostot, joita peli ei koskaan lataa, sekä alikansiot
+249|Aktiivinen: tämä on Quake-kansiosi. Peli käyttää täällä olevia tiedostoja. Värillinen merkintä kertoo, mistä kukin tiedosto tuli: alkuperäinen (oli jo siellä), lähde: <folder> (sovelluksen sijoittama) tai virheellinen.
+250|Luo kansio
+251|Paikallinen
+252|Tämän tyypin resurssien paikalliset kopiosi (Assets-kansio)
+253|Verkossa
+254|Selaa ja lataa tämän tyypin resursseja sivustolta gfx.quakeworld.nu
+255|Luo vaihtoehtokansio
+256|Assets: vaihtoehtojesi varasto. Peli ei lataa näitä. Napsauta hiiren kakkospainikkeella tai käytä esikatselun alla olevia painikkeita: Käytä tätä tiedostoa, Käytä näitä (koko kansio), Nimeä uudelleen, Poista. Voit myös pudottaa ikkunaan zip/rar/7z-tiedostoja, kansioita tai kuvia.
+257|Selaa PAK- ja PK3-tiedostoja. Kopioi tiedostoja qw-paketeista Assets-kansioon.
+258|Käynnistä asiakasohjelma asetusten kartalla nähdäksesi muutoksesi.
+259|Asetukset: Quake-kansio, Assets-kansio, asiakasohjelma ja kartta.
+260|Ohje: selittää ikkunan jokaisen osan.
+261|Kukin resurssityypin välilehti hallitsee yhtä kansiota, josta peli lataa tiedostoja. Paketit: selaa PAK- ja PK3-tiedostoja. Pudota zip/rar/7z-tiedostoja, kansioita tai kuvia mihin tahansa lisätäksesi ne Assets-kansioon.
+262|Testaa: käynnistää asiakasohjelman asetusten kartalla, jotta näet muutoksesi pelissä.
+263|Asetukset: Quake-kansiosi, Assets-kansio, asiakasohjelma ja testikartta.
+264|Luetaan pelin tietoja…
+265|Pudota lisätäksesi Assets-kansioon
+266|zip, pk3, rar, 7z, tar.gz, kansiot tai kuvat. Näet yhteenvedon ennen kuin mitään lisätään.
+267|Mitä sivuston luetteloa selataan
+268|Edellinen sivu
+269|Seuraava sivu
+270|Verkossa: tämän välilehden resurssit sivustolta gfx.quakeworld.nu. Valitse resurssi nähdäksesi tiedot ja valitse sitten Lataa Assets-kansioon. Mitään ei lisätä ennen kuin painat yhteenvedossa OK.
+271|Yritä uudelleen
+272|Avaa sivusto selaimessa
+273|Ladataan…
+274|Ladattu jo
+275|Esikatselu
+276|Valitun tiedoston esikatselu ja sille tehtävät toiminnot. Kun valitset vaihtoehdon Assets-kansiosta, pelin nyt käyttämä versio näkyy sen alla.
+277|Pelissä nyt
+278|Yleiset
+279|Quake-kansio
+280|Kansio, jossa ovat id1 ja qw.
+281|Selaa…
+282|id1 ja qw löytyivät.
+283|Luo puuttuvat kansiot
+284|Assets-kansio (arkisto)
+285|Kansio, johon sovellus tallentaa kopion jokaisesta resurssista. Peli ei lataa tätä kansiota.
+286|Asiakasohjelma
+287|Valitse asiakasohjelma…
+288|Quake-kansiosta löytyneet ohjelmat.
+289|Avattava kartta
+290|Kieli
+291|Sovelluksen kieli. Kansioiden, tiedostojen ja resurssityyppien nimet pysyvät ennallaan.
+292|Resurssityypit
+293|Valitse, millä resurssityypeillä on välilehti. Piilotetut tyypit tunnistetaan silti, kun pudotat tiedostoja. Kaikki tyyppiä koskeva (kansiot, tiedostopäätteet, kelvolliset nimet, verkkoluettelot) on alla olevissa määritystiedostoissa; käynnistä sovellus uudelleen niiden muokkaamisen jälkeen.
+294|Avaa määrityskansio
+295|Näytä kaikki
+296|Vain viisi oletustyyppiä
+299|Enter: tallenna · Sarkain: seuraava kenttä
+300|Valitse Quake-kansiosi.
+301|Tätä kansiota ei ole olemassa.
+302|Tämä ei ole Quake-kansio. Siinä on oltava kansiot id1 ja qw.
+303|Valitse, mihin resurssiesi kopiot tallennetaan.
+304|Käytä täydellistä polkua.
+305|Assets-kansio ei voi olla kansiossa qw\textures, muuten peli lataisi sen.
+306|Valitse ohjelma, joka käynnistetään, kun painat Testaa.
+307|Tätä ohjelmaa ei ole enää Quake-kansiossa.
+308|Kirjoita kartan nimi, esim. dm4.
+309|Kartan nimessä ei voi olla välilyöntejä.
+311|Kirjoita nimi.
+312|Nimi ei ole sallittu.
+313|Nimessä ei voi olla merkkejä / \ : * ? " < > |
+314|peli ei lataa tätä nimeä
+315|tiedostotyyppiä ei tueta
+316|ei löytynyt
+18|• **Gfx** (`qw/gfx`): konsolin tausta (`conback` tai asetuksen `scr_conpicture` nimi), valikkokuvat ja hiiren osoitin. Tiedoston `gfx/conback.lmp` on oltava olemassa, muuten peli ei käynnisty.
+22|• **Progs** (`qw/progs`): mallit ja spritet, mikä tahansa nimi. Samanniminen `.md3` korvaa `.mdl`-tiedoston.
+25|• **Maps** (`qw/maps`): `<map>.bsp` sekä lisätiedostot; esinelaatikot (`b_*.bsp`) ovat myös täällä.
+26|• **Lits ja Locs** (`qw/lits`, `qw/locs`): värillinen valaistus (`<map>.lit`) ja paikkojen nimet joukkuepeliin (`<map>.loc`).
+39|valitset resurssityypin itse
+40|valittavana: {0}
+43|Kansioissa, joita sovellus ei hallitse (jätetään pois): {0}
+54|Pelikansiossa on piilotettu 1 virheellinen tiedosto tai kansio
+63|Siirretäänkö {0} kohteeseen: {1}? Peli käyttää sisäänrakennettua versiotaan.
+64|Siirretty kohteeseen {2}: {0} ja Assets-kansiosta {1}.
+82|virheellisiä, ohitettu: {0}
+103|{0} nimillä, joita peli ei lataa (merkitty virheellisiksi)
+121|Kuvake: {0}
+123|Ohita
+124|Minne nämä tiedostot laitetaan?
+125|Lähteessä {0} on tiedostoja kansioissa, joita sovellus ei osaa sijoittaa itse. Valitse kullekin kansiolle resurssityyppi tai Ohita.
+126|(paketin juuri)
+127|ehdotettu tiedostonimien perusteella
+128|Jatka
+129|Löytyi kansioita, joissa on vaihtoehtoisia resursseja
+130|Peli ei lataa alikansioita, joten ne ovat yleensä vaihtoehtoisia versioita. Valitse Assets-kansioon kopioitavat; kukin säilyttää nimensä.
+131|Älä kysy uudelleen kansioista, joita en valitse
+132|Kopioi
+133|Kopioi ja poista
+134|Kopioi ja siirrä sitten alkuperäiset kansiot Quake-kansiostasi roskakoriin
+135|Esc: {0}
+136|Poista myös kopiot Assets-kansiosta ({0})
+137|Tästä tiedostosta ei ole kopiota Assets-kansiossa: tämä on ainoa kopio.
+144|Kansiota ei voitu avata: {0}
+149|Peli käyttää tätä. Ei vielä Assets-kansiossa.
+150|Peli käyttää tätä. Kopio on Assets-kansiossa ”{0}”.
+184|Pelikansioista ei löytynyt alikansioita.
+185|Kopioinnin jälkeen nämä kansiot siirretään Quake-kansiostasi roskakoriin:
+297|Etsi alikansioita uudelleen
+298|Tarjoa uudelleen pelikansioista löytyneet alikansiot, myös ne, jotka ohitit

@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:QuakeAssetManager"
+             x:Class="QuakeAssetManager.OnlineView">
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Classes="headerbar">
+      <Grid ColumnDefinitions="*,Auto,Auto,Auto">
+        <ComboBox x:Name="SourceBox" HorizontalAlignment="Stretch" MinWidth="160"
+                  ToolTip.Tip="{local:T 'Which list on the website to browse'}" />
+        <Button x:Name="PrevButton" Grid.Column="1" Classes="icon" Content="‹" Margin="6,0,0,0" ToolTip.Tip="{local:T 'Previous page'}" />
+        <TextBlock x:Name="PageText" Grid.Column="2" Classes="muted" VerticalAlignment="Center" Margin="6,0" />
+        <Button x:Name="NextButton" Grid.Column="3" Classes="icon" Content="›" ToolTip.Tip="{local:T 'Next page'}" />
+      </Grid>
+    </Border>
+    <Border DockPanel.Dock="Top" Classes="help">
+      <TextBlock x:Name="HelpText" Text="{local:T 'Online: assets from gfx.quakeworld.nu for this tab. Select one to see its details, then Download to assets. Nothing is added until you press OK in the summary.'}" />
+    </Border>
+
+    <Border x:Name="MessagePanel" DockPanel.Dock="Top" Classes="missing" IsVisible="False">
+      <StackPanel Spacing="8">
+        <TextBlock x:Name="MessageTitle" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+        <StackPanel x:Name="MessageButtons" Orientation="Horizontal" Spacing="6">
+          <Button x:Name="RetryButton" Content="{local:T 'Retry'}" />
+          <Button x:Name="OpenSiteButton" Content="{local:T 'Open site in browser'}" />
+        </StackPanel>
+      </StackPanel>
+    </Border>
+
+    <Panel>
+      <TextBlock x:Name="LoadingText" Text="{local:T 'Loading…'}" Classes="muted" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="False" />
+      <ListBox x:Name="Grid" SelectionMode="Single" Background="Transparent">
+        <ListBox.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel Orientation="Horizontal" />
+          </ItemsPanelTemplate>
+        </ListBox.ItemsPanel>
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="local:OnlineItem">
+            <StackPanel Width="160" Spacing="4" ToolTip.Tip="{Binding Category}">
+              <Border Width="160" Height="120" CornerRadius="4" ClipToBounds="True" Background="#22808080">
+                <Image Source="{Binding Thumbnail}" Stretch="UniformToFill" />
+              </Border>
+              <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" FontSize="12" />
+                <TextBlock Grid.Column="1" Text="✓" Classes="badge ingame" IsVisible="{Binding Downloaded}"
+                           ToolTip.Tip="{local:T 'Already downloaded'}" Margin="4,0,0,0" />
+              </Grid>
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </Panel>
+  </DockPanel>
+</UserControl>

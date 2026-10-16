@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:QuakeAssetManager"
+        x:Class="QuakeAssetManager.MainWindow"
+        Title="Quake Asset Manager"
+        Icon="/Assets/icon.ico"
+        Width="1180" Height="760" MinWidth="820" MinHeight="520"
+        WindowStartupLocation="CenterScreen"
+        DragDrop.AllowDrop="True">
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Classes="headerbar">
+      <StackPanel>
+        <Grid ColumnDefinitions="*,Auto">
+          <WrapPanel x:Name="Tabs" Orientation="Horizontal">
+            <ToggleButton x:Name="TabArchives" Classes="tab" Content="{local:T 'Archives'}" Tag="archives"
+                          ToolTip.Tip="{local:T 'Browse PAK and PK3 files. Copy files from qw archives to Assets.'}" />
+          </WrapPanel>
+          <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Top">
+            <Button x:Name="TestButton" Content="▶  Test"
+                    ToolTip.Tip="{local:T 'Start the client on the map from Settings so you can see your changes.'}" />
+            <Button x:Name="SettingsButton" Classes="icon" Content="⚙"
+                    ToolTip.Tip="{local:T 'Settings: Quake folder, Assets folder, client and map.'}" />
+            <ToggleButton x:Name="HelpButton" Classes="icon" Content="?"
+                          ToolTip.Tip="{local:T 'Help: explain each area of the window.'}" />
+            <Button x:Name="AboutButton" Classes="icon" Content="ⓘ"
+                    ToolTip.Tip="{local:T 'About Quake Asset Manager'}" />
+          </StackPanel>
+        </Grid>
+        <WrapPanel HorizontalAlignment="Right">
+          <Border Classes="help" MaxWidth="300">
+            <TextBlock Text="{local:T 'Each asset type tab manages one folder the game loads files from. Archives: browse PAK and PK3 files. Drop zip/rar/7z files, folders or images anywhere to add them to Assets.'}" />
+          </Border>
+          <Border Classes="help" MaxWidth="260">
+            <TextBlock Text="{local:T 'Test: starts your client on the map from Settings, so you can see your changes in the game.'}" />
+          </Border>
+          <Border Classes="help" MaxWidth="220">
+            <TextBlock Text="{local:T 'Settings: your Quake folder, Assets folder, client and test map.'}" />
+          </Border>
+        </WrapPanel>
+      </StackPanel>
+    </Border>
+
+    <Border DockPanel.Dock="Bottom" Padding="10,4" BorderThickness="0,1,0,0"
+            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+      <Grid ColumnDefinitions="*,Auto">
+        <TextBlock x:Name="StatusText" Classes="muted" TextTrimming="CharacterEllipsis" />
+        <TextBlock x:Name="HintText" Grid.Column="1" Classes="muted" Margin="16,0,0,0" />
+      </Grid>
+    </Border>
+
+    <Panel>
+      <local:SetupView x:Name="Setup" IsVisible="False" />
+      <local:AssetView x:Name="Assets" IsVisible="False" />
+      <local:ArchivesView x:Name="Archives" IsVisible="False" />
+      <TextBlock x:Name="LoadingText" Text="{local:T 'Reading game data…'}" IsVisible="False"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" Classes="muted" />
+      <Border x:Name="DropOverlay" Classes="dropoverlay" IsVisible="False" IsHitTestVisible="False">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
+          <TextBlock Text="{local:T 'Drop to add to Assets'}" FontSize="22" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" />
+          <TextBlock Text="{local:T 'zip, pk3, rar, 7z, tar.gz, folders or image files. You’ll see a summary before anything is added.'}"
+                     Foreground="White" Opacity="0.8" HorizontalAlignment="Center" />
+        </StackPanel>
+      </Border>
+    </Panel>
+  </DockPanel>
+</Window>
