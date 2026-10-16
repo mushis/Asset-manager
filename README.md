@@ -10,6 +10,25 @@ The app does the juggling:
 - It keeps a copy of every version in an **Assets** folder.
 - It shows you which file the game uses now.
 - It swaps a file, or a whole set of files, into your Quake folder with one click.
+<table>
+  <tr>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/02a2c8cb-6c30-48a1-9d85-e85100a6746c" alt="Screenshot 1" width="100%">
+    </td>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/64451e99-7778-48ee-bf21-158da5a13560" alt="Screenshot 2" width="100%">
+    </td>
+  </tr>
+  <tr>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/e40d215b-55a8-4c7c-8e83-d885f216a2b2" alt="Screenshot 3" width="100%">
+    </td>
+    <td width="50%">
+      <img src="https://github.com/user-attachments/assets/64cde192-a429-4748-bd0c-82f9b2d48b55" alt="Screenshot 4" width="100%">
+    </td>
+  </tr>
+</table>
+
 
 ## Download
 
