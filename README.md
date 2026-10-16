@@ -1,8 +1,10 @@
 # Quake Asset Manager
 
-A desktop app for Windows and Linux that manages QuakeWorld (ezQuake) replacement assets: model skins, item boxes,
-HUD pictures, the frag tracker, particles and more. These assets aren't configurable in the client. Each one needs
-a specific file name in a specific folder, and switching between versions means juggling files by hand.
+A desktop app for Windows and Linux that manages QuakeWorld replacement assets: Assets are: **model skins, item boxes,
+HUD pictures, frag tracker, particles and more**. 
+
+## Why
+**Organize your own collection of assets that you have been downloading over the years (maybe even creating your own), on ONE folder, which is read by this app, and the app does the copying to your Quake installation(s), while keeping your archive safe.**
 
 The app does the juggling:
 - It keeps a copy of every version in an **Assets** folder.
@@ -23,9 +25,11 @@ You don't need to install .NET; the packages include everything. The app is port
 
 - **Asset types:** Models, BModels, HUD, Tracker and Particles are shown by default. Crosshairs, Skyboxes, Gfx,
   Charsets, Levelshots, Skins and Progs can be switched on in Settings.
+- **Configurable:** asset types, their folders, extensions and valid file names are JSON files you can edit
+  (see below).
 - **For each type:**
-  - **Active:** what the game loads now.
-  - **Local:** your Assets folder, with the file that's in the game marked "in game".
+  - **Active:** what the game loads now. Corresponds to the **currently selected game folder**.
+  - **Local:** your Assets folder, with the file that's in the game marked "in game". **Your archive.**
   - **Online:** browse and download from [gfx.quakeworld.nu](https://gfx.quakeworld.nu).
 - **Thumbnails and previews:** PNG, JPG, TGA and PCX, and Quake palette images (`.mdl` skins, `.lmp`, WAD lumps).
 - **Drag and drop:** zip, pk3, pak, rar, 7z and tar.gz archives, folders and images. Each file goes to the right
@@ -33,11 +37,11 @@ You don't need to install .NET; the packages include everything. The app is port
 - **Archives tab:** browse the PAK and PK3 files in your Quake folder, and copy files from the `qw` ones to Assets.
 - **Test:** starts your client on a chosen map so you can check your changes.
 - **Languages:** English, French, Spanish, Portuguese, Swedish, Finnish and Russian.
-- **Configurable:** asset types, their folders, extensions and valid file names are JSON files you can edit
-  (see below).
+
 
 ## Configuration
 
+**Drag and drop to the app** or **copy your existing folders** containing assets to the Quake assets folder you selected. 
 These files are in `config/` next to the app. If that folder can't be written to, they go in
 `%AppData%\QuakeAssetManager` on Windows or `~/.config/QuakeAssetManager` on Linux.
 
