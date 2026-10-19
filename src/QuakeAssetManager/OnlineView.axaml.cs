@@ -43,13 +43,12 @@ public partial class OnlineView : UserControl
     {
         var changed = _type != type || SourceBox.ItemCount == 0;
         _type = type;
-        HelpText.Text = Loc.F("Online: {0} assets from {1}. Select one to see its details, then Download to assets. Nothing is added until you press OK in the summary.", _type.DisplayName, Catalog.Name);
+        HelpText.Text = Loc.F("Online: browse {0} alternatives on {1}. Select one to see its details, then download it to your Local assets. You confirm before anything is added.", _type.DisplayName, Catalog.Name);
         _preview.Clear(Loc.T("Select an item to see its details."));
         if (!changed && _items.Count > 0)
             return;
         var sources = type.Online;
-        SourceBox.ItemsSource = sources;
-        SourceBox.DisplayMemberBinding = new Avalonia.Data.Binding(nameof(OnlineLink.Label));
+        SourceBox.ItemsSource = sources;   // shown by label (OnlineLink.ToString)
         if (sources.Count == 0)
         {
             _items.Clear();
@@ -142,7 +141,7 @@ public partial class OnlineView : UserControl
         if (details.SizeText is not null) facts.Add(details.SizeText);
         _preview.Show(new Preview(null, string.Join(" · ", facts), details.Description), title: item.Name, actions:
         [
-            new PreviewAction(item.Downloaded ? Loc.T("Download to assets again") : Loc.T("Download to assets"), () => _ = Download(item, details)),
+            new PreviewAction(item.Downloaded ? Loc.T("Download to Local assets again") : Loc.T("Download to Local assets"), () => _ = Download(item, details)),
             new PreviewAction(Loc.T("Open page in browser"), () => _ = OpenUrl(item.Item.DetailsUrl)),
         ]);
         try

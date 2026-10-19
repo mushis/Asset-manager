@@ -39,7 +39,8 @@ public abstract class ThumbItem : Observable
 }
 
 /// <summary>A row in the Active list: a file or a subfolder of qw/textures/&lt;type&gt;.</summary>
-public sealed class ActiveItem(ActiveEntry entry) : ThumbItem
+/// <param name="AnyName">The type accepts any name, so a client setting decides which file is used (Gfx, Crosshairs...).</param>
+public sealed class ActiveItem(ActiveEntry entry, bool anyName = false) : ThumbItem
 {
     public ActiveEntry Entry { get; } = entry;
     public string Name => Entry.IsFolder ? Entry.Name + Path.DirectorySeparatorChar : Entry.Name;
@@ -52,19 +53,15 @@ public sealed class ActiveItem(ActiveEntry entry) : ThumbItem
         : !Entry.IsValid ? Loc.T("invalid") : "";
 
     public bool BadgeIsBad => Entry.IsFolder || !Entry.IsValid;
-    public bool BadgeIsFrom => false;
-    public bool BadgeIsChanged => false;
-    public bool BadgeIsOriginal => false;
 
     public string ModifiedText => RelativeDate.Format(Entry.Modified);
     public string ModifiedTip => RelativeDate.Full(Entry.Modified);
 
     public string Tip => Entry.IsFolder
-        ? Loc.T("Subfolders aren't loaded by the game. Right-click to move it to Assets or delete it.")
-        : !Entry.IsValid ? Loc.T("The game never loads this name. Right-click to move it to Assets or delete it.")
-        : Entry.Backup is null
-            ? Loc.T("Used by the game. Not in Assets yet.")
-            : Loc.F("Used by the game. A copy is in assets folder \"{0}\".", Entry.Backup);
+        ? Loc.T("Subfolders aren't loaded by the game. Right-click to rename it, move it to Local assets or delete it.")
+        : !Entry.IsValid ? Loc.T("The game never loads this name. Right-click to rename it, mark it as valid, move it to Local assets or delete it.")
+        : (anyName ? Loc.T("Available to the game (the client setting decides which file is used).") : Loc.T("Used by the game.")) + " " +
+          (Entry.Backup is null ? Loc.T("Not in Local assets yet.") : Loc.F("A copy is in Local assets folder \"{0}\".", Entry.Backup));
 }
 
 /// <summary>A node in the Assets tree: a pack folder, a nested folder or a file.</summary>
@@ -85,28 +82,35 @@ public sealed class AssetNode : ThumbItem
     public bool IsExpanded { get => _isExpanded; set => Set(ref _isExpanded, value); }
     public override string? ThumbnailPath => IsFolder ? null : FullPath;
 
+    /// <summary>Files directly in this folder (shown in its label even while a filter hides some).</summary>
+    public int FileCount { get; init; }
+    /// <summary>Full path of the file or folder, shown in the tooltip.</summary>
+    public string Location { get; init; } = "";
+
     public string Icon => IsFolder ? "📁" : IsValid ? "🖼" : "⚠";
     public string Badge => IsFolder
-        ? (IsPack ? Loc.Files(Children.Count(c => !c.IsFolder)) : Loc.T("nested · not usable"))
+        ? (IsPack ? Loc.Files(FileCount) : Loc.Files(FileCount) + " · " + Loc.T("nested"))
         : IsActive ? Loc.T("in game") : IsValid ? "" : Loc.T("invalid");
     public bool BadgeIsInGame => !IsFolder && IsActive;
     public bool BadgeIsBad => IsInvalid;
     public string ModifiedText => RelativeDate.Format(Modified);
     public string ModifiedTip => RelativeDate.Full(Modified);
-    public string Tip => IsFolder
-        ? (IsPack ? Loc.T("An option folder. Right-click to use all its files, rename it or delete it.") : Loc.T("Files in nested folders can't be used. Move them into an option folder."))
+    public string Tip => (IsFolder
+        ? (IsPack ? Loc.T("A folder of alternatives. Right-click to use all its files, rename it or delete it.")
+                  : Loc.T("A folder inside a folder of alternatives. Right-click to use its files or move it to the root."))
         : IsValid ? Loc.T("Right-click and choose \"Use this file\" to copy it into the game.")
-        : Loc.T("The game never loads this name. Right-click to rename it, move it or delete it.");
+        : Loc.T("The game never loads this name. Right-click to rename it, mark it as valid, copy it to the game folder or delete it."))
+        + "\n" + Location;
 }
 
 public sealed class ArchiveTreeNode
 {
     public required string Name { get; init; }
     public string? ArchivePath { get; init; }
-    public bool CanExtract { get; init; }
     public ObservableCollection<ArchiveTreeNode> Children { get; } = [];
     public string Icon => ArchivePath is null ? "📁" : "🗜";
-    public string Badge => ArchivePath is null ? (CanExtract ? Loc.T("copy to assets") : Loc.T("browse only")) : "";
+    /// <summary>0.5: every archive can be copied from, so there's nothing to label.</summary>
+    public string Badge => "";
 }
 
 /// <summary>A file inside an archive. WAD files inside archives are expanded into their lumps.</summary>
@@ -116,11 +120,15 @@ public sealed class ArchiveItem : ThumbItem
     public required ArchiveEntry Entry { get; init; }
     public WadLump? Lump { get; init; }
     public WadFile? Wad { get; init; }
+    /// <summary>Where the file would go (filled in by the Archives view): an asset type, other, or asked.</summary>
+    public string Destination { get; init; } = "";
+    /// <summary>The asset type the file goes to (shown or hidden), from its folder in the archive.</summary>
+    public AssetType? Target { get; init; }
     public string DisplayPath => Lump is null ? Entry.Path : $"{Entry.Path}/{Lump.Name}";
     public string Name => Lump?.Name ?? Entry.Name;
     public string SizeText => Previews.Size(Lump?.Size ?? Entry.Size);
     public AssetType? Type => Lump is null ? AssetType.FromArchivePath(Entry.Path) : null;
-    public string Badge => Type is { } t ? $"→ assets\\{t.FolderName}" : Lump is not null ? Loc.T("WAD lump") : "";
+    public string Badge => Lump is not null ? Loc.T("WAD lump") : Destination;
     public string ModifiedText => Entry.Modified is { } m ? RelativeDate.Format(m) : "";
     public string ModifiedTip => Entry.Modified is { } m ? RelativeDate.Full(m) : Loc.T("PAK files don't store dates");
 

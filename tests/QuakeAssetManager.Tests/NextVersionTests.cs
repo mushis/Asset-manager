@@ -109,7 +109,7 @@ public class ImportTests
         // Files at the zip's root are asked about; accept the suggestions (what the dialog pre-selects).
         var importer = new Importer(m);
         var plan = importer.Prepare([zip], new DateTime(2026, 10, 16));
-        var session = importer.Stage(plan, plan.Questions.ToDictionary(q => q.Key, q => q.Suggested));
+        var session = importer.Stage(plan, plan.Questions.ToDictionary(q => q.Key, q => q.Suggested?.Id));
 
         Assert.Equal(2, session.AddedCount("models"));
         Assert.Equal(1, session.AddedCount("wad"));

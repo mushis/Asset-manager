@@ -45,13 +45,14 @@ public sealed record UseFolderPlan(
 /// Rules: the assets folder always keeps a copy; nothing lives directly in assets/&lt;type&gt;/;
 /// files copied into the game are lower case; archives are never modified.
 /// </summary>
-public sealed class AssetManager
+public sealed partial class AssetManager
 {
     private readonly Dictionary<(string Path, long Length, DateTime Modified, DateTime Created), string> _hashCache = [];
     private readonly object _hashLock = new();
+    private readonly Dictionary<string, ValidNameSet> _validNames;
 
     public AppSettings Settings { get; }
-    public IReadOnlyDictionary<string, ValidNameSet> ValidNames { get; private set; }
+    public IReadOnlyDictionary<string, ValidNameSet> ValidNames => _validNames;
     public GameData GameData { get; private set; }
     public AssetConfig? Config { get; }
 
@@ -61,11 +62,14 @@ public sealed class AssetManager
         GameData = gameData;
         Config = config;
         // Hidden types are built too, so dropped files can be recognised as belonging to them.
-        ValidNames = AssetType.Known.ToDictionary(t => t.Id, t => ValidNameSet.Build(t, gameData, config?.LoadNames(t)), StringComparer.OrdinalIgnoreCase);
+        _validNames = AssetType.Known.ToDictionary(t => t.Id, t => ValidNameSet.Build(t, gameData, config?.LoadNames(t)), StringComparer.OrdinalIgnoreCase);
     }
 
     public string ActiveFolder(AssetType type) => type.ActiveFolder(Settings.QuakeFolder);
     public string AssetsFolder(AssetType type) => type.AssetsFolder(Settings.AssetsFolder);
+
+    /// <summary>assets/other: files the app doesn't manage (sound, maps, map textures...), kept with their game path.</summary>
+    public string OtherFolder => Path.Combine(Settings.AssetsFolder, "other");
     public bool ActiveFolderExists(AssetType type) => Directory.Exists(ActiveFolder(type));
 
     public void CreateActiveFolder(AssetType type) => Directory.CreateDirectory(ActiveFolder(type));
@@ -129,13 +133,13 @@ public sealed class AssetManager
 
     private AssetFolderEntry ListFolder(AssetType type, string dir, bool isPack, Dictionary<string, string> activeHashes)
     {
-        // Only files directly inside a pack folder can be used; deeper folders are shown as invalid.
+        // 0.5: files in nested folders can be used too ("Use these" copies a folder's own files).
         var folders = Directory.EnumerateDirectories(dir).Order(StringComparer.OrdinalIgnoreCase)
             .Select(d => ListFolder(type, d, isPack: false, activeHashes)).ToList();
         var files = Directory.EnumerateFiles(dir).Order(StringComparer.OrdinalIgnoreCase).Select(f =>
         {
             var name = Path.GetFileName(f);
-            var valid = isPack && IsValid(type, name);
+            var valid = IsValid(type, name);
             var active = valid && activeHashes.TryGetValue(name.ToLowerInvariant(), out var h) && h == Hash(f);
             return new AssetFileEntry(name, f, valid, active, File.GetLastWriteTime(f));
         }).ToList();
@@ -219,10 +223,14 @@ public sealed class AssetManager
     private static string Hash(byte[] data) => Convert.ToHexString(SHA256.HashData(data));
 
     /// <summary>Content hash → every copy under assets/&lt;type&gt;/.</summary>
-    public Dictionary<string, List<string>> BuildIndex(AssetType type)
+    public Dictionary<string, List<string>> BuildIndex(AssetType type) => BuildIndex(AssetsFolder(type));
+
+    /// <summary>Content hash → every copy under assets/other/.</summary>
+    public Dictionary<string, List<string>> BuildOtherIndex() => BuildIndex(OtherFolder);
+
+    private Dictionary<string, List<string>> BuildIndex(string root)
     {
         var index = new Dictionary<string, List<string>>();
-        var root = AssetsFolder(type);
         if (!Directory.Exists(root))
             return index;
         foreach (var file in Directory.EnumerateFiles(root, "*", SearchOption.AllDirectories))
@@ -563,6 +571,54 @@ public sealed class AssetManager
         Forget(path);
     }
 
+    /// <summary>Rename a file or folder in the game folder. File names are lower-cased (Linux is case sensitive).</summary>
+    public string RenameInGame(string path, string newName) =>
+        Rename(path, Directory.Exists(path) ? newName : newName.Trim().ToLowerInvariant());
+
+    /// <summary>Move a nested Assets folder (assets/models/pack/extra) up to assets/models/extra, with a suffix if taken.</summary>
+    public string MoveFolderToRoot(AssetType type, string folder)
+    {
+        Forget(folder);
+        var dest = UniqueFolderPath(AssetsFolder(type), Path.GetFileName(folder.TrimEnd(Path.DirectorySeparatorChar)));
+        Directory.Move(folder, dest);
+        return dest;
+    }
+
+    /// <summary>Copy an Assets file into the game folder with its name unchanged (e.g. an invalid one, to rename it there).</summary>
+    public string CopyToGame(AssetType type, string assetFile)
+    {
+        var active = ActiveFolder(type);
+        Directory.CreateDirectory(active);
+        var target = Path.Combine(active, Path.GetFileName(assetFile));
+        foreach (var existing in Directory.EnumerateFiles(active)
+                     .Where(f => Path.GetFileName(f).Equals(Path.GetFileName(assetFile), StringComparison.OrdinalIgnoreCase)).ToList())
+            RemoveFromGame(type, existing);
+        File.Copy(assetFile, target, overwrite: true);
+        Forget(target);
+        return target;
+    }
+
+    /// <summary>
+    /// "Mark as valid": add the names (without extension) to names/&lt;type&gt;.json and reload the rules.
+    /// Returns the names that were added. A file whose extension the type doesn't accept stays invalid.
+    /// </summary>
+    public IReadOnlyList<string> MarkValid(AssetType type, IEnumerable<string> fileNames)
+    {
+        var names = Config?.LoadNames(type) ?? AssetTypeDefaults.DefaultNames(type.Id);
+        var added = new List<string>();
+        foreach (var stem in fileNames.Select(Path.GetFileNameWithoutExtension).OfType<string>().Where(s => s.Length > 0))
+        {
+            if (names.Names.Contains(stem, ValidNameSet.NameComparer) || added.Contains(stem, ValidNameSet.NameComparer))
+                continue;
+            names.Names.Add(stem);
+            added.Add(stem);
+        }
+        if (added.Count > 0)
+            Config?.SaveNames(type, names);
+        _validNames[type.Id] = ValidNameSet.Build(type, GameData, names);
+        return added;
+    }
+
     public IReadOnlyList<string> PackFolderNames(AssetType type)
     {
         var root = AssetsFolder(type);
@@ -593,18 +649,12 @@ public sealed class AssetManager
         return result;
     }
 
-    /// <summary>Only qw archives can be extracted into the assets folder.</summary>
-    public bool CanExtract(string archivePath) =>
-        string.Equals(Path.GetFileName(Path.GetDirectoryName(archivePath)), "qw", StringComparison.OrdinalIgnoreCase);
-
     /// <summary>
     /// Copy texture entries (textures/models|bmodels|wad/...) to assets/&lt;type&gt;/&lt;archive name&gt;/.
-    /// Content already in the assets folder is skipped.
+    /// Content already in the assets folder is skipped. Any archive in any game folder can be copied from (0.5).
     /// </summary>
     public ImportResult ExtractFromArchive(GameArchive archive, IEnumerable<ArchiveEntry> entries)
     {
-        if (!CanExtract(archive.FilePath))
-            throw new InvalidOperationException("Only archives in the qw folder can be extracted.");
         var folderName = Path.GetFileNameWithoutExtension(archive.FilePath);
         var indexes = new Dictionary<string, Dictionary<string, List<string>>>();
         int copied = 0, skipped = 0;

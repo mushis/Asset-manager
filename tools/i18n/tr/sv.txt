@@ -16,299 +16,397 @@
 15|# Andra tillgångstyper (dolda som standard, slå på dem i Inställningar)
 16|• **Crosshairs** (`qw/crosshairs`): valfritt bildnamn, väljs med `crosshairimage`.
 17|• **Skyboxes** (`qw/env`, även `gfx/env`): `<sky>` plus `rt`, `bk`, `lf`, `ft`, `up`, `dn` (alla 6 sidor). En himmels `_wind.cfg` läses bara från `gfx/env`.
+18|• **Gfx** (`qw/gfx`): konsolens bakgrund (`conback`, eller namnet i `scr_conpicture`), menybilder och muspekaren. `gfx/conback.lmp` måste finnas, annars startar inte spelet.
 19|• **Charsets** (`qw/textures/charsets`): konsolens typsnitt, valfritt namn, väljs med `gl_consolefont`.
 20|• **Levelshots** (`qw/textures/levelshots`): laddningsbilden för varje bana, med banans namn.
 21|• **Skins** (`qw/skins`): spelarskins, valfritt namn. Provar `.tga`, `.png`, `.jpg` och sedan `.pcx`; annars används `base`.
+22|• **Progs** (`qw/progs`): modeller och sprites, valfritt namn. En `.md3` med samma namn ersätter `.mdl`-filen.
 23|# Hanteras inte av appen
 24|• **Sounds** (`qw/sound`): exakta sökvägar med undermappar; en `.ogg` ersätter aldrig en begärd `.wav`.
+25|• **Maps** (`qw/maps`): `<map>.bsp` plus sidofiler; föremålslådorna (`b_*.bsp`) ligger också här.
+26|• **Lits och Locs** (`qw/lits`, `qw/locs`): färgad belysning (`<map>.lit`) och platsnamn för lagspel (`<map>.loc`).
 27|• **Map textures** (`qw/textures/<map>/`): söks per bana, sedan per bangrupp och sist i `textures/`.
 28|Oväntat fel:
 29|läser…
 30|Det gick inte att läsa {0}:
-31|Välj ett arkiv till vänster för att se innehållet.
-32|{0} filer här hör till en känd tillgångstyp och kan kopieras till {1}. Håll ned Ctrl eller Skift för att välja flera och högerklicka sedan.
-33|Arkivet innehåller inga filer som appen känner igen.
-34|Endast visning. Bara arkiv i qw-mappen kan kopieras till Assets.
-35|För stor för förhandsvisning.
-36|dold
-37|Endast visning: bara arkiv i qw-mappen kan kopieras till Assets
-38|Kopiera {0} till Assets
-41|Kopiera till deras tillgångsmappar ({0})
-42|Kopiera bara {0} ({1})
-44|Ingen känd tillgångstyp för de valda filerna
+31|dold
+32|du väljer
+33|Välj ett arkiv till vänster för att se innehållet.
+34|{0} filer här hör till en känd tillgångstyp och hamnar i {1}. Filer i mappar som appen inte hanterar hamnar i {2}; för resten väljer du typ. Håll ned Ctrl eller Skift för att markera flera och högerklicka sedan.
+35|Ingen fil här hör till en känd tillgångstyp. Filer i mappar som appen inte hanterar hamnar i {0}; för resten väljer du typ.
+36|För stor för förhandsvisning.
+37|övrigt
+38|att välja: {0}
+39|Kopiera {0} till Assets
+40|hanteras inte av appen
+41|du väljer tillgångstyp
+42|Kopiera till deras tillgångsmappar ({0})
+43|Kopiera bara {0} ({1})
+44|filerna som appen inte hanterar
 45|Kopiera till Assets
-46|Bara arkiv i qw-mappen kan kopieras till Assets.
-47|Välj först de filer som ska kopieras.
-48|Papperskorgen
-49|papperskorgen
-50|{0} skapad.
-51|Aktiv
+46|Välj först de filer som ska kopieras.
+47|Papperskorgen
+48|papperskorgen
+49|{0} skapad.
+50|Aktiv
+51|Dina lokala kopior av tillgångar av den här typen (Assets-mappen):
 52|Det gick inte att läsa mapparna:
 53|Spelmappen {0} finns inte än, så ingenting laddas för {1}.
-55|{0} ogiltiga filer eller mappar dolda i spelmappen
-56|{0} filer ligger direkt i {1}; flytta dem till en mapp
-57|{0} innehåller {1}. Spelet laddar inte undermappar.
-58|Inget i spelmappen; spelet använder sin inbyggda textur.
-59|Flytta till Assets…
-60|Ta bort
-61|Öppna mappen
-62|Flytta {0} till {1}?
-65|Flyttade {0} till {1}.
-66|Använd dessa
-67|Byt namn…
-68|Använd den här filen
-69|{0} finns nu i spelet.
-70|Flytta till mapp…
-71|Något gick fel
-72|Flytta {0} till Assets
-73|Flytta
-74|Flyttade {0} till {1}.
-75|Flytta {0}
-76|Byt namn på {0}
-77|Byt namn
-78|Spelet laddar aldrig ”{0}”, så filen kommer inte att kunna användas längre. Byta namn ändå?
-79|Bytte namn på {0} till {1}.
-80|Skapa spelmappen {0} först.
-81|”{0}” har inga giltiga {1}-filer att använda.
-83|Kopierade {0} från {1} till spelet.
-84|Ny mapp
-85|Mappen finns redan.
-86|Skapa
-87|Enter: {0}
-88|Esc: avbryt
-89|Tabb: nästa
-90|Avbryt
-91|OK
-92|Enter eller Esc: stäng
-93|Nuvarande namn: {0}
-94|Nytt namn
-95|Namn
-96|Föreslaget utifrån det närmaste giltiga namnet
-97|Mappnamn
-98|Mapp:
-99|Filnamn:
-100|Mapp (välj en eller skriv ett nytt namn)
-101|Filnamn
-102|Tillagt från {0}
-104|Redan i Assets
-105|{0} hoppades över
-106|Hanteras inte av appen
-107|Ignorerade
-108|Fel:
-109|Visa de ignorerade filerna
-110|Inget lades till: ingen fil matchade ett namn som spelet laddar för de visade tillgångstyperna.
-111|Ångra
-112|Lägg inte till de här filerna i Assets
-113|namnet passar flera tillgångstyper
-114|Om Quake Asset Manager
-115|Stäng
-116|Version {0}
-117|Vibe-kodad med Claude
-118|Appens syfte är att hjälpa till att hantera de Quake-tillgångar som inte går att ställa in i klienten. Tillgångar som HUD-ikoner, modelltexturer och annat måste ha ett visst filnamn i en viss mapp. Den här appen sköter det genom att skapa och spara en kopia av alternativa tillgångar i en annan mapp och byta ut dem i din Quake-mapp med ett klick.
-119|Jag hoppas att du har nytta av den.
-120|Gjord med kärlek av mushi
-122|Detaljer om QuakeWorld-tillgångar
-138|Filen hittades inte
-139|för stor för förhandsvisning
-140|Pekar på {0}
-141|Ingen förhandsvisning: Quakes palett (gfx/palette.lmp) hittades inte.
-142|Det gick inte att läsa bilden.
-143|Ingen förhandsvisning för den här filtypen.
-145|laddas inte
-146|ogiltig
-147|Undermappar laddas inte av spelet. Högerklicka för att flytta den till Assets eller ta bort den.
-148|Spelet laddar aldrig det här namnet. Högerklicka för att flytta den till Assets eller ta bort den.
-151|nästlad · kan inte användas
-152|i spelet
-153|En alternativmapp. Högerklicka för att använda alla filer, byta namn eller ta bort den.
-154|Filer i nästlade mappar kan inte användas. Flytta dem till en alternativmapp.
-155|Högerklicka och välj ”Använd den här filen” för att kopiera den till spelet.
-156|Spelet laddar aldrig det här namnet. Högerklicka för att byta namn, flytta eller ta bort den.
-157|kopiera till Assets
-158|endast visning
-159|WAD-del
-160|PAK-filer sparar inga datum
-161|I går
-162|Förra veckan
-163|Förra månaden
-164|Förra året
-165|1 fil
-168|{0} filer
-169|Testa
-170|Inställningar
-171|Det gick inte att spara inställningarna:
-172|Det gick inte att läsa Quake-mappen
-173|Quakes palett hittades inte, så PAK-bilder kan inte förhandsvisas.
-174|Konfiguration
-175|Ofullständig import
-176|En import från ”{0}” bekräftades inte innan appen stängdes ({1}). Lägga till filerna i Assets?
-177|Lägg till i Assets
-178|Läser filerna…
-179|Inget lades till från {0}.
-180|Importera
-181|Det gick inte att läsa filerna:
-182|Lade till {0} från {1} i Assets.
-183|Vissa filer kunde inte flyttas till Assets:
-186|kopierade {0} till Assets ({1} fanns redan).
-187|Första genomsökningen av den här Quake-mappen:
-188|Genomsökning:
-189|allt finns redan i Assets.
-190|Nya mappar: {0}.
-191|Kopierade {0} från spelmappen till Assets.
-192|Det gick inte att kopiera nya filer till Assets:
-193|Kontrollera inställningarna först:
-194|Startade {0}
-195|Det gick inte att starta {0}:
-196|Online: {0}-tillgångar från {1}. Välj en för att se detaljerna och sedan Ladda ned till Assets. Inget läggs till förrän du trycker OK i sammanfattningen.
-197|Välj ett objekt för att se detaljerna.
-198|Ingen onlinekälla för {0} än.
-199|{0} har ingen lista för {1}. Listor kan läggas till under ”online” för den här typen i asset-types.json.
-200|Inget här än.
-201|Den här listan på webbplatsen är tom.
-202|Läser in detaljer…
-203|Öppna sidan i webbläsaren
-204|{0} nedladdningar
-205|Ladda ned till Assets igen
-206|Ladda ned till Assets
-207|Laddar ned {0}…
-208|Ladda ned
-209|{0} går inte att nå just nu.
-210|Kontrollera internetanslutningen och försök igen.
-211|{0} returnerade en sida som appen inte känner igen.
-212|Webbplatsen kan ha ändrats; appen behöver uppdateras för att kunna läsa den.
-213|Välj en fil för att förhandsvisa den.
-214|Ändrad {0}
-215|Spelmapp: {0} · Assets-mapp: {1} · Namn: {2}
-216|Visa den här tillgångstypen som en flik
-217|Välj din Quake-mapp
-218|Välj Assets-mappen
-219|Konfigurera Quake Asset Manager
-220|Alla inställningar krävs. Du kan använda appen när alla fält är ifyllda.
-221|Alla inställningar krävs.
-222|Spara och fortsätt
-223|Konfigurationsmapp: {0}
-224|Varje tillgångstyp får en egen mapp här.
-225|Mappen skapas när du sparar.
-226|Inga program hittades i Quake-mappen.
-227|Kör: {0} +map {1}
-228|De här spelmapparna finns inte än, så deras flikar kan inte visa något:
-229|1 inställning saknar fortfarande ett värde.
-230|{0} inställningar saknar fortfarande ett värde.
-231|Det gick inte att skapa mapparna:
-232|Mappen kan inte skapas:
-233|Spelmappar saknas
-234|De här spelmapparna finns inte:
-235|Skapa dem nu? Du kan också skapa dem senare från varje flik.
-236|Arkiv
-237|Arkiv: PAK- och PK3-filerna i din Quake-mapp. Här är de skrivskyddade. Filer från qw-arkiv kan kopieras till Assets: markera dem och högerklicka.
-238|Välj ett arkiv
-239|Filtrera, t.ex. textures/
-240|Visa bara poster vars sökväg innehåller den här texten
-241|Kopiera markerade
-242|Kopiera de markerade filerna till deras typmappar i Assets
-243|Kopiera allt till Assets
-244|Kopiera alla filer i arkivet som hör till en visad tillgångstyp till Assets
-245|Filer i det valda arkivet. Bilder och filer med Quakes palett (.mdl-skins, .lmp, WAD-delar) kan förhandsvisas. Kopiering lägger filerna i assets\<type>\<archive name>, hoppar över filer som redan finns i Assets och visar en sammanfattning först.
-246|Öppna mappen i filutforskaren
-247|Visa ogiltiga
-248|Visa även filer som spelet aldrig laddar, och undermappar
-249|Aktiv: det här är din Quake-mapp. Filerna här används av spelet. Den färgade etiketten visar varifrån varje fil kommer: original (fanns redan), från <folder> (placerad av appen) eller ogiltig.
-250|Skapa mapp
-251|Lokalt
-252|Dina lokala kopior av tillgångar av den här typen (Assets-mappen)
-253|Online
-254|Bläddra bland och ladda ned tillgångar av den här typen från gfx.quakeworld.nu
-255|Skapa en alternativmapp
-256|Assets: ditt lager av alternativ. Spelet laddar inte dessa. Högerklicka eller använd knapparna under förhandsvisningen: Använd den här filen, Använd dessa (en hel mapp), Byt namn, Ta bort. Du kan också släppa zip/rar/7z-filer, mappar eller bilder i fönstret.
-257|Bläddra bland PAK- och PK3-filer. Kopiera filer från qw-arkiv till Assets.
-258|Starta klienten på banan från Inställningar så att du ser dina ändringar.
-259|Inställningar: Quake-mapp, Assets-mapp, klient och bana.
-260|Hjälp: förklarar varje del av fönstret.
-261|Varje flik för en tillgångstyp hanterar en mapp som spelet laddar filer från. Arkiv: bläddra bland PAK- och PK3-filer. Släpp zip/rar/7z-filer, mappar eller bilder var som helst för att lägga till dem i Assets.
-262|Testa: startar klienten på banan från Inställningar, så att du ser dina ändringar i spelet.
-263|Inställningar: din Quake-mapp, Assets-mappen, klienten och testbanan.
-264|Läser speldata…
-265|Släpp för att lägga till i Assets
-266|zip, pk3, rar, 7z, tar.gz, mappar eller bilder. Du ser en sammanfattning innan något läggs till.
-267|Vilken lista på webbplatsen du vill bläddra i
-268|Föregående sida
-269|Nästa sida
-270|Online: tillgångar från gfx.quakeworld.nu för den här fliken. Välj en för att se detaljerna och sedan Ladda ned till Assets. Inget läggs till förrän du trycker OK i sammanfattningen.
-271|Försök igen
-272|Öppna webbplatsen i webbläsaren
-273|Läser in…
-274|Redan nedladdad
-275|Förhandsvisning
-276|Förhandsvisning av den valda filen, med det du kan göra med den. När du väljer ett alternativ i Assets visas versionen som spelet använder nu nedanför.
-277|I spelet nu
-278|Allmänt
+54|Inga filnamn börjar med ”{0}”.
+55|1 ogiltig fil eller mapp dold i spelmappen
+56|{0} ogiltiga filer eller mappar dolda i spelmappen
+57|{0} filer ligger direkt i {1}; flytta dem till en mapp
+58|Större än 128×128: unezQuake laddar inte den här sprayen.
+59|{0} markerade.
+60|{0} innehåller {1}. Spelet laddar inte undermappar.
+61|Inget i spelmappen; spelet använder sin inbyggda textur.
+62|Flytta till Assets…
+63|Markera som giltig
+64|Ta bort
+65|Byt namn…
+66|Visa alternativ
+67|Öppna mappen
+68|Använd de här filerna
+69|Flytta till mapp…
+70|Använd dessa
+71|Flytta till roten
+72|Använd den här filen
+73|Kopiera till spelmappen
+74|Något gick fel
+75|Visar alla versioner av {0} i Assets.
+76|Lade till {0} i {1}.
+77|De här namnen fanns redan i listan.
+78|Fortfarande ogiltiga: {0}. Den här tillgångstypen använder inte de här filändelserna, eller så ligger filerna direkt i typens Assets-mapp.
+79|Byt namn på {0}
+80|Byt namn
+81|Spelet laddar aldrig ”{0}”, så filen kommer inte att användas. Byta namn ändå?
+82|Bytte namn på {0} till {1}.
+83|Flytta {0} till {1}?
+84|Flyttade {0} till {1}.
+85|Flytta {0} till {1}? Spelet använder då sin inbyggda version.
+86|Flyttade {0} och {1} i Assets till {2}.
+87|Flytta {0} till Assets
+88|Flytta
+89|Flyttade {0} till {1}.
+90|Flytta {0}
+91|Kopierade {0} till spelmappen. Byt namn på den där till ett namn som spelet laddar.
+92|{0} finns nu i spelet.
+93|Kopierade {0} till spelet.
+94|Spelet laddar aldrig ”{0}”, så filen kommer inte att kunna användas längre. Byta namn ändå?
+95|Skapa spelmappen {0} först.
+96|”{0}” har inga giltiga {1}-filer att använda.
+97|ogiltiga, hoppades över: {0}
+98|Kopierade {0} från {1} till spelet.
+99|Ny mapp
+100|Mappen finns redan.
+101|Skapa
+102|Enter: {0}
+103|Esc: avbryt
+104|Tabb: nästa
+105|Avbryt
+106|OK
+107|Enter eller Esc: stäng
+108|Nuvarande namn: {0}
+109|Nytt namn
+110|Namn
+111|Föreslaget utifrån det närmaste giltiga namnet
+112|Mappnamn
+113|Byt namn på filen till
+114|Mapp:
+115|Filnamn:
+116|Mapp (välj en eller skriv ett nytt namn)
+117|Tillagt från {0}
+118|{0} med namn som spelet inte laddar (markerade som ogiltiga)
+119|Hanteras inte av appen
+120|Redan i Assets
+121|{0} hoppades över
+122|Ignorerade
+123|Fel:
+124|Visa de ignorerade filerna
+125|Inget lades till: allt fanns redan i Assets, hoppades över eller stöds inte.
+126|Ångra
+127|Lägg inte till de här filerna i Assets
+128|namnet passar flera tillgångstyper
+129|Om Quake Asset Manager
+130|Stäng
+131|Version {0}
+132|Vibe-kodad med Claude
+133|Appens syfte är att hjälpa till att hantera de Quake-tillgångar som inte går att ställa in i klienten. Tillgångar som HUD-ikoner, modelltexturer och annat måste ha ett visst filnamn i en viss mapp. Den här appen sköter det genom att skapa och spara en kopia av alternativa tillgångar i en annan mapp och byta ut dem i din Quake-mapp med ett klick.
+134|Jag hoppas att du har nytta av den.
+135|Gjord med kärlek av mushi
+136|Detaljer om QuakeWorld-tillgångar
+137|Övrigt (hanteras inte, sparas i assets/other)
+138|Hoppa över
+139|Vart ska de här filerna?
+140|{0} har filer i mappar som appen inte kan placera själv. Välj en tillgångstyp för varje mapp, Övrigt eller Hoppa över.
+141|(arkivets rot)
+142|föreslagen utifrån filnamnen
+143|Mapp i Assets för de här filerna
+144|Filerna hamnar i assets/<type>/<den här mappen>. Filer som sparas i assets/other behåller sin sökväg från arkivet.
+145|Fortsätt
+146|Mappar med alternativa tillgångar hittades
+147|Spelet laddar inte undermappar, så det här är oftast alternativa versioner. Kryssa för dem som ska till Assets; var och en behåller sitt namn.
+148|Rekommenderat: Flytta. Det städar upp dina Quake-undermappar, och tillgångarna hamnar ordnade i din lokala Assets-mapp, på ett ställe. Kopiera lämnar originalen kvar.
+149|Fråga inte igen om mapparna jag lämnar omarkerade
+150|Kopiera
+151|Kopiera till Assets och lämna originalmapparna i Quake-mappen
+152|Kopiera till Assets och flytta sedan originalmapparna från Quake-mappen till papperskorgen
+153|Esc: {0}
+154|Ta även bort kopiorna i Assets ({0})
+155|Det finns ingen kopia av den här filen i Assets: det här är den enda kopian.
+156|Välkommen till Quake Asset Manager
+157|Byt modeller, HUD och mer med ett klick.
+158|En filutforskare gjord för Quake-tillgångar: modeller, HUD, tracker, charsets och mer. Se vad spelet använder bredvid alla alternativ du har, använd ett med ett klick och starta spelet för att testa det. Dina filer säkerhetskopieras alltid först, allt i en enda lokal Assets-mapp.
+159|Säkerhetskopierar dina filer automatiskt, allt i en enda lokal Assets-mapp
+160|Visa alternativ: alla versioner av en fil i en överblick
+161|Ladda ned från gfx.quakeworld.nu, eller dra och släpp, direkt till dina Assets
+162|Och mycket mer
+163|Visa inte igen
+164|Kom igång
+165|Filen hittades inte
+166|för stor för förhandsvisning
+167|Pekar på {0}
+168|Ingen förhandsvisning: Quakes palett (gfx/palette.lmp) hittades inte.
+169|Det gick inte att läsa bilden.
+170|Ingen förhandsvisning för den här filtypen.
+171|Mappen kunde inte öppnas: {0}
+172|laddas inte
+173|ogiltig
+174|Spelet laddar inte undermappar. Högerklicka för att byta namn, flytta den till Assets eller ta bort den.
+175|Spelet laddar aldrig det här namnet. Högerklicka för att byta namn, markera som giltig, flytta till Assets eller ta bort.
+176|Tillgänglig för spelet (klientens inställning avgör vilken fil som används).
+177|Används av spelet.
+178|Finns inte i Assets ännu.
+179|En kopia finns i Assets-mappen ”{0}”.
+180|inkapslad
+181|i spelet
+182|En mapp med alternativ. Högerklicka för att använda alla filer, byta namn eller ta bort den.
+183|En mapp i en mapp med alternativ. Högerklicka för att använda dess filer eller flytta den till roten.
+184|Högerklicka och välj ”Använd den här filen” för att kopiera den till spelet.
+185|Spelet laddar aldrig det här namnet. Högerklicka för att byta namn, markera som giltig, kopiera till spelmappen eller ta bort.
+186|WAD-del
+187|PAK-filer sparar inga datum
+188|I går
+189|Förra veckan
+190|Förra månaden
+191|Förra året
+192|1 fil
+195|{0} filer
+196|Arkiv
+197|Testa
+198|Inställningar
+199|Det gick inte att spara inställningarna:
+200|Det gick inte att läsa Quake-mappen
+201|Quakes palett hittades inte, så PAK-bilder kan inte förhandsvisas.
+202|Konfiguration
+203|Ofullständig import
+204|En import från ”{0}” bekräftades inte innan appen stängdes ({1}). Lägga till filerna i Assets?
+205|Lägg till i Assets
+206|Läser filerna…
+207|Inget lades till från {0}.
+208|Importera
+209|Det gick inte att läsa filerna:
+210|Lade till {0} från {1} i Assets.
+211|Vissa filer kunde inte flyttas till Assets:
+212|Inga undermappar hittades i spelmapparna.
+213|Efter kopieringen flyttas de här mapparna från din Quake-mapp till papperskorgen:
+214|kopierade {0} till Assets ({1} fanns redan).
+215|Första genomsökningen av den här Quake-mappen:
+216|Genomsökning:
+217|allt finns redan i Assets.
+218|Nya mappar: {0}.
+219|Kopierade {0} från spelmappen till Assets.
+220|Det gick inte att kopiera nya filer till Assets:
+221|Kontrollera inställningarna först:
+222|Startade {0}
+223|Det gick inte att starta {0}:
+225|Välj ett objekt för att se detaljerna.
+226|Ingen onlinekälla för {0} än.
+227|{0} har ingen lista för {1}. Listor kan läggas till under ”online” för den här typen i asset-types.json.
+228|Inget här än.
+229|Den här listan på webbplatsen är tom.
+230|Läser in detaljer…
+231|Öppna sidan i webbläsaren
+232|{0} nedladdningar
+233|Ladda ned till Assets igen
+234|Ladda ned till Assets
+235|Laddar ned {0}…
+236|Ladda ned
+237|{0} går inte att nå just nu.
+238|Kontrollera internetanslutningen och försök igen.
+239|{0} returnerade en sida som appen inte känner igen.
+240|Webbplatsen kan ha ändrats; appen behöver uppdateras för att kunna läsa den.
+241|Välj en fil för att förhandsvisa den.
+242|Ändrad {0}
+243|Väljs med {0}
+244|Visas när {0} är {1}
+245|Ritas när {0} är {1}
+246|Används när {0} är {1}
+247|Spelmapp: {0} · Assets-mapp: {1} · Namn: {2}
+248|Visa den här tillgångstypen som en flik
+249|Välj din Quake-mapp
+250|Välj Assets-mappen
+251|Konfigurera Quake Asset Manager
+252|Alla inställningar krävs. Du kan använda appen när alla fält är ifyllda.
+253|Alla inställningar krävs.
+254|Spara och fortsätt
+255|Konfigurationsmapp: {0}
+256|Varje tillgångstyp får en egen mapp här.
+257|Mappen skapas när du sparar.
+258|Inga program hittades i Quake-mappen.
+259|Kör: {0} +map {1}
+260|De här spelmapparna finns inte än, så deras flikar kan inte visa något:
+261|1 inställning saknar fortfarande ett värde.
+262|{0} inställningar saknar fortfarande ett värde.
+263|Det gick inte att skapa mapparna:
+264|Mappen kan inte skapas:
+265|Spelmappar saknas
+266|De här spelmapparna finns inte:
+267|Skapa dem nu? Du kan också skapa dem senare från varje flik.
+268|Inte nu
+269|Letar efter filnamn med versaler…
+270|Konvertera till gemener
+271|Alla filnamn har redan gemener.
+272|{0} har versaler. Kryssa för dem som ska byta namn; en fil hoppas över om namnet med gemener redan finns.
+273|Alla
+274|Konvertera
+275|Bytte namn på {0} till gemener.
+276|Bytte namn på {0}. Hoppade över {1} eftersom en fil med namnet i gemener redan finns:
+277|Några filer kunde inte byta namn:
+278|Assets
 279|Quake-mapp
-280|Mappen som innehåller id1 och qw.
-281|Bläddra…
-282|Hittade id1 och qw.
-283|Skapa saknade mappar
-284|Assets-mapp (arkiv)
-285|Där appen sparar en kopia av varje tillgång. Spelet laddar inte den här mappen.
-286|Klient
-287|Välj en klient…
-288|Program som hittades i Quake-mappen.
-289|Bana att öppna
-290|Språk
-291|Appens språk. Mappnamn, filnamn och namn på tillgångstyper förblir oförändrade.
-292|Tillgångstyper
-293|Välj vilka tillgångstyper som har en flik. Dolda typer känns ändå igen när du släpper filer. Allt om en typ (mappar, filändelser, giltiga namn, onlinelistor) finns i konfigurationsfilerna nedan; starta om appen efter att du har ändrat dem.
-294|Öppna konfigurationsmappen
-295|Visa alla
-296|Bara standardtyperna (fem)
-299|Enter: spara · Tabb: nästa fält
-300|Välj din Quake-mapp.
-301|Mappen finns inte.
-302|Det här är ingen Quake-mapp. Den måste innehålla mapparna id1 och qw.
-303|Välj var kopiorna av dina tillgångar ska sparas.
-304|Ange en fullständig sökväg.
-305|Assets-mappen får inte ligga i qw\textures, då skulle spelet ladda den.
-306|Välj programmet som ska startas när du trycker på Testa.
-307|Programmet finns inte längre i Quake-mappen.
-308|Skriv ett bannamn, t.ex. dm4.
-309|Ett bannamn får inte innehålla mellanslag.
-311|Ange ett namn.
-312|Det namnet är inte tillåtet.
-313|Ett namn får inte innehålla / \ : * ? " < > |
-314|spelet laddar inte det här namnet
-315|filtypen stöds inte
-316|hittades inte
-18|• **Gfx** (`qw/gfx`): konsolens bakgrund (`conback`, eller namnet i `scr_conpicture`), menybilder och muspekaren. `gfx/conback.lmp` måste finnas, annars startar inte spelet.
-22|• **Progs** (`qw/progs`): modeller och sprites, valfritt namn. En `.md3` med samma namn ersätter `.mdl`-filen.
-25|• **Maps** (`qw/maps`): `<map>.bsp` plus sidofiler; föremålslådorna (`b_*.bsp`) ligger också här.
-26|• **Lits och Locs** (`qw/lits`, `qw/locs`): färgad belysning (`<map>.lit`) och platsnamn för lagspel (`<map>.loc`).
-39|du väljer tillgångstyp
-40|att välja: {0}
-43|{0} i mappar som appen inte hanterar (utelämnas)
-54|1 ogiltig fil eller mapp dold i spelmappen
-63|Flytta {0} till {1}? Spelet använder då sin inbyggda version.
-64|Flyttade {0} och {1} i Assets till {2}.
-82|ogiltiga, hoppades över: {0}
-103|{0} med namn som spelet inte laddar (markerade som ogiltiga)
-121|Ikon: {0}
-123|Hoppa över
-124|Vart ska de här filerna?
-125|{0} har filer i mappar som appen inte kan placera själv. Välj en tillgångstyp för varje mapp, eller Hoppa över.
-126|(arkivets rot)
-127|föreslagen utifrån filnamnen
-128|Fortsätt
-129|Mappar med alternativa tillgångar hittades
-130|Spelet laddar inte undermappar, så det är oftast alternativa versioner. Markera de som ska kopieras till Assets; var och en behåller sitt namn.
-131|Fråga inte igen om mapparna jag lämnar omarkerade
-132|Kopiera
-133|Kopiera och ta bort
-134|Kopiera och flytta sedan originalmapparna från din Quake-mapp till papperskorgen
-135|Esc: {0}
-136|Ta även bort kopiorna i Assets ({0})
-137|Det finns ingen kopia av den här filen i Assets: det här är den enda kopian.
-144|Mappen kunde inte öppnas: {0}
-149|Används av spelet. Inte i Assets än.
-150|Används av spelet. En kopia finns i Assets-mappen ”{0}”.
-184|Inga undermappar hittades i spelmapparna.
-185|Efter kopieringen flyttas de här mapparna från din Quake-mapp till papperskorgen:
-297|Leta efter undermappar igen
-298|Erbjud de undermappar som hittats i spelmapparna igen, även dem du hoppade över
+280|I din lokala Assets-mapp
+281|I din Quake-mapp: spelet laddar den härifrån
+282|Hitta dubbletter i den aktiva Quake-mappen
+283|Letar efter dubbletter i Quake-mappen…
+284|Inga dubbletter: varje sökväg i spelmapparna finns bara en gång.
+285|{0} sökvägar finns på mer än ett ställe ({1} med identiskt innehåll). Spelet använder bara en av varje.
+286|Den som är markerad med ✓ är kopian som spelet laddar: qw före ezquake före id1, och inom en mapp en lös fil före en pk3 eller pak.
+287|Exportera…
+288|Spara listan som en textfil
+289|identiska
+290|olika
+291|Förhandsvisning
+292|Visa alla kopior sida vid sida
+293|används av spelet
+294|{0} kopior av {1}.
+295|Dubbletter i {0}
+296|Spara listan med dubbletter
+297|Textfil
+298|Listan kunde inte sparas:
+299|Hitta dubbletter i de lokala Assets-mapparna
+300|Letar efter kopior i de lokala Assets-mapparna…
+301|Inga kopior: varje fil i dina lokala Assets-mappar finns bara en gång.
+302|{0} filer finns sparade mer än en gång ({1} extra kopior). Kopiorna har samma namn, storlek och innehåll. Kryssa för de kopior som ska behållas (den äldsta är förkryssad); Ta bort flyttar de andra till {2}. Minst en kopia av varje fil behålls alltid.
+303|Ta bort…
+304|Visar listan med filer som tas bort och ber dig bekräfta
+305|Alla kopior är förkryssade för att behållas, så det finns inget att ta bort.
+306|Några filer kunde inte tas bort:
+307|Esc: stäng
+308|{0} kopior
+309|Förkryssad: behåll kopian. Inte förkryssad: ta bort den.
+310|Ta bort de här kopiorna?
+311|De här {0} flyttas till {1}. Kopiorna du kryssade för stannar i Assets. Du kan återställa borttagna filer från {1}.
+312|Ta bort {0}
+313|Enter eller Esc: avbryt
+315|Välj ett arkiv
+316|Filtrera, t.ex. textures/
+317|Visa bara poster vars sökväg innehåller den här texten
+318|Kopiera markerade
+319|Kopiera de markerade filerna till deras typmappar i Assets
+320|Kopiera allt till Assets
+321|Kopiera alla filer i arkivet till Assets. Du ser en sammanfattning, med Ångra, innan något läggs till.
+323|Öppna mappen i filutforskaren
+324|Visa ogiltiga
+325|Visa även filer som spelet aldrig laddar, och undermappar. Påverkar bara den här listan: listan Lokalt visar alltid alla filer.
+326|Aktiv: det här är din valda Quake-mapp. Filerna här används av spelet.
+327|Skapa mapp
+328|Lokalt
+329|Online
+330|Bläddra bland och ladda ned tillgångar av den här typen från gfx.quakeworld.nu
+331|Filtrera…
+332|Visa bara filer vars namn börjar med den här texten, i alla mappar för den här tillgångstypen
+333|Rensa filtret
+334|Ny mapp: skapa en mapp med alternativ i Assets för den här typen
+335|Lokala Assets: ditt arkiv med alternativa tillgångar. Spelet laddar inte dessa. Dra och släpp dina egna zip-filer eller mappar här så sorteras de automatiskt efter tillgångstyp.
+336|Bläddra bland PAK- och PK3-filerna i din Quake-mapp och kopiera filer från dem till Assets.
+337|Starta klienten på banan från Inställningar så att du ser dina ändringar.
+338|Inställningar: mappar, klient, karta, språk, tema, tillgångstyper och verktyg.
+339|Hjälp: förklarar varje del av fönstret.
+340|Tillgångstyperna finns högst upp. Hantera dem under Inställningar. Arkiv: bläddra bland PAK- och PK3-filerna i din aktiva Quake-mapp.\nSläpp zip/rar/7z-filer i det här fönstret för att importera dem till dina lokala assets!
+343|Läser speldata…
+344|Släpp för att lägga till i Assets
+345|zip, pk3, rar, 7z, tar.gz, mappar eller bilder. Du ser en sammanfattning innan något läggs till.
+346|Vilken lista på webbplatsen du vill bläddra i
+347|Föregående sida
+348|Nästa sida
+350|Försök igen
+351|Öppna webbplatsen i webbläsaren
+352|Läser in…
+353|Redan nedladdad
+355|Klientinställningen som avgör om filen används. Ställ in den i klientens konfiguration eller konsol.
+356|I spelet nu
+357|Allmänt
+358|Mappen som innehåller id1 och qw.
+359|Bläddra…
+360|Hittade id1 och qw.
+361|Skapa saknade mappar
+362|Assets-mapp (arkiv)
+363|Där appen sparar en kopia av varje tillgång. Spelet laddar inte den här mappen.
+364|Klient
+365|Välj en klient…
+366|Program som hittades i Quake-mappen.
+367|Bana att öppna
+368|Språk
+369|Appens språk. Mappnamn, filnamn och namn på tillgångstyper förblir oförändrade.
+370|Tema
+371|Appens färger och stil. De ändras när du väljer; Avbryt går tillbaka.
+372|Visa fliken Online
+373|Visa växlingen Lokalt/Online ovanför Assets-listan, för att bläddra på gfx.quakeworld.nu. När den är av visas bara dina lokala kopior.
+374|Tillgångstyper
+375|Välj vilka tillgångstyper som har en flik. Dolda typer känns ändå igen när du släpper filer. Allt om en typ (mappar, filändelser, giltiga namn, onlinelistor) finns i konfigurationsfilerna nedan; starta om appen efter att du har ändrat dem.
+376|Öppna konfigurationsmappen
+377|Öppna mappen med asset-types.json och namnfilerna
+378|Visa alla
+379|Kryssa för alla tillgångstyper
+380|Bara standardtyperna (fem)
+381|Models, BModels, HUD, Tracker och Particles
+382|Leta efter undermappar igen
+383|Erbjud de undermappar som hittats i spelmapparna igen, även dem du hoppade över
+384|Verktyg
+385|Spara inställningarna först: verktygen behöver dina Quake- och Assets-mappar.
+386|På Linux hittar spelet bara filer vars namn matchar exakt, och det frågar efter namn med gemener. Det här letar efter filer med versaler på båda ställena: spelmapparna för alla tillgångstyper i din Quake-mapp och din lokala Assets-mapp. Varje fil visar var den finns, och bara de du kryssar för byter namn.
+387|Hitta filnamn med versaler…
+388|Söker bara i Quake-mappen som anges under Allmänt (dess spelmappar och .pak- och .pk3-filerna i dem). Samma sökväg kan finnas på flera ställen, till exempel id1/textures/abc.png och qw/textures/abc.png, eller en lös fil och en i en pak/pk3, och spelet använder bara en av dem. Listan visar vilken, låter dig förhandsvisa kopiorna och kan sparas som en textfil. Inget ändras.
+389|Hitta dubbletter…
+390|Söker igenom alla mappar i din lokala Assets-mapp, för alla tillgångstyper, efter exakta kopior: filer med samma namn, filändelse och storlek vars innehåll också är identiskt. Du väljer vilken kopia av varje som ska behållas; de andra kan flyttas till papperskorgen, efter en slutlig lista över vad som tas bort.
+391|Hitta kopior i Assets…
+392|Projektsidan på GitHub
+393|Wiki på QuakeWorld.nu
+394|Enter: spara · Tabb: nästa fält
+395|Välj din Quake-mapp.
+396|Mappen finns inte.
+397|Det här är ingen Quake-mapp. Den måste innehålla mapparna id1 och qw.
+398|Välj var kopiorna av dina tillgångar ska sparas.
+399|Ange en fullständig sökväg.
+400|Assets-mappen får inte ligga i qw\textures, då skulle spelet ladda den.
+401|Välj programmet som ska startas när du trycker på Testa.
+402|Programmet finns inte längre i Quake-mappen.
+403|Skriv ett bannamn, t.ex. dm4.
+404|Ett bannamn får inte innehålla mellanslag.
+406|Ange ett namn.
+407|Det namnet är inte tillåtet.
+408|Ett namn får inte innehålla / \ : * ? " < > |
+409|spelet laddar inte det här namnet
+410|filtypen stöds inte
+411|hittades inte
+412|Rost
+413|Skiffer
+414|Pergament
+224|Online: bläddra bland {0}-alternativ på {1}. Markera ett för att se detaljer och ladda sedan ned det till dina lokala Assets. Du bekräftar innan något läggs till.
+314|Arkiv: PAK- och PK3-filerna i din aktiva Quake-mapp. De ändras aldrig. Markera filer och högerklicka för att kopiera dem till dina lokala Assets.
+322|Filer i det markerade arkivet. Bilder, modellskins och WAD-bilder kan förhandsvisas. Kopierade filer sorteras i dina lokala Assets efter tillgångstyp; ljud, kartor och andra filer hamnar i assets\other. Du ser först en sammanfattning.
+341|Testa: starta din klient på kartan från Inställningar och se dina ändringar i spelet.
+342|Inställningar: mappar, klient, testkarta, språk och tema. Välj vilka tillgångstyper som visas och använd verktygen för att rätta filnamn och hitta dubbletter.
+349|Online: bläddra bland alternativ för den här fliken på gfx.quakeworld.nu. Markera ett för att se detaljer och ladda sedan ned det till dina lokala Assets. Du bekräftar innan något läggs till.
+354|Förhandsvisning av den markerade filen och vad du kan göra med den. För ett alternativ visas versionen som spelet använder nu under, för jämförelse.

@@ -128,7 +128,7 @@ public sealed class DownloadHistory(string assetsRoot)
             if (_ids is not null) return _ids;
             try
             {
-                _ids = File.Exists(_path) ? JsonSerializer.Deserialize<HashSet<string>>(File.ReadAllText(_path)) ?? [] : [];
+                _ids = File.Exists(_path) ? JsonSerializer.Deserialize(File.ReadAllText(_path), OnlineJson.Default.HashSetString) ?? [] : [];
             }
             catch (Exception e) when (e is IOException or JsonException)
             {
@@ -146,8 +146,12 @@ public sealed class DownloadHistory(string assetsRoot)
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-            File.WriteAllText(_path, JsonSerializer.Serialize(Ids));
+            File.WriteAllText(_path, JsonSerializer.Serialize(Ids, OnlineJson.Default.HashSetString));
         }
         catch (IOException) { }
     }
 }
+
+/// <summary>JSON code generated at build time (safe to trim).</summary>
+[System.Text.Json.Serialization.JsonSerializable(typeof(HashSet<string>))]
+internal sealed partial class OnlineJson : System.Text.Json.Serialization.JsonSerializerContext;

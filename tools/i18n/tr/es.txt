@@ -16,299 +16,397 @@
 15|# Otros tipos de recurso (ocultos por defecto, actívalos en Ajustes)
 16|• **Crosshairs** (`qw/crosshairs`): cualquier nombre de imagen, elegido con `crosshairimage`.
 17|• **Skyboxes** (`qw/env`, también `gfx/env`): `<sky>` más `rt`, `bk`, `lf`, `ft`, `up`, `dn` (las 6 caras). El `_wind.cfg` de un cielo solo se lee desde `gfx/env`.
+18|• **Gfx** (`qw/gfx`): el fondo de la consola (`conback`, o el nombre de `scr_conpicture`), las imágenes de los menús y el cursor. `gfx/conback.lmp` debe existir o el juego no arranca.
 19|• **Charsets** (`qw/textures/charsets`): fuentes de la consola, cualquier nombre, elegido con `gl_consolefont`.
 20|• **Levelshots** (`qw/textures/levelshots`): la imagen de carga de cada mapa, con el nombre del mapa.
 21|• **Skins** (`qw/skins`): skins de jugador, cualquier nombre. Prueba `.tga`, `.png`, `.jpg` y luego `.pcx`; si no, usa `base`.
+22|• **Progs** (`qw/progs`): modelos y sprites, cualquier nombre. Un `.md3` con el mismo nombre sustituye al `.mdl`.
 23|# No gestionado por la aplicación
 24|• **Sounds** (`qw/sound`): rutas exactas con subcarpetas; un `.ogg` nunca sustituye a un `.wav` pedido.
+25|• **Maps** (`qw/maps`): `<map>.bsp` más archivos auxiliares; las cajas de objetos (`b_*.bsp`) también están aquí.
+26|• **Lits y Locs** (`qw/lits`, `qw/locs`): iluminación de color (`<map>.lit`) y nombres de lugares para el juego en equipo (`<map>.loc`).
 27|• **Map textures** (`qw/textures/<map>/`): se buscan por mapa, luego por grupo de mapas y luego en `textures/`.
 28|Error inesperado:
 29|leyendo…
 30|No se pudo leer {0}:
-31|Elige un archivo comprimido a la izquierda para ver su contenido.
-32|{0} archivos de aquí pertenecen a un tipo de recurso conocido y se pueden copiar en {1}. Mantén pulsado Ctrl o Mayús para seleccionar varios y luego haz clic derecho.
-33|Este archivo no contiene ningún archivo que la aplicación reconozca.
-34|Solo lectura. Solo los archivos de la carpeta qw se pueden copiar en Assets.
-35|Demasiado grande para la vista previa.
-36|oculto
-37|Solo lectura: solo los archivos de la carpeta qw se pueden copiar en Assets
-38|Copiar {0} en Assets
-41|Copiar en sus carpetas de recursos ({0})
-42|Copiar solo {0} ({1})
-44|Ningún tipo de recurso conocido para los archivos seleccionados
+31|oculto
+32|tú eliges
+33|Elige un archivo comprimido a la izquierda para ver su contenido.
+34|{0} archivos de aquí pertenecen a un tipo de recurso conocido y van a {1}. Los archivos de carpetas que la aplicación no gestiona van a {2}; para el resto, eliges el tipo. Mantén Ctrl o Mayús para seleccionar varios y haz clic derecho.
+35|Ningún archivo de aquí pertenece a un tipo de recurso conocido. Los archivos de carpetas que la aplicación no gestiona van a {0}; para el resto, eliges el tipo.
+36|Demasiado grande para la vista previa.
+37|otros
+38|por elegir: {0}
+39|Copiar {0} en Assets
+40|no gestionado por la aplicación
+41|tú eliges el tipo de recurso
+42|Copiar en sus carpetas de recursos ({0})
+43|Copiar solo {0} ({1})
+44|los archivos que la aplicación no gestiona
 45|Copiar en Assets
-46|Solo los archivos de la carpeta qw se pueden copiar en Assets.
-47|Primero selecciona los archivos que quieres copiar.
-48|Papelera de reciclaje
-49|papelera
-50|Se creó {0}.
-51|Activo
+46|Primero selecciona los archivos que quieres copiar.
+47|Papelera de reciclaje
+48|papelera
+49|Se creó {0}.
+50|Activo
+51|Tus copias locales de recursos de este tipo (la carpeta Assets):
 52|No se pudieron leer las carpetas:
 53|La carpeta del juego {0} aún no existe, así que no hay nada cargado para {1}.
-55|{0} archivos o carpetas no válidos ocultos en la carpeta del juego
-56|{0} archivos están directamente en {1}; muévelos a una carpeta
-57|{0} contiene {1}. El juego no carga subcarpetas.
-58|No hay nada en la carpeta del juego; el juego usa su textura integrada.
-59|Mover a Assets…
-60|Eliminar
-61|Abrir carpeta
-62|¿Mover {0} a la {1}?
-65|Se movió {0} a la {1}.
-66|Usar estos
-67|Cambiar nombre…
-68|Usar este archivo
-69|{0} ya está en el juego.
-70|Mover a una carpeta…
-71|Algo salió mal
-72|Mover {0} a Assets
-73|Mover
-74|Se movió {0} a {1}.
-75|Mover {0}
-76|Cambiar el nombre de {0}
-77|Cambiar nombre
-78|El juego nunca carga «{0}», así que este archivo ya no se podrá usar. ¿Cambiar el nombre de todos modos?
-79|Se cambió el nombre de {0} a {1}.
-80|Primero crea la carpeta del juego {0}.
-81|«{0}» no tiene archivos {1} válidos para usar.
-83|Se copiaron {0} de {1} al juego.
-84|Nueva carpeta
-85|Esta carpeta ya existe.
-86|Crear
-87|Intro: {0}
-88|Esc: cancelar
-89|Tab: siguiente
-90|Cancelar
-91|Aceptar
-92|Intro o Esc: cerrar
-93|Nombre actual: {0}
-94|Nombre nuevo
-95|Nombre
-96|Sugerido a partir del nombre válido más parecido
-97|Nombre de la carpeta
-98|Carpeta:
-99|Nombre del archivo:
-100|Carpeta (elige una o escribe un nombre nuevo)
-101|Nombre del archivo
-102|Añadido desde {0}
-104|Ya en Assets
-105|{0} omitidos
-106|No gestionados por la aplicación
-107|Ignorados
-108|Error:
-109|Mostrar los archivos ignorados
-110|No se añadió nada: ningún archivo coincide con un nombre que el juego cargue para los tipos de recurso visibles.
-111|Revertir
-112|No añadir estos archivos a Assets
-113|el nombre encaja en varios tipos de recurso
-114|Acerca de Quake Asset Manager
-115|Cerrar
-116|Versión {0}
-117|Programado con Claude a base de vibe coding
-118|El objetivo de la aplicación es ayudar a gestionar los recursos de Quake que no se pueden configurar en el cliente. Recursos como los iconos del HUD, las texturas de los modelos y otros necesitan un nombre de archivo concreto en una carpeta concreta. Esta aplicación se encarga de ellos: crea y guarda una copia de los recursos alternativos en otra carpeta y reemplaza los de tu carpeta de Quake con un clic.
-119|Espero que te resulte útil.
-120|Hecho con cariño por mushi
-122|Detalles sobre los recursos de QuakeWorld
-138|Archivo no encontrado
-139|demasiado grande para la vista previa
-140|Apunta a {0}
-141|Sin vista previa: no se encontró la paleta de Quake (gfx/palette.lmp).
-142|No se pudo leer esta imagen.
-143|No hay vista previa para este tipo de archivo.
-145|no se carga
-146|no válido
-147|El juego no carga las subcarpetas. Haz clic derecho para moverla a Assets o eliminarla.
-148|El juego nunca carga este nombre. Haz clic derecho para moverlo a Assets o eliminarlo.
-151|anidada · no se puede usar
-152|en el juego
-153|Una carpeta de opciones. Haz clic derecho para usar todos sus archivos, cambiarle el nombre o eliminarla.
-154|Los archivos de carpetas anidadas no se pueden usar. Muévelos a una carpeta de opciones.
-155|Haz clic derecho y elige «Usar este archivo» para copiarlo al juego.
-156|El juego nunca carga este nombre. Haz clic derecho para cambiarle el nombre, moverlo o eliminarlo.
-157|copiar en Assets
-158|solo lectura
-159|elemento WAD
-160|Los archivos PAK no guardan fechas
-161|Ayer
-162|La semana pasada
-163|El mes pasado
-164|El año pasado
-165|1 archivo
-168|{0} archivos
-169|Probar
-170|Ajustes
-171|No se pudieron guardar tus ajustes:
-172|No se pudo leer la carpeta de Quake
-173|No se encontró la paleta de Quake, así que las imágenes PAK no tienen vista previa.
-174|Configuración
-175|Importación sin terminar
-176|Una importación desde «{0}» no se confirmó antes de cerrar la aplicación ({1}). ¿Añadir los archivos a Assets?
-177|Añadir a Assets
-178|Leyendo los archivos…
-179|No se añadió nada desde {0}.
-180|Importar
-181|No se pudieron leer los archivos:
-182|Se añadieron {0} desde {1} a Assets.
-183|Algunos archivos no se pudieron mover a Assets:
-186|se copiaron {0} a Assets ({1} ya estaban).
-187|Primer análisis de esta carpeta de Quake:
-188|Análisis:
-189|todo está ya en Assets.
-190|Carpetas nuevas: {0}.
-191|Se copiaron {0} de la carpeta del juego a Assets.
-192|No se pudieron copiar los archivos nuevos a Assets:
-193|Revisa primero tus ajustes:
-194|Se inició {0}
-195|No se pudo iniciar {0}:
-196|En línea: recursos de {0} en {1}. Selecciona uno para ver sus detalles y luego Descargar en Assets. No se añade nada hasta que pulses Aceptar en el resumen.
-197|Selecciona un elemento para ver sus detalles.
-198|Aún no hay fuente en línea para {0}.
-199|{0} no tiene ninguna lista para {1}. Se pueden añadir listas en «online» para este tipo en asset-types.json.
-200|Aquí no hay nada todavía.
-201|Esta lista del sitio web está vacía.
-202|Cargando detalles…
-203|Abrir la página en el navegador
-204|{0} descargas
-205|Volver a descargar en Assets
-206|Descargar en Assets
-207|Descargando {0}…
-208|Descargar
-209|No se puede acceder a {0} en este momento.
-210|Revisa tu conexión a Internet y vuelve a intentarlo.
-211|{0} devolvió una página que la aplicación no reconoce.
-212|Puede que el sitio haya cambiado; hay que actualizar la aplicación para leerlo.
-213|Selecciona un archivo para verlo.
-214|Modificado: {0}
-215|Carpeta del juego: {0} · Carpeta de Assets: {1} · Nombres: {2}
-216|Mostrar este tipo de recurso como pestaña
-217|Elige tu carpeta de Quake
-218|Elige la carpeta de Assets
-219|Configurar Quake Asset Manager
-220|Todos los ajustes son obligatorios. Podrás usar la aplicación cuando todos los campos estén rellenos.
-221|Todos los ajustes son obligatorios.
-222|Guardar y continuar
-223|Carpeta de configuración: {0}
-224|Cada tipo de recurso tiene aquí su propia carpeta.
-225|Esta carpeta se creará al guardar.
-226|No se encontraron programas en la carpeta de Quake.
-227|Ejecuta: {0} +map {1}
-228|Estas carpetas del juego aún no existen, así que sus pestañas no pueden mostrar nada:
-229|Falta 1 ajuste por rellenar.
-230|Faltan {0} ajustes por rellenar.
-231|No se pudieron crear las carpetas:
-232|No se puede crear esta carpeta:
-233|Faltan carpetas del juego
-234|Estas carpetas del juego no existen:
-235|¿Crearlas ahora? También puedes crearlas más tarde desde cada pestaña.
-236|Archivos comprimidos
-237|Archivos comprimidos: los archivos PAK y PK3 de tu carpeta de Quake. Aquí son de solo lectura. Los archivos de los comprimidos de qw se pueden copiar en Assets: selecciónalos y haz clic derecho.
-238|Elige un archivo comprimido
-239|Filtrar, p. ej. textures/
-240|Mostrar solo las entradas cuya ruta contenga este texto
-241|Copiar selección
-242|Copiar los archivos seleccionados en las carpetas de su tipo en Assets
-243|Copiar todo en Assets
-244|Copiar en Assets todos los archivos de este comprimido que pertenecen a un tipo de recurso visible
-245|Archivos del comprimido seleccionado. Se pueden previsualizar las imágenes y los archivos con paleta de Quake (skins .mdl, .lmp, elementos WAD). Al copiar, los archivos van a assets\<type>\<archive name>, se omiten los que ya están en Assets y primero se muestra un resumen.
-246|Abrir esta carpeta en el explorador de archivos
-247|Mostrar no válidos
-248|Mostrar también los archivos que el juego nunca carga y las subcarpetas
-249|Activo: esta es tu carpeta de Quake. El juego usa los archivos de aquí. La etiqueta de color indica de dónde viene cada archivo: original (ya estaba), de <folder> (puesto por la aplicación) o no válido.
-250|Crear carpeta
-251|Local
-252|Tus copias locales de recursos de este tipo (la carpeta de Assets)
-253|En línea
-254|Explorar y descargar recursos de este tipo desde gfx.quakeworld.nu
-255|Crear una carpeta de opciones
-256|Assets: tu almacén de opciones. El juego no los carga. Haz clic derecho o usa los botones bajo la vista previa: Usar este archivo, Usar estos (una carpeta entera), Cambiar nombre, Eliminar. También puedes soltar archivos zip/rar/7z, carpetas o imágenes en la ventana.
-257|Explorar archivos PAK y PK3. Copiar archivos de los comprimidos de qw a Assets.
-258|Inicia el cliente en el mapa de Ajustes para ver tus cambios.
-259|Ajustes: carpeta de Quake, carpeta de Assets, cliente y mapa.
-260|Ayuda: explica cada zona de la ventana.
-261|Cada pestaña de tipo de recurso gestiona una carpeta desde la que el juego carga archivos. Archivos comprimidos: explorar archivos PAK y PK3. Suelta en cualquier parte archivos zip/rar/7z, carpetas o imágenes para añadirlos a Assets.
-262|Probar: inicia tu cliente en el mapa de Ajustes para que veas tus cambios en el juego.
-263|Ajustes: tu carpeta de Quake, la carpeta de Assets, el cliente y el mapa de prueba.
-264|Leyendo los datos del juego…
-265|Suelta para añadir a Assets
-266|zip, pk3, rar, 7z, tar.gz, carpetas o imágenes. Verás un resumen antes de que se añada nada.
-267|Qué lista del sitio web explorar
-268|Página anterior
-269|Página siguiente
-270|En línea: recursos de gfx.quakeworld.nu para esta pestaña. Selecciona uno para ver sus detalles y luego Descargar en Assets. No se añade nada hasta que pulses Aceptar en el resumen.
-271|Reintentar
-272|Abrir el sitio en el navegador
-273|Cargando…
-274|Ya descargado
-275|Vista previa
-276|Vista previa del archivo seleccionado, con las acciones que puedes hacer. Al seleccionar una opción en Assets, debajo se muestra la versión que usa ahora el juego.
-277|Ahora en el juego
-278|General
+54|Ningún nombre de archivo empieza por «{0}».
+55|1 archivo o carpeta no válido oculto en la carpeta del juego
+56|{0} archivos o carpetas no válidos ocultos en la carpeta del juego
+57|{0} archivos están directamente en {1}; muévelos a una carpeta
+58|Mayor que 128×128: unezQuake no cargará este spray.
+59|{0} seleccionados.
+60|{0} contiene {1}. El juego no carga subcarpetas.
+61|No hay nada en la carpeta del juego; el juego usa su textura integrada.
+62|Mover a Assets…
+63|Marcar como válido
+64|Eliminar
+65|Cambiar nombre…
+66|Mostrar alternativas
+67|Abrir carpeta
+68|Usar estos archivos
+69|Mover a una carpeta…
+70|Usar estos
+71|Mover a la raíz
+72|Usar este archivo
+73|Copiar en la carpeta del juego
+74|Algo salió mal
+75|Mostrando todas las versiones de {0} en Assets.
+76|Se añadió {0} a {1}.
+77|Estos nombres ya estaban en la lista.
+78|Siguen sin ser válidos: {0}. Este tipo de recurso no usa estas extensiones, o los archivos están directamente en la carpeta Assets del tipo.
+79|Cambiar el nombre de {0}
+80|Cambiar nombre
+81|El juego nunca carga «{0}», así que no usará este archivo. ¿Cambiar el nombre de todos modos?
+82|Se cambió el nombre de {0} a {1}.
+83|¿Mover {0} a la {1}?
+84|Se movió {0} a la {1}.
+85|¿Mover {0} a la {1}? El juego usará su versión integrada.
+86|Se movieron {0} y {1} de Assets a la {2}.
+87|Mover {0} a Assets
+88|Mover
+89|Se movió {0} a {1}.
+90|Mover {0}
+91|Se copió {0} en la carpeta del juego. Cámbiale allí el nombre por uno que el juego cargue.
+92|{0} ya está en el juego.
+93|Se copiaron {0} en el juego.
+94|El juego nunca carga «{0}», así que este archivo ya no se podrá usar. ¿Cambiar el nombre de todos modos?
+95|Primero crea la carpeta del juego {0}.
+96|«{0}» no tiene archivos {1} válidos para usar.
+97|no válidos, omitidos: {0}
+98|Se copiaron {0} de {1} al juego.
+99|Nueva carpeta
+100|Esta carpeta ya existe.
+101|Crear
+102|Intro: {0}
+103|Esc: cancelar
+104|Tab: siguiente
+105|Cancelar
+106|Aceptar
+107|Intro o Esc: cerrar
+108|Nombre actual: {0}
+109|Nombre nuevo
+110|Nombre
+111|Sugerido a partir del nombre válido más parecido
+112|Nombre de la carpeta
+113|Cambiar el nombre del archivo a
+114|Carpeta:
+115|Nombre del archivo:
+116|Carpeta (elige una o escribe un nombre nuevo)
+117|Añadido desde {0}
+118|{0} con nombres que el juego no carga (marcados como no válidos)
+119|No gestionados por la aplicación
+120|Ya en Assets
+121|{0} omitidos
+122|Ignorados
+123|Error:
+124|Mostrar los archivos ignorados
+125|No se añadió nada: todo estaba ya en Assets, se omitió o no es compatible.
+126|Revertir
+127|No añadir estos archivos a Assets
+128|el nombre encaja en varios tipos de recurso
+129|Acerca de Quake Asset Manager
+130|Cerrar
+131|Versión {0}
+132|Programado con Claude a base de vibe coding
+133|El objetivo de la aplicación es ayudar a gestionar los recursos de Quake que no se pueden configurar en el cliente. Recursos como los iconos del HUD, las texturas de los modelos y otros necesitan un nombre de archivo concreto en una carpeta concreta. Esta aplicación se encarga de ellos: crea y guarda una copia de los recursos alternativos en otra carpeta y reemplaza los de tu carpeta de Quake con un clic.
+134|Espero que te resulte útil.
+135|Hecho con cariño por mushi
+136|Detalles sobre los recursos de QuakeWorld
+137|Otro (no gestionado, se guarda en assets/other)
+138|Omitir
+139|¿Dónde van estos archivos?
+140|{0} tiene archivos en carpetas que la aplicación no puede colocar por sí sola. Elige un tipo de recurso para cada carpeta, Otro u Omitir.
+141|(raíz del archivo)
+142|sugerido a partir de los nombres de archivo
+143|Carpeta en Assets para estos archivos
+144|Los archivos van a assets/<type>/<esta carpeta>. Los que se guardan en assets/other conservan su ruta del archivo comprimido.
+145|Continuar
+146|Se encontraron carpetas con recursos alternativos
+147|El juego no carga las subcarpetas, así que suelen ser versiones alternativas. Marca las que quieras llevar a Assets; cada una conserva su nombre.
+148|Recomendado: Mover. Limpia las subcarpetas de Quake y los recursos quedan organizados en tu carpeta Assets local, en un solo lugar. Copiar deja los originales donde están.
+149|No volver a preguntar por las carpetas que deje sin marcar
+150|Copiar
+151|Copiar en Assets y dejar las carpetas originales en tu carpeta de Quake
+152|Copiar en Assets y luego mover las carpetas originales de tu carpeta de Quake a la Papelera de reciclaje
+153|Esc: {0}
+154|Eliminar también las copias en Assets ({0})
+155|No hay ninguna copia de este archivo en Assets: es la única copia.
+156|Bienvenido a Quake Asset Manager
+157|Cambia modelos, HUD y más con un clic.
+158|Un explorador de archivos hecho para los recursos de Quake: modelos, HUD, tracker, charsets y más. Mira lo que usa el juego junto a todas tus alternativas, aplica una con un clic y entra al juego para probarla. Tus archivos siempre se respaldan primero, todos en una sola carpeta Assets local.
+159|Respalda tus archivos automáticamente, todos en una sola carpeta Assets local
+160|Mostrar alternativas: todas las versiones de un archivo de un vistazo
+161|Descarga de gfx.quakeworld.nu, o arrastra y suelta, directamente en tus Assets
+162|Y mucho más
+163|No volver a mostrar
+164|Empezar
+165|Archivo no encontrado
+166|demasiado grande para la vista previa
+167|Apunta a {0}
+168|Sin vista previa: no se encontró la paleta de Quake (gfx/palette.lmp).
+169|No se pudo leer esta imagen.
+170|No hay vista previa para este tipo de archivo.
+171|No se pudo abrir esta carpeta: {0}
+172|no se carga
+173|no válido
+174|El juego no carga las subcarpetas. Haz clic derecho para cambiarle el nombre, moverla a Assets o eliminarla.
+175|El juego nunca carga este nombre. Haz clic derecho para cambiarle el nombre, marcarlo como válido, moverlo a Assets o eliminarlo.
+176|Disponible para el juego (el ajuste del cliente decide qué archivo se usa).
+177|Lo usa el juego.
+178|Todavía no está en Assets.
+179|Hay una copia en la carpeta «{0}» de Assets.
+180|anidada
+181|en el juego
+182|Una carpeta de alternativas. Haz clic derecho para usar todos sus archivos, cambiarle el nombre o eliminarla.
+183|Una carpeta dentro de una carpeta de alternativas. Haz clic derecho para usar sus archivos o moverla a la raíz.
+184|Haz clic derecho y elige «Usar este archivo» para copiarlo al juego.
+185|El juego nunca carga este nombre. Haz clic derecho para cambiarle el nombre, marcarlo como válido, copiarlo en la carpeta del juego o eliminarlo.
+186|elemento WAD
+187|Los archivos PAK no guardan fechas
+188|Ayer
+189|La semana pasada
+190|El mes pasado
+191|El año pasado
+192|1 archivo
+195|{0} archivos
+196|Archivos comprimidos
+197|Probar
+198|Ajustes
+199|No se pudieron guardar tus ajustes:
+200|No se pudo leer la carpeta de Quake
+201|No se encontró la paleta de Quake, así que las imágenes PAK no tienen vista previa.
+202|Configuración
+203|Importación sin terminar
+204|Una importación desde «{0}» no se confirmó antes de cerrar la aplicación ({1}). ¿Añadir los archivos a Assets?
+205|Añadir a Assets
+206|Leyendo los archivos…
+207|No se añadió nada desde {0}.
+208|Importar
+209|No se pudieron leer los archivos:
+210|Se añadieron {0} desde {1} a Assets.
+211|Algunos archivos no se pudieron mover a Assets:
+212|No se encontraron subcarpetas en las carpetas del juego.
+213|Después de copiar, estas carpetas se moverán de tu carpeta de Quake a la papelera de reciclaje:
+214|se copiaron {0} a Assets ({1} ya estaban).
+215|Primer análisis de esta carpeta de Quake:
+216|Análisis:
+217|todo está ya en Assets.
+218|Carpetas nuevas: {0}.
+219|Se copiaron {0} de la carpeta del juego a Assets.
+220|No se pudieron copiar los archivos nuevos a Assets:
+221|Revisa primero tus ajustes:
+222|Se inició {0}
+223|No se pudo iniciar {0}:
+225|Selecciona un elemento para ver sus detalles.
+226|Aún no hay fuente en línea para {0}.
+227|{0} no tiene ninguna lista para {1}. Se pueden añadir listas en «online» para este tipo en asset-types.json.
+228|Aquí no hay nada todavía.
+229|Esta lista del sitio web está vacía.
+230|Cargando detalles…
+231|Abrir la página en el navegador
+232|{0} descargas
+233|Volver a descargar en Assets
+234|Descargar en Assets
+235|Descargando {0}…
+236|Descargar
+237|No se puede acceder a {0} en este momento.
+238|Revisa tu conexión a Internet y vuelve a intentarlo.
+239|{0} devolvió una página que la aplicación no reconoce.
+240|Puede que el sitio haya cambiado; hay que actualizar la aplicación para leerlo.
+241|Selecciona un archivo para verlo.
+242|Modificado: {0}
+243|Se elige con {0}
+244|Se muestra cuando {0} es {1}
+245|Se dibuja cuando {0} es {1}
+246|Se usa cuando {0} es {1}
+247|Carpeta del juego: {0} · Carpeta de Assets: {1} · Nombres: {2}
+248|Mostrar este tipo de recurso como pestaña
+249|Elige tu carpeta de Quake
+250|Elige la carpeta de Assets
+251|Configurar Quake Asset Manager
+252|Todos los ajustes son obligatorios. Podrás usar la aplicación cuando todos los campos estén rellenos.
+253|Todos los ajustes son obligatorios.
+254|Guardar y continuar
+255|Carpeta de configuración: {0}
+256|Cada tipo de recurso tiene aquí su propia carpeta.
+257|Esta carpeta se creará al guardar.
+258|No se encontraron programas en la carpeta de Quake.
+259|Ejecuta: {0} +map {1}
+260|Estas carpetas del juego aún no existen, así que sus pestañas no pueden mostrar nada:
+261|Falta 1 ajuste por rellenar.
+262|Faltan {0} ajustes por rellenar.
+263|No se pudieron crear las carpetas:
+264|No se puede crear esta carpeta:
+265|Faltan carpetas del juego
+266|Estas carpetas del juego no existen:
+267|¿Crearlas ahora? También puedes crearlas más tarde desde cada pestaña.
+268|Ahora no
+269|Buscando nombres de archivo con mayúsculas…
+270|Convertir a minúsculas
+271|Todos los nombres de archivo ya están en minúsculas.
+272|{0} tienen mayúsculas. Marca los que quieras renombrar; un archivo se omite si el nombre en minúsculas ya existe.
+273|Todos
+274|Convertir
+275|Se renombraron {0} a minúsculas.
+276|Se renombraron {0}. Se omitieron {1} porque ya existe un archivo con el nombre en minúsculas:
+277|Algunos archivos no se pudieron renombrar:
+278|Assets
 279|Carpeta de Quake
-280|La carpeta que contiene id1 y qw.
-281|Examinar…
-282|Se encontraron id1 y qw.
-283|Crear las carpetas que faltan
-284|Carpeta de Assets (archivo)
-285|Donde la aplicación guarda una copia de cada recurso. El juego no carga esta carpeta.
-286|Cliente
-287|Elige un cliente…
-288|Programas encontrados en la carpeta de Quake.
-289|Mapa que abrir
-290|Idioma
-291|El idioma de la aplicación. Los nombres de carpetas, archivos y tipos de recurso no cambian.
-292|Tipos de recurso
-293|Elige qué tipos de recurso tienen pestaña. Los tipos ocultos se siguen reconociendo al soltar archivos. Todo lo relativo a un tipo (carpetas, extensiones, nombres válidos, listas en línea) está en los archivos de configuración de abajo; reinicia la aplicación después de editarlos.
-294|Abrir la carpeta de configuración
-295|Mostrar todos
-296|Solo los cinco por defecto
-299|Intro: guardar · Tab: campo siguiente
-300|Elige tu carpeta de Quake.
-301|Esta carpeta no existe.
-302|No es una carpeta de Quake. Debe contener las carpetas id1 y qw.
-303|Elige dónde guardar las copias de tus recursos.
-304|Usa una ruta completa.
-305|La carpeta de Assets no puede estar dentro de qw\textures, o el juego la cargaría.
-306|Elige el programa que se iniciará al pulsar Probar.
-307|Este programa ya no está en la carpeta de Quake.
-308|Escribe un nombre de mapa, p. ej. dm4.
-309|Un nombre de mapa no puede contener espacios.
-311|Escribe un nombre.
-312|Ese nombre no está permitido.
-313|Un nombre no puede contener / \ : * ? " < > |
-314|el juego no carga este nombre
-315|tipo de archivo no compatible
-316|no encontrado
-18|• **Gfx** (`qw/gfx`): el fondo de la consola (`conback`, o el nombre de `scr_conpicture`), las imágenes de los menús y el cursor. `gfx/conback.lmp` debe existir o el juego no arranca.
-22|• **Progs** (`qw/progs`): modelos y sprites, cualquier nombre. Un `.md3` con el mismo nombre sustituye al `.mdl`.
-25|• **Maps** (`qw/maps`): `<map>.bsp` más archivos auxiliares; las cajas de objetos (`b_*.bsp`) también están aquí.
-26|• **Lits y Locs** (`qw/lits`, `qw/locs`): iluminación de color (`<map>.lit`) y nombres de lugares para el juego en equipo (`<map>.loc`).
-39|tú eliges el tipo de recurso
-40|por elegir: {0}
-43|{0} en carpetas que la aplicación no gestiona (se omiten)
-54|1 archivo o carpeta no válido oculto en la carpeta del juego
-63|¿Mover {0} a la {1}? El juego usará su versión integrada.
-64|Se movieron {0} y {1} de Assets a la {2}.
-82|no válidos, omitidos: {0}
-103|{0} con nombres que el juego no carga (marcados como no válidos)
-121|Icono: {0}
-123|Omitir
-124|¿Dónde van estos archivos?
-125|{0} tiene archivos en carpetas que la aplicación no sabe ubicar sola. Elige un tipo de recurso para cada carpeta, u Omitir.
-126|(raíz del archivo)
-127|sugerido a partir de los nombres de archivo
-128|Continuar
-129|Se encontraron carpetas con recursos alternativos
-130|El juego no carga subcarpetas, así que suelen ser versiones alternativas. Marca las que quieras copiar en Assets; cada una conserva su nombre.
-131|No volver a preguntar por las carpetas que deje sin marcar
-132|Copiar
-133|Copiar y eliminar
-134|Copiar y luego mover las carpetas originales de tu carpeta de Quake a la papelera de reciclaje
-135|Esc: {0}
-136|Eliminar también las copias en Assets ({0})
-137|No hay ninguna copia de este archivo en Assets: es la única copia.
-144|No se pudo abrir esta carpeta: {0}
-149|Lo usa el juego. Aún no está en Assets.
-150|Lo usa el juego. Hay una copia en la carpeta de Assets «{0}».
-184|No se encontraron subcarpetas en las carpetas del juego.
-185|Después de copiar, estas carpetas se moverán de tu carpeta de Quake a la papelera de reciclaje:
-297|Buscar subcarpetas de nuevo
-298|Volver a ofrecer las subcarpetas encontradas en las carpetas del juego, incluidas las que omitiste
+280|En tu carpeta Assets local
+281|En tu carpeta de Quake: el juego lo carga desde aquí
+282|Buscar duplicados en la carpeta de Quake activa
+283|Buscando duplicados en la carpeta de Quake…
+284|No hay duplicados: cada ruta de las carpetas del juego existe una sola vez.
+285|{0} rutas existen en más de un lugar ({1} con contenido idéntico). El juego solo usa una de cada.
+286|La marcada con ✓ es la copia que carga el juego: qw antes que ezquake antes que id1, y dentro de una carpeta un archivo suelto antes que un pk3 o pak.
+287|Exportar…
+288|Guardar esta lista como archivo de texto
+289|idénticos
+290|diferentes
+291|Vista previa
+292|Mostrar todas las copias lado a lado
+293|lo usa el juego
+294|{0} copias de {1}.
+295|Duplicados en {0}
+296|Guardar la lista de duplicados
+297|Archivo de texto
+298|No se pudo guardar la lista:
+299|Buscar duplicados en las carpetas Assets locales
+300|Buscando copias en las carpetas Assets locales…
+301|No hay copias: cada archivo de tus carpetas Assets locales está una sola vez.
+302|{0} archivos están guardados más de una vez ({1} copias de más). Las copias tienen el mismo nombre, tamaño y contenido. Marca las copias que quieres conservar (la más antigua está marcada); Eliminar mueve las demás a la {2}. Siempre se conserva al menos una copia de cada archivo.
+303|Eliminar…
+304|Muestra la lista de archivos a eliminar y pide confirmación
+305|Todas las copias están marcadas para conservar, así que no hay nada que eliminar.
+306|Algunos archivos no se pudieron eliminar:
+307|Esc: cerrar
+308|{0} copias
+309|Marcada: conservar esta copia. Sin marcar: eliminarla.
+310|¿Eliminar estas copias?
+311|Estos {0} se moverán a la {1}. Las copias que marcaste se quedan en Assets. Puedes restaurar los archivos eliminados desde la {1}.
+312|Eliminar {0}
+313|Intro o Esc: cancelar
+315|Elige un archivo comprimido
+316|Filtrar, p. ej. textures/
+317|Mostrar solo las entradas cuya ruta contenga este texto
+318|Copiar selección
+319|Copiar los archivos seleccionados en las carpetas de su tipo en Assets
+320|Copiar todo en Assets
+321|Copiar todos los archivos de este archivo comprimido en Assets. Verás un resumen, con Revertir, antes de que se añada nada.
+323|Abrir esta carpeta en el explorador de archivos
+324|Mostrar no válidos
+325|Mostrar también los archivos que el juego nunca carga y las subcarpetas. Solo afecta a esta lista: la lista Local siempre muestra todos los archivos.
+326|Activo: es la carpeta de Quake seleccionada. El juego usa los archivos de aquí.
+327|Crear carpeta
+328|Local
+329|En línea
+330|Explorar y descargar recursos de este tipo desde gfx.quakeworld.nu
+331|Filtrar…
+332|Mostrar solo los archivos cuyo nombre empieza por este texto, en todas las carpetas de este tipo de recurso
+333|Borrar el filtro
+334|Nueva carpeta: crear una carpeta de alternativas en Assets para este tipo
+335|Assets locales: tu archivo de recursos alternativos. El juego no los carga. Arrastra y suelta aquí tus propios zip o carpetas y se organizarán automáticamente en los distintos tipos de recurso.
+336|Explorar los archivos PAK y PK3 de tu carpeta de Quake y copiar archivos de ellos en Assets.
+337|Inicia el cliente en el mapa de Ajustes para ver tus cambios.
+338|Ajustes: carpetas, cliente, mapa, idioma, tema, tipos de recurso y herramientas.
+339|Ayuda: explica cada zona de la ventana.
+340|Los tipos de recurso están arriba. Gestiónalos en Ajustes. Archivos: explora los archivos PAK y PK3 de tu carpeta de Quake activa.\n¡Suelta archivos zip/rar/7z en esta ventana para importarlos a tus assets locales!
+343|Leyendo los datos del juego…
+344|Suelta para añadir a Assets
+345|zip, pk3, rar, 7z, tar.gz, carpetas o imágenes. Verás un resumen antes de que se añada nada.
+346|Qué lista del sitio web explorar
+347|Página anterior
+348|Página siguiente
+350|Reintentar
+351|Abrir el sitio en el navegador
+352|Cargando…
+353|Ya descargado
+355|El ajuste del cliente que decide si se usa este archivo. Configúralo en la configuración del cliente o en la consola.
+356|Ahora en el juego
+357|General
+358|La carpeta que contiene id1 y qw.
+359|Examinar…
+360|Se encontraron id1 y qw.
+361|Crear las carpetas que faltan
+362|Carpeta de Assets (archivo)
+363|Donde la aplicación guarda una copia de cada recurso. El juego no carga esta carpeta.
+364|Cliente
+365|Elige un cliente…
+366|Programas encontrados en la carpeta de Quake.
+367|Mapa que abrir
+368|Idioma
+369|El idioma de la aplicación. Los nombres de carpetas, archivos y tipos de recurso no cambian.
+370|Tema
+371|Los colores y el estilo de la aplicación. Cambian al elegir; Cancelar vuelve atrás.
+372|Mostrar la pestaña En línea
+373|Mostrar el selector Local/En línea sobre la lista de Assets para explorar gfx.quakeworld.nu. Si está desactivado, solo se muestran tus copias locales.
+374|Tipos de recurso
+375|Elige qué tipos de recurso tienen pestaña. Los tipos ocultos se siguen reconociendo al soltar archivos. Todo lo relativo a un tipo (carpetas, extensiones, nombres válidos, listas en línea) está en los archivos de configuración de abajo; reinicia la aplicación después de editarlos.
+376|Abrir la carpeta de configuración
+377|Abrir la carpeta con asset-types.json y los archivos de nombres
+378|Mostrar todos
+379|Marcar todos los tipos de recurso
+380|Solo los cinco por defecto
+381|Models, BModels, HUD, Tracker y Particles
+382|Buscar subcarpetas de nuevo
+383|Volver a ofrecer las subcarpetas encontradas en las carpetas del juego, incluidas las que omitiste
+384|Herramientas
+385|Guarda primero los ajustes: las herramientas necesitan tus carpetas de Quake y Assets.
+386|En Linux el juego solo encuentra archivos cuyo nombre coincide exactamente, y pide nombres en minúsculas. Esto busca archivos con mayúsculas en los dos sitios: las carpetas del juego de todos los tipos de recurso en tu carpeta de Quake y tu carpeta Assets local. Cada archivo indica dónde está, y solo se renombran los que marques.
+387|Buscar nombres con mayúsculas…
+388|Analiza solo la carpeta de Quake indicada en General (sus carpetas del juego y los archivos .pak y .pk3 que contienen). La misma ruta puede existir en varios sitios, por ejemplo id1/textures/abc.png y qw/textures/abc.png, o un archivo suelto y otro dentro de un pak/pk3, y el juego solo usa uno. La lista muestra cuál, permite previsualizar las copias y se puede guardar como archivo de texto. No se cambia nada.
+389|Buscar duplicados…
+390|Analiza todas las carpetas de tu carpeta Assets local, para todos los tipos de recurso, en busca de copias exactas: archivos con el mismo nombre, extensión y tamaño cuyo contenido también es idéntico. Eliges qué copia conservar de cada uno; las demás se pueden mover a la Papelera de reciclaje, tras una lista final de lo que se eliminará.
+391|Buscar copias en Assets…
+392|Página del proyecto en GitHub
+393|Wiki en QuakeWorld.nu
+394|Intro: guardar · Tab: campo siguiente
+395|Elige tu carpeta de Quake.
+396|Esta carpeta no existe.
+397|No es una carpeta de Quake. Debe contener las carpetas id1 y qw.
+398|Elige dónde guardar las copias de tus recursos.
+399|Usa una ruta completa.
+400|La carpeta de Assets no puede estar dentro de qw\textures, o el juego la cargaría.
+401|Elige el programa que se iniciará al pulsar Probar.
+402|Este programa ya no está en la carpeta de Quake.
+403|Escribe un nombre de mapa, p. ej. dm4.
+404|Un nombre de mapa no puede contener espacios.
+406|Escribe un nombre.
+407|Ese nombre no está permitido.
+408|Un nombre no puede contener / \ : * ? " < > |
+409|el juego no carga este nombre
+410|tipo de archivo no compatible
+411|no encontrado
+412|Óxido
+413|Pizarra
+414|Pergamino
+224|En línea: explora alternativas de {0} en {1}. Selecciona una para ver sus detalles y luego descárgala a tus Assets locales. Confirmas antes de que se añada nada.
+314|Archivos: los archivos PAK y PK3 de tu carpeta de Quake activa. Nunca se modifican. Selecciona archivos y haz clic derecho para copiarlos a tus Assets locales.
+322|Archivos dentro del archivo comprimido seleccionado. Se pueden previsualizar imágenes, skins de modelos e imágenes WAD. Los archivos copiados se ordenan en tus Assets locales por tipo de recurso; sonidos, mapas y otros archivos van a assets\other. Primero ves un resumen.
+341|Probar: inicia tu cliente en el mapa de Ajustes y mira tus cambios en el juego.
+342|Ajustes: carpetas, cliente, mapa de prueba, idioma y tema. Elige qué tipos de recurso mostrar y usa las herramientas para corregir nombres de archivo y buscar duplicados.
+349|En línea: explora alternativas para esta pestaña en gfx.quakeworld.nu. Selecciona una para ver sus detalles y luego descárgala a tus Assets locales. Confirmas antes de que se añada nada.
+354|Vista previa del archivo seleccionado y de lo que puedes hacer con él. Para una alternativa, debajo se muestra la versión que usa ahora el juego, para comparar.

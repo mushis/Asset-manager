@@ -13,17 +13,18 @@ public sealed record SourceFile(string Path, Func<byte[]> Read, bool InArchive =
 /// <summary>What happened to one import, file by file, before it is committed.</summary>
 public sealed class ImportSession
 {
+    /// <param name="Kind">The asset type id, or <see cref="Importer.Other"/> for files kept in assets/other.</param>
     public sealed record Staged(string Kind, string StagedPath, string FinalPath, string Folder, bool Invalid = false);
 
     public required string Title { get; init; }
     public required string StagingDir { get; init; }
-    public List<Staged> Files { get; init; } = [];
+    public List<Staged> Files { get; set; } = [];
     public int Duplicates { get; set; }
     /// <summary>Files in known folders the app doesn't manage (sound, maps, map textures...), by folder.</summary>
-    public SortedDictionary<string, int> NotManaged { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+    public SortedDictionary<string, int> NotManaged { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>"path — reason" for every file that was left out.</summary>
-    public List<string> Ignored { get; init; } = [];
-    public List<string> Errors { get; init; } = [];
+    public List<string> Ignored { get; set; } = [];
+    public List<string> Errors { get; set; } = [];
 
     public int AddedCount(string kind) => Files.Count(f => f.Kind == kind);
     public int InvalidCount(string kind) => Files.Count(f => f.Kind == kind && f.Invalid);
@@ -80,14 +81,14 @@ public sealed class ImportSession
     }
 
     internal void SaveManifest() =>
-        File.WriteAllText(Path.Combine(StagingDir, "session.json"), JsonSerializer.Serialize(this));
+        File.WriteAllText(Path.Combine(StagingDir, "session.json"), JsonSerializer.Serialize(this, PlainJson.Files.ImportSession));
 
     public static ImportSession? LoadManifest(string stagingDir)
     {
         try
         {
             var path = Path.Combine(stagingDir, "session.json");
-            return File.Exists(path) ? JsonSerializer.Deserialize<ImportSession>(File.ReadAllText(path)) : null;
+            return File.Exists(path) ? JsonSerializer.Deserialize(File.ReadAllText(path), PlainJson.Files.ImportSession) : null;
         }
         catch (Exception e) when (e is IOException or JsonException)
         {
@@ -110,6 +111,9 @@ public sealed class ImportPlan
 
     public required string Title { get; init; }
     internal List<Group> Groups { get; } = [];
+
+    /// <summary>The Assets subfolder the files go to (the archive or folder name), unless the user picks another.</summary>
+    public string? FolderName => Groups.FirstOrDefault(g => !g.Dated)?.Name;
     internal List<string> Ignored { get; } = [];
     internal List<string> Errors { get; } = [];
 
@@ -133,6 +137,9 @@ public sealed class ImportPlan
 /// </summary>
 public sealed class Importer(AssetManager manager)
 {
+    /// <summary>The answer, and the staged kind, for files kept in assets/other.</summary>
+    public const string Other = "other";
+
     public static readonly string[] ArchiveExtensions = [".zip", ".pk3", ".pak", ".rar", ".7z", ".tar", ".tar.gz", ".tgz"];
 
     public string StagingRoot => Path.Combine(manager.Settings.AssetsFolder, ".qam", "staging");
@@ -196,10 +203,11 @@ public sealed class Importer(AssetManager manager)
     }
 
     /// <summary>
-    /// Stage the plan. <paramref name="answers"/> maps each question key to the chosen type (null or missing = skip).
+    /// Stage the plan. <paramref name="answers"/> maps each question key to the chosen type id, <see cref="Other"/>,
+    /// or null (or missing) to skip. <paramref name="folder"/> replaces the archive or folder name as the Assets subfolder.
     /// Call Commit or Revert on the result.
     /// </summary>
-    public ImportSession Stage(ImportPlan plan, IReadOnlyDictionary<string, AssetType?>? answers = null)
+    public ImportSession Stage(ImportPlan plan, IReadOnlyDictionary<string, string?>? answers = null, string? folder = null)
     {
         var session = new ImportSession
         {
@@ -210,10 +218,13 @@ public sealed class Importer(AssetManager manager)
         session.Ignored.AddRange(plan.Ignored);
         session.Errors.AddRange(plan.Errors);
         var indexes = AssetType.Known.ToDictionary(t => t.Id, t => manager.BuildIndex(t).Keys.ToHashSet(), StringComparer.OrdinalIgnoreCase);
+        var otherIndex = manager.BuildOtherIndex().Keys.ToHashSet();
         var reserved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var chosenFolder = string.IsNullOrWhiteSpace(folder) ? null : SafeFolderName(folder.Trim());
 
         foreach (var group in plan.Groups)
         {
+            var groupName = !group.Dated && chosenFolder is not null ? chosenFolder : group.Name;
             var folderByKind = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             foreach (var item in group.Items)
             {
@@ -221,21 +232,31 @@ public sealed class Importer(AssetManager manager)
                 var type = c.Type;
                 var relative = c.RelativePath;
                 var invalid = c.Invalid;
+                var otherPath = c.OtherPath;
                 if (c.NeedsChoice)
                 {
-                    type = answers is not null && answers.TryGetValue(item.QuestionKey, out var chosen) ? chosen : null;
-                    if (type is null)
+                    var answer = answers is not null && answers.TryGetValue(item.QuestionKey, out var chosen) ? chosen : null;
+                    if (answer == Other)
                     {
-                        session.Ignored.Add($"{item.File.Path} — skipped");
-                        continue;
+                        type = null;
+                        otherPath = item.File.Path.Replace('\\', '/').TrimStart('/');
                     }
-                    relative = Path.GetFileName(item.File.Path);
-                    invalid = manager.ValidNames.TryGetValue(type.Id, out var set) && !set.IsValidFileName(relative);
+                    else
+                    {
+                        type = answer is null ? null : AssetType.ById(answer);
+                        if (type is null)
+                        {
+                            session.Ignored.Add($"{item.File.Path} — skipped");
+                            continue;
+                        }
+                        relative = Path.GetFileName(item.File.Path);
+                        invalid = manager.ValidNames.TryGetValue(type.Id, out var set) && !set.IsValidFileName(relative);
+                    }
                 }
                 if (type is null)
                 {
-                    if (c.OtherFolder is not null)
-                        session.NotManaged[c.OtherFolder] = session.NotManaged.GetValueOrDefault(c.OtherFolder) + 1;
+                    if (otherPath is not null)
+                        StageOther(session, item.File, otherPath, c.OtherFolder ?? Other, otherIndex);
                     else
                         session.Ignored.Add($"{item.File.Path} — {c.Reason}");
                     continue;
@@ -257,22 +278,52 @@ public sealed class Importer(AssetManager manager)
                     continue;
                 }
 
-                if (!folderByKind.TryGetValue(type.Id, out var folder))
+                if (!folderByKind.TryGetValue(type.Id, out var target))
                 {
-                    folder = group.Dated ? group.Name : UniqueFolder(manager.AssetsFolder(type), group.Name, type.Id, reserved);
-                    folderByKind[type.Id] = folder;
+                    target = group.Dated ? group.Name : UniqueFolder(manager.AssetsFolder(type), groupName, type.Id, reserved);
+                    folderByKind[type.Id] = target;
                 }
                 var rel = relative.Replace('/', Path.DirectorySeparatorChar);
-                var staged = Path.Combine(session.StagingDir, type.FolderName, folder, rel);
+                var staged = Path.Combine(session.StagingDir, type.FolderName, target, rel);
                 if (File.Exists(staged))
                     staged = AssetManager.UniqueFilePathFor(staged);
                 Directory.CreateDirectory(Path.GetDirectoryName(staged)!);
                 File.WriteAllBytes(staged, data);
-                session.Files.Add(new ImportSession.Staged(type.Id, staged, Path.Combine(manager.AssetsFolder(type), folder, rel), folder, invalid));
+                session.Files.Add(new ImportSession.Staged(type.Id, staged, Path.Combine(manager.AssetsFolder(type), target, rel), target, invalid));
             }
         }
         session.SaveManifest();
         return session;
+    }
+
+    /// <summary>
+    /// A file the app doesn't manage (sound, maps, map textures...): kept in assets/other with the same path.
+    /// Identical content is skipped; a different file with the same path gets a "(2)" suffix when committed.
+    /// </summary>
+    private void StageOther(ImportSession session, SourceFile file, string otherPath, string folder, HashSet<string> index)
+    {
+        var parts = otherPath.Split('/', StringSplitOptions.RemoveEmptyEntries).Select(SafeFolderName).ToArray();
+        if (parts.Length == 0) return;
+        byte[] data;
+        try { data = file.Read(); }
+        catch (Exception e) when (e is IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            session.Errors.Add($"{file.Path}: {e.Message}");
+            return;
+        }
+        if (!index.Add(Convert.ToHexString(SHA256.HashData(data))))
+        {
+            session.Duplicates++;
+            return;
+        }
+        var rel = Path.Combine(parts);
+        var staged = Path.Combine(session.StagingDir, Other, rel);
+        if (File.Exists(staged))
+            staged = AssetManager.UniqueFilePathFor(staged);
+        Directory.CreateDirectory(Path.GetDirectoryName(staged)!);
+        File.WriteAllBytes(staged, data);
+        session.Files.Add(new ImportSession.Staged(Other, staged, Path.Combine(manager.OtherFolder, rel), folder));
+        session.NotManaged[folder] = session.NotManaged.GetValueOrDefault(folder) + 1;
     }
 
     /// <summary>Prepare and stage in one go; questions are skipped (tests, and imports that have none).</summary>

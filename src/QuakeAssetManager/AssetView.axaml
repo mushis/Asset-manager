@@ -7,16 +7,19 @@
     <!-- Active: the folder the game loads -->
     <DockPanel Grid.Column="0">
       <Border DockPanel.Dock="Top" Classes="headerbar">
-        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
-          <TextBlock x:Name="ActiveHeader" Classes="header" Text="{local:T 'Active'}" />
-          <Button x:Name="OpenActive" Grid.Column="1" Classes="icon" Content="📂" Margin="6,0,0,0"
+        <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+          <!-- The app icon, as tall as the header bar -->
+          <Image Source="/Assets/icon.png" Height="34" Margin="-2,-5,6,-5" VerticalAlignment="Center"
+                 RenderOptions.BitmapInterpolationMode="HighQuality" />
+          <TextBlock x:Name="ActiveHeader" Grid.Column="1" Classes="header" Text="{local:T 'Active'}" TextTrimming="CharacterEllipsis" />
+          <Button x:Name="OpenActive" Grid.Column="2" Classes="icon" Content="📂" Margin="6,0,0,0"
                   ToolTip.Tip="{local:T 'Open this folder in your file explorer'}" />
-          <ToggleSwitch x:Name="ShowInvalid" Grid.Column="3" OnContent="{local:T 'Show invalid'}" OffContent="{local:T 'Show invalid'}"
-                        ToolTip.Tip="{local:T 'Also show files the game never loads, and subfolders'}" />
+          <ToggleSwitch x:Name="ShowInvalid" Grid.Column="4" IsChecked="True" OnContent="{local:T 'Show invalid'}" OffContent="{local:T 'Show invalid'}"
+                        ToolTip.Tip="{local:T 'Also show files the game never loads, and subfolders. Only affects this list: the Local list always shows every file.'}" />
         </Grid>
       </Border>
       <Border DockPanel.Dock="Top" Classes="help">
-        <TextBlock Text="{local:T 'Active: this is your Quake folder. Files here are used by the game. The coloured label shows where each file came from: original (was there before), from &lt;folder&gt; (placed by the app), or invalid.'}" />
+        <TextBlock Text="{local:T 'Active: this is your selected Quake folder. Files here are used by the game.'}" />
       </Border>
       <Border x:Name="MissingFolder" DockPanel.Dock="Top" Classes="missing" IsVisible="False">
         <StackPanel Spacing="8">
@@ -24,7 +27,7 @@
           <Button x:Name="CreateFolder" Content="{local:T 'Create folder'}" />
         </StackPanel>
       </Border>
-      <ListBox x:Name="ActiveList" SelectionMode="Single">
+      <ListBox x:Name="ActiveList" SelectionMode="Multiple">
         <ListBox.ItemTemplate>
           <DataTemplate x:DataType="local:ActiveItem">
             <Grid ColumnDefinitions="Auto,*,Auto,62" Background="Transparent" ToolTip.Tip="{Binding Tip}">
@@ -37,9 +40,7 @@
               </Border>
               <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
                          TextTrimming="CharacterEllipsis" Classes.invalid="{Binding IsInvalid}" />
-              <TextBlock Grid.Column="2" Text="{Binding Badge}" Classes="badge" Margin="8,0,0,0"
-                         Classes.bad="{Binding BadgeIsBad}" Classes.from="{Binding BadgeIsFrom}"
-                         Classes.changed="{Binding BadgeIsChanged}" Classes.original="{Binding BadgeIsOriginal}" />
+              <TextBlock Grid.Column="2" Text="{Binding Badge}" Classes="badge" Margin="8,0,0,0" Classes.bad="{Binding BadgeIsBad}" />
               <TextBlock Grid.Column="3" Text="{Binding ModifiedText}" Classes="date" ToolTip.Tip="{Binding ModifiedTip}" />
             </Grid>
           </DataTemplate>
@@ -47,28 +48,36 @@
       </ListBox>
     </DockPanel>
 
-    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="{DynamicResource SystemControlForegroundBaseLowBrush}" Width="1" />
+    <GridSplitter Grid.Column="1" ResizeDirection="Columns" Width="1" />
 
     <!-- Assets (the options) or Online -->
     <DockPanel Grid.Column="2">
       <Border DockPanel.Dock="Top" Classes="headerbar">
         <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
-          <ToggleButton x:Name="AssetsTab" Classes="tab" Content="{local:T 'Local'}" IsChecked="True"
-                        ToolTip.Tip="{local:T 'Your local copies of assets for this type (the Assets folder)'}" />
+          <ToggleButton x:Name="AssetsTab" Classes="tab" Content="{local:T 'Local'}" IsChecked="True" />
           <ToggleButton x:Name="OnlineTab" Grid.Column="1" Classes="tab" Content="{local:T 'Online'}"
                         ToolTip.Tip="{local:T 'Browse and download assets for this type from gfx.quakeworld.nu'}" />
           <Button x:Name="OpenAssets" Grid.Column="2" Classes="icon" Content="📂" Margin="2,0,0,0"
                   ToolTip.Tip="{local:T 'Open this folder in your file explorer'}" />
-          <Button x:Name="NewFolder" Grid.Column="4" Content="{local:T 'New folder'}" ToolTip.Tip="{local:T 'Create an option folder'}" />
+          <TextBox x:Name="FilterBox" Grid.Column="3" Margin="8,0,6,0" MinWidth="80" Watermark="{local:T 'Filter…'}"
+                   ToolTip.Tip="{local:T 'Show only files whose names start with this text, in every folder of this asset type'}">
+            <TextBox.InnerRightContent>
+              <Button x:Name="ClearFilter" Classes="icon" Content="×" Padding="6,0" MinWidth="0" Background="Transparent"
+                      BorderThickness="0" IsVisible="False" ToolTip.Tip="{local:T 'Clear the filter'}" />
+            </TextBox.InnerRightContent>
+          </TextBox>
+          <Button x:Name="NewFolder" Grid.Column="4" Classes="icon" Content="📁✱"
+                  ToolTip.Tip="{local:T 'New folder: create a folder of alternatives in Local assets for this type'}" />
         </Grid>
       </Border>
       <Panel>
         <DockPanel x:Name="AssetsPanel">
-          <TextBlock x:Name="AssetsHeader" DockPanel.Dock="Top" Classes="muted" Margin="10,4" />
+          <TextBlock x:Name="AssetsHeader" DockPanel.Dock="Top" Classes="muted" Margin="10,4" TextTrimming="CharacterEllipsis" />
           <Border DockPanel.Dock="Top" Classes="help">
-            <TextBlock Text="{local:T 'Assets: your archive of options. The game doesn’t load these. Right-click, or use the buttons under the preview: Use this file, Use these (a whole folder), Rename, Delete. You can also drop zip/rar/7z files, folders or images on the window.'}" />
+            <TextBlock Text="{local:T 'Local assets: your archive of alternative assets. The game doesn’t load these. Drag and drop your own zip/folders here and they will get automatically organized into the different asset types.'}" />
           </Border>
-          <TreeView x:Name="AssetsTree" SelectionMode="Single">
+          <TextBlock x:Name="NoMatches" DockPanel.Dock="Top" Classes="muted" Margin="10,8" IsVisible="False" TextWrapping="Wrap" />
+          <TreeView x:Name="AssetsTree" SelectionMode="Multiple">
             <TreeView.ItemContainerTheme>
               <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}"
                             x:DataType="local:AssetNode">
@@ -99,7 +108,7 @@
       </Panel>
     </DockPanel>
 
-    <GridSplitter Grid.Column="3" ResizeDirection="Columns" Background="{DynamicResource SystemControlForegroundBaseLowBrush}" Width="1" />
+    <GridSplitter Grid.Column="3" ResizeDirection="Columns" Width="1" />
 
     <!-- Preview -->
     <local:PreviewPanel x:Name="Preview" Grid.Column="4" />

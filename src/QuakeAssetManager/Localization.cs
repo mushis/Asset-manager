@@ -11,7 +11,10 @@ namespace QuakeAssetManager;
 /// </summary>
 public static class Loc
 {
-    public sealed record Language(string Code, string NativeName);
+    public sealed record Language(string Code, string NativeName)
+    {
+        public override string ToString() => NativeName;
+    }
 
     public static readonly IReadOnlyList<Language> Languages =
     [
@@ -40,7 +43,7 @@ public static class Loc
         {
             var path = Path.Combine(Folder, code + ".json");
             if (File.Exists(path))
-                _strings = JsonSerializer.Deserialize<Dictionary<string, string>>(File.ReadAllText(path)) ?? [];
+                _strings = JsonSerializer.Deserialize(File.ReadAllText(path), LangJson.Default.DictionaryStringString) ?? [];
         }
         catch (Exception e) when (e is IOException or JsonException) { }
         try
@@ -71,6 +74,10 @@ public static class Loc
         return Loc.F("{0} files", n);
     }
 }
+
+/// <summary>JSON code generated at build time for lang/*.json (safe to trim).</summary>
+[System.Text.Json.Serialization.JsonSerializable(typeof(Dictionary<string, string>))]
+internal sealed partial class LangJson : System.Text.Json.Serialization.JsonSerializerContext;
 
 /// <summary>XAML: Text="{local:T 'Show invalid'}"</summary>
 public sealed class TExtension(string text) : MarkupExtension

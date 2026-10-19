@@ -1,0 +1,74 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    x:Class="QuakeAssetManager.ThemeFiles.Rust">
+  <!-- Rust: Dark brown surfaces, warm orange accent, square corners. One file per theme: colours and corner radii. -->
+  <x:String x:Key="ThemeName">Rust</x:String>
+  <x:String x:Key="ThemeVariant">Dark</x:String>
+
+  <!-- Fluent palette (copied into FluentTheme.Palettes by Themes.Apply) -->
+  <Color x:Key="Palette.Accent">#D9661F</Color>
+  <Color x:Key="Palette.RegionColor">#17120F</Color>
+  <Color x:Key="Palette.AltHigh">#17120F</Color>
+  <Color x:Key="Palette.AltMediumHigh">#CC17120F</Color>
+  <Color x:Key="Palette.AltMedium">#9917120F</Color>
+  <Color x:Key="Palette.AltMediumLow">#6617120F</Color>
+  <Color x:Key="Palette.AltLow">#3317120F</Color>
+  <Color x:Key="Palette.BaseHigh">#E9DFD3</Color>
+  <Color x:Key="Palette.BaseMediumHigh">#CCE9DFD3</Color>
+  <Color x:Key="Palette.BaseMedium">#99E9DFD3</Color>
+  <Color x:Key="Palette.BaseMediumLow">#66E9DFD3</Color>
+  <Color x:Key="Palette.BaseLow">#3A2B20</Color>
+  <Color x:Key="Palette.ChromeLow">#221A14</Color>
+  <Color x:Key="Palette.ChromeMediumLow">#2E241C</Color>
+  <Color x:Key="Palette.ChromeMedium">#221A14</Color>
+  <Color x:Key="Palette.ChromeHigh">#5A4636</Color>
+  <Color x:Key="Palette.ChromeAltLow">#E9DFD3</Color>
+  <Color x:Key="Palette.ListLow">#2E241C</Color>
+  <Color x:Key="Palette.ListMedium">#3A2414</Color>
+
+  <!-- Brushes -->
+  <SolidColorBrush x:Key="ThemeWindowBrush" Color="#17120F" />
+  <SolidColorBrush x:Key="ThemeHeaderBrush" Color="#221A14" />
+  <SolidColorBrush x:Key="ThemeBorderBrush" Color="#3A2B20" />
+  <SolidColorBrush x:Key="ThemeTextBrush" Color="#E9DFD3" />
+  <SolidColorBrush x:Key="ThemeMutedBrush" Color="#A8957F" />
+  <SolidColorBrush x:Key="ThemeAccentBrush" Color="#D9661F" />
+  <SolidColorBrush x:Key="ThemeOnAccentBrush" Color="#1A0E05" />
+  <SolidColorBrush x:Key="ThemeInvalidBrush" Color="#FF6B5B" />
+  <SolidColorBrush x:Key="ThemeInGameBrush" Color="#6FD08C" />
+  <SolidColorBrush x:Key="ThemeWarnBrush" Color="#E8A33D" />
+  <SolidColorBrush x:Key="ThemeInfoBrush" Color="#5FA8E8" />
+  <SolidColorBrush x:Key="ThemeThumbBrush" Color="#2E241C" />
+  <SolidColorBrush x:Key="ThemeCodeBrush" Color="#F0A066" />
+  <SolidColorBrush x:Key="ThemeInputBrush" Color="#100C09" />
+  <SolidColorBrush x:Key="ThemeHelpBrush" Color="#22D9661F" />
+  <SolidColorBrush x:Key="ThemeHelpBorderBrush" Color="#80D9661F" />
+  <SolidColorBrush x:Key="ThemeDropBrush" Color="#E617120F" />
+  <SolidColorBrush x:Key="ButtonBackground" Color="#2E241C" />
+  <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#3A2E24" />
+  <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#45362A" />
+  <SolidColorBrush x:Key="ToggleButtonBackground" Color="#2E241C" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundPointerOver" Color="#3A2E24" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundPressed" Color="#45362A" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundChecked" Color="#D9661F" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPointerOver" Color="#D9661F" />
+  <SolidColorBrush x:Key="ToggleButtonBackgroundCheckedPressed" Color="#D9661F" />
+  <SolidColorBrush x:Key="ToggleButtonForegroundChecked" Color="#1A0E05" />
+  <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPointerOver" Color="#1A0E05" />
+  <SolidColorBrush x:Key="ToggleButtonForegroundCheckedPressed" Color="#1A0E05" />
+  <SolidColorBrush x:Key="TextControlBackground" Color="#100C09" />
+  <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#100C09" />
+  <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#100C09" />
+  <SolidColorBrush x:Key="ComboBoxBackground" Color="#2E241C" />
+  <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#3A2E24" />
+  <SolidColorBrush x:Key="ThemeSelectionBrush" Color="#40D9661F" />
+  <SolidColorBrush x:Key="ThemeSelectionHoverBrush" Color="#55D9661F" />
+  <SolidColorBrush x:Key="TreeViewItemBackgroundSelected" Color="#40D9661F" />
+  <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPointerOver" Color="#55D9661F" />
+  <SolidColorBrush x:Key="TreeViewItemBackgroundSelectedPressed" Color="#70D9661F" />
+
+  <!-- Corners -->
+  <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+  <CornerRadius x:Key="OverlayCornerRadius">0</CornerRadius>
+  <CornerRadius x:Key="TabCornerRadius">0</CornerRadius>
+</ResourceDictionary>

@@ -45,11 +45,10 @@ public partial class ArchivesView : UserControl
         ArchiveTreeNode? reselect = null;
         foreach (var (dir, archives) in Manager.ListArchives())
         {
-            var canExtract = dir.Equals("qw", StringComparison.OrdinalIgnoreCase);
-            var group = new ArchiveTreeNode { Name = dir, CanExtract = canExtract };
+            var group = new ArchiveTreeNode { Name = dir };
             foreach (var path in archives)
             {
-                var node = new ArchiveTreeNode { Name = Path.GetFileName(path), ArchivePath = path, CanExtract = canExtract };
+                var node = new ArchiveTreeNode { Name = Path.GetFileName(path), ArchivePath = path };
                 group.Children.Add(node);
                 if (path == _selectedArchive) reselect = node;
             }
@@ -74,10 +73,11 @@ public partial class ArchivesView : UserControl
         Preview.Clear();
         try
         {
+            var manager = Manager;
             var (archive, items) = await Task.Run(() =>
             {
                 var a = GameArchive.Open(path);
-                return (a, ListItems(a));
+                return (a, ListItems(a, manager));
             });
             if (_selectedArchive != path)
             {
@@ -98,13 +98,19 @@ public partial class ArchivesView : UserControl
         UpdateButtons();
     }
 
-    /// <summary>All entries, with WAD files expanded into their lumps.</summary>
-    private static List<ArchiveItem> ListItems(GameArchive archive)
+    /// <summary>All entries, with WAD files expanded into their lumps, each labelled with where it would be copied.</summary>
+    private static List<ArchiveItem> ListItems(GameArchive archive, AssetManager manager)
     {
         var items = new List<ArchiveItem>();
+        var sep = Path.DirectorySeparatorChar;
         foreach (var entry in archive.Entries.OrderBy(e => e.Path, StringComparer.OrdinalIgnoreCase))
         {
-            items.Add(new ArchiveItem { Archive = archive, Entry = entry });
+            var c = FileClassifier.Classify(entry.Path, manager, fromArchive: true);
+            var destination = c.Type is { } t ? $"→ assets{sep}{t.FolderName}" + (t.Visible ? "" : $" ({Loc.T("hidden")})")
+                : c.OtherPath is not null ? $"→ assets{sep}{Importer.Other}"
+                : c.NeedsChoice ? Loc.T("you'll pick")
+                : "";
+            items.Add(new ArchiveItem { Archive = archive, Entry = entry, Destination = destination, Target = c.Type });
             if (entry.Extension == ".wad" && entry.Size < 32 * 1024 * 1024 &&
                 WadFile.TryParse(archive.ReadEntry(entry), out var wad) && wad is not null)
             {
@@ -132,17 +138,16 @@ public partial class ArchivesView : UserControl
 
     private void UpdateButtons()
     {
-        var canExtract = _archive is not null && Manager.CanExtract(_archive.FilePath);
-        ExtractAll.IsVisible = ExtractSelected.IsVisible = canExtract;
-        var textures = _items.Count(i => i.Type is not null);
+        var open = _archive is not null;
+        ExtractAll.IsVisible = ExtractSelected.IsVisible = open;
+        var textures = _items.Count(i => i.Target is not null);
         ExtractNote.Text = _archive is null
             ? Loc.T("Pick an archive on the left to see what's inside.")
-            : canExtract
-                ? textures > 0
-                    ? Loc.F("{0} files here belong to a known asset type and can be copied to {1}. Hold Ctrl or Shift to select several, then right-click.", textures, Path.Combine("assets", "<type>", Path.GetFileNameWithoutExtension(_archive.FilePath)))
-                    : Loc.T("This archive has no files the app recognises.")
-                : "🔒 " + Loc.T("Browse only. Only archives in the qw folder can be copied to Assets.");
-        ExtractAll.IsEnabled = textures > 0;
+            : textures > 0
+                ? Loc.F("{0} files here belong to a known asset type and go to {1}. Files in folders the app doesn't manage go to {2}; for the rest you pick the type. Hold Ctrl or Shift to select several, then right-click.",
+                    textures, Path.Combine("assets", "<type>", Path.GetFileNameWithoutExtension(_archive.FilePath)), Path.Combine("assets", Importer.Other))
+                : Loc.F("No file here belongs to a known asset type. Files in folders the app doesn't manage go to {0}; for the rest you pick the type.", Path.Combine("assets", Importer.Other));
+        ExtractAll.IsEnabled = _items.Count > 0;
     }
 
     private void OnEntrySelected()
@@ -170,16 +175,17 @@ public partial class ArchivesView : UserControl
 
     /// <summary>
     /// Selected archive files grouped by the asset type of the folder they sit in (shown or hidden types).
-    /// The archive's folder decides; files in folders the app can't place are counted separately (asked about).
+    /// The archive's folder decides; files in folders the app doesn't manage go to assets/other, and the rest are asked about.
     /// </summary>
-    private (List<IGrouping<AssetType, ArchiveItem>> ByType, int Unsure, int NotManaged) Sorted(IEnumerable<ArchiveItem> items)
+    private (List<IGrouping<AssetType, ArchiveItem>> ByType, List<ArchiveItem> Other, int Unsure) Sorted(IEnumerable<ArchiveItem> items)
     {
         var classified = items.Select(i => (Item: i, Class: FileClassifier.Classify(i.Entry.Path, Manager, fromArchive: true))).ToList();
         var byType = classified.Where(x => x.Class.Type is not null)
             .GroupBy(x => x.Class.Type!, x => x.Item)
             .OrderByDescending(g => g.Count())
             .ToList();
-        return (byType, classified.Count(x => x.Class.NeedsChoice), classified.Count(x => x.Class.Type is null && !x.Class.NeedsChoice));
+        var other = classified.Where(x => x.Class.Type is null && x.Class.OtherPath is not null).Select(x => x.Item).ToList();
+        return (byType, other, classified.Count(x => x.Class.NeedsChoice));
     }
 
     private static string TypeLabel(AssetType t) => t.Visible ? t.DisplayName : $"{t.DisplayName}, {Loc.T("hidden")}";
@@ -197,36 +203,27 @@ public partial class ArchivesView : UserControl
 
         var menu = new ContextMenu();
         var folder = Importer.ArchiveBaseName(_archive.FilePath);
-        if (!Manager.CanExtract(_archive.FilePath))
-        {
-            menu.Items.Add(new MenuItem { Header = Loc.T("Browse only: only archives in the qw folder can be copied to Assets"), IsEnabled = false });
-        }
+        var (groups, other, unsure) = Sorted(selected);
+        var sep = System.IO.Path.DirectorySeparatorChar;
+        var parts = groups.Select(g => $"{TypeLabel(g.Key)}: {g.Count()}").ToList();
+        if (other.Count > 0) parts.Add($"{Loc.T("other")}: {other.Count}");
+        if (unsure > 0) parts.Add(Loc.F("to pick: {0}", unsure));
+        var kinds = groups.Count + (other.Count > 0 ? 1 : 0) + (unsure > 0 ? 1 : 0);
+
+        if (kinds == 1 && groups.Count == 1)
+            menu.Items.Add(Item(Loc.F("Copy {0} to Local assets", Count(selected.Count)) + $" → assets{sep}{groups[0].Key.FolderName}{sep}{folder} ({TypeLabel(groups[0].Key)})", () => _ = CopyToAssets(selected)));
+        else if (kinds == 1 && other.Count > 0)
+            menu.Items.Add(Item(Loc.F("Copy {0} to Local assets", Count(selected.Count)) + $" → assets{sep}{Importer.Other} ({Loc.T("not managed by the app")})", () => _ = CopyToAssets(selected)));
+        else if (kinds == 1)
+            menu.Items.Add(Item(Loc.F("Copy {0} to Local assets", Count(selected.Count)) + " (" + Loc.T("you'll pick the asset type") + ")", () => _ = CopyToAssets(selected)));
         else
         {
-            var (groups, unsure, notManaged) = Sorted(selected);
-            var sep = System.IO.Path.DirectorySeparatorChar;
-            if (groups.Count == 0 && unsure > 0)
-            {
-                menu.Items.Add(Item(Loc.F("Copy {0} to Assets", Count(unsure)) + " (" + Loc.T("you'll pick the asset type") + ")", () => _ = CopyToAssets(selected)));
-            }
-            else if (groups.Count == 1 && unsure == 0)
-            {
-                var g = groups[0];
-                menu.Items.Add(Item(Loc.F("Copy {0} to Assets", Count(g.Count())) + $" → assets{sep}{g.Key.FolderName}{sep}{folder} ({TypeLabel(g.Key)})", () => _ = CopyToAssets(g.ToList())));
-            }
-            else if (groups.Count > 0)
-            {
-                var summary = string.Join(", ", groups.Select(g => $"{TypeLabel(g.Key)}: {g.Count()}"));
-                if (unsure > 0) summary += ", " + Loc.F("to pick: {0}", unsure);
-                menu.Items.Add(Item(Loc.F("Copy to their asset folders ({0})", summary), () => _ = CopyToAssets(selected)));
-                menu.Items.Add(new Separator());
-                foreach (var g in groups)
-                    menu.Items.Add(Item(Loc.F("Copy only {0} ({1})", TypeLabel(g.Key), g.Count()) + $" → assets{sep}{g.Key.FolderName}{sep}{folder}", () => _ = CopyToAssets(g.ToList())));
-            }
-            if (notManaged > 0)
-                menu.Items.Add(new MenuItem { Header = Loc.F("{0} in folders the app doesn't manage (left out)", Count(notManaged)), IsEnabled = false });
-            if (groups.Count == 0 && unsure == 0 && notManaged == 0)
-                menu.Items.Add(new MenuItem { Header = Loc.T("No known asset type for the selected files"), IsEnabled = false });
+            menu.Items.Add(Item(Loc.F("Copy to their asset folders ({0})", string.Join(", ", parts)), () => _ = CopyToAssets(selected)));
+            menu.Items.Add(new Separator());
+            foreach (var g in groups)
+                menu.Items.Add(Item(Loc.F("Copy only {0} ({1})", TypeLabel(g.Key), g.Count()) + $" → assets{sep}{g.Key.FolderName}{sep}{folder}", () => _ = CopyToAssets(g.ToList())));
+            if (other.Count > 0)
+                menu.Items.Add(Item(Loc.F("Copy only {0} ({1})", Loc.T("files the app doesn't manage"), other.Count) + $" → assets{sep}{Importer.Other}", () => _ = CopyToAssets(other)));
         }
         menu.Open(EntryList);
 
@@ -239,26 +236,20 @@ public partial class ArchivesView : UserControl
         }
     }
 
-    /// <summary>Copy archive files to assets/&lt;type&gt;/&lt;archive name&gt; through the import summary (OK or Revert).</summary>
+    /// <summary>Copy archive files to Assets through the import summary (OK or Revert). Any archive can be copied from.</summary>
     private async Task CopyToAssets(List<ArchiveItem> items)
     {
         if (_archive is null) return;
         var owner = (Window)TopLevel.GetTopLevel(this)!;
-        if (!Manager.CanExtract(_archive.FilePath))
-        {
-            await Dialogs.Message(owner, Loc.T("Copy to Assets"), Loc.T("Only archives in the qw folder can be copied to Assets."));
-            return;
-        }
         if (items.Count == 0)
         {
-            await Dialogs.Message(owner, Loc.T("Copy to Assets"), Loc.T("Select the files to copy first."));
+            await Dialogs.Message(owner, Loc.T("Copy to Local assets"), Loc.T("Select the files to copy first."));
             return;
         }
         var archive = _archive;
         var files = items.Select(i => new SourceFile(i.Entry.Path, () => archive.ReadEntry(i.Entry), InArchive: true)).ToList();
         await _host.ImportWithSummary(m => new Importer(m).Prepare(archive.Name, Importer.ArchiveBaseName(archive.FilePath), files));
     }
-
     private void CloseArchive()
     {
         _thumbs?.Cancel();

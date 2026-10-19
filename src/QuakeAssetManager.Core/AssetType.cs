@@ -3,7 +3,34 @@ using System.Text.Json.Serialization;
 namespace QuakeAssetManager.Core;
 
 /// <summary>A list on a website that has assets for a type (shown in that type's Online tab).</summary>
-public sealed record OnlineLink(string Label, string Url);
+public sealed record OnlineLink(string Label, string Url)
+{
+    public override string ToString() => Label;
+}
+
+/// <summary>
+/// The client setting that decides whether a file is used, shown in the preview (docs/cvars-and-assets.md).
+/// </summary>
+/// <param name="Pattern">Regular expression matched against the file name, extension included, ignoring case.</param>
+/// <param name="Kind">used, shown or drawn ("Used when cvar is value"), or chosen ("Chosen with cvar").</param>
+public sealed record CvarHint(string Pattern, string Cvar, string Kind = "used", string Value = "1")
+{
+    private System.Text.RegularExpressions.Regex? _regex;
+
+    public bool Matches(string fileName)
+    {
+        try
+        {
+            _regex ??= new System.Text.RegularExpressions.Regex(Pattern,
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase | System.Text.RegularExpressions.RegexOptions.CultureInvariant);
+            return _regex.IsMatch(fileName);
+        }
+        catch (ArgumentException)
+        {
+            return false; // a bad pattern in the json is skipped
+        }
+    }
+}
 
 /// <summary>
 /// An asset type, read from asset-types.json. Everything about it is configuration: where the game loads it
@@ -14,7 +41,7 @@ public sealed class AssetType
 {
     public required string Id { get; init; }
     public required string DisplayName { get; init; }
-    public string Description { get; init; } = "";
+    public string Description { get; set; } = "";
     /// <summary>Shown as a tab. Hidden types are still recognised when files are dropped.</summary>
     public bool Visible { get; set; }
     /// <summary>Game folder, relative to the Quake folder, with '/' separators (e.g. "qw/textures/models").</summary>
@@ -22,24 +49,26 @@ public sealed class AssetType
     /// <summary>Folder inside the Assets folder (e.g. "models").</summary>
     public required string AssetsFolderName { get; init; }
     /// <summary>Accepted extensions, in the order the client tries them.</summary>
-    public List<string> Extensions { get; init; } = [];
+    public List<string> Extensions { get; set; } = [];
     /// <summary>File with the fixed names and patterns, relative to the config folder (e.g. "names/models.json").</summary>
-    public string NamesFile { get; init; } = "";
+    public string NamesFile { get; set; } = "";
     /// <summary>Names computed from the game data: mdl-skins, mdl-simple, md3-simple, bsp-items, bsp-items-simple, fragfile, map-names, progs-models.</summary>
-    public List<string> NameSources { get; init; } = [];
+    public List<string> NameSources { get; set; } = [];
     /// <summary>Paths inside archives and dropped folders that hold this type, e.g. "textures/models/".</summary>
-    public List<string> ArchivePrefixes { get; init; } = [];
+    public List<string> ArchivePrefixes { get; set; } = [];
     /// <summary>Folder names that hint at this type when a dropped file's name alone can't decide.</summary>
-    public List<string> FolderHints { get; init; } = [];
-    public List<OnlineLink> Online { get; init; } = [];
+    public List<string> FolderHints { get; set; } = [];
+    public List<OnlineLink> Online { get; set; } = [];
     /// <summary>
     /// How a loose file with no type folder in its path is recognised: "names" (the name is on this type's list,
     /// e.g. armor_0 for Models), "extension" (e.g. .mdl for Progs) or "folder" (only its folder can tell, the
     /// default for any-name types such as Crosshairs).
     /// </summary>
-    public string RecognizeBy { get; init; } = "folder";
+    public string RecognizeBy { get; set; } = "folder";
+    /// <summary>Client settings that decide whether a file is used; the first one whose pattern matches is shown.</summary>
+    public List<CvarHint> Hints { get; set; } = [];
     /// <summary>Notes for people editing the file; not used by the app.</summary>
-    public string? Notes { get; init; }
+    public string? Notes { get; set; }
 
     // ---------- Helpers (not stored) ----------
 
@@ -55,6 +84,9 @@ public sealed class AssetType
     public string AssetsFolder(string assetsRoot) => Path.Combine(assetsRoot, AssetsFolderName);
 
     [JsonIgnore] public string ArchivePrefix => ArchivePrefixes.FirstOrDefault() ?? ActiveFolderPath.Split('/', 2).Last() + "/";
+
+    /// <summary>The client setting that decides whether this file is used, if one is known.</summary>
+    public CvarHint? HintFor(string fileName) => Hints.FirstOrDefault(h => h.Matches(fileName));
 
     public override string ToString() => DisplayName;
 

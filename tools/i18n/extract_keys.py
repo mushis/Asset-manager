@@ -29,7 +29,7 @@ for path in glob.glob(os.path.join(ui, '*.cs')):
 for path in glob.glob(os.path.join(ui, '*.axaml')):
     s = open(path, encoding='utf-8').read()
     for m in re.finditer(r"\{local:T '([^']*)'\}", s):
-        add(m.group(1).replace('&lt;', '<').replace('&gt;', '>').replace('&amp;', '&').replace('&quot;', '"'))
+        add(m.group(1).replace('&lt;', '<').replace('&gt;', '>').replace('&quot;', '"').replace('&#10;', '\n').replace('&amp;', '&'))
 
 # Messages from the core library that the UI translates.
 for name in ['SettingsValidator.cs']:
@@ -46,7 +46,7 @@ ne = ne[:ne.index('\n    }\n')]
 for m in re.finditer(r'return ' + cs_lit, ne):
     add(unescape(m.group(1)))
 for k in ['{0} files#few', '{0} files#one', 'hidden', 'name fits several asset types', 'the game doesn\'t load this name',
-          'unsupported file type', 'not found']:
+          'unsupported file type', 'not found', 'Rust', 'Slate', 'Parchment']:
     add(k)
 
 out = os.path.join(here, 'keys.json')

@@ -14,7 +14,7 @@ public sealed class TypeRow(AssetType type) : Observable
     public bool Visible { get => _visible; set => Set(ref _visible, value); }
     public string Title => Type.DisplayName;
     public string Description => Type.Description;
-    public string Folders => Loc.F("Game folder: {0} · Assets folder: {1} · Names: {2}", Type.ActiveFolderPath, Type.AssetsFolderName, Type.NamesFile);
+    public string Folders => Loc.F("Game folder: {0} · Local assets folder: {1} · Names: {2}", Type.ActiveFolderPath, Type.AssetsFolderName, Type.NamesFile);
     public string ShowTip => Loc.T("Show this asset type as a tab");
 }
 
@@ -39,7 +39,7 @@ public partial class SetupView : UserControl
         MapBox.TextChanged += (_, _) => Revalidate();
         ClientBox.SelectionChanged += (_, _) => Revalidate();
         QuakeBrowse.Click += async (_, _) => await Browse(QuakeBox, Loc.T("Choose your Quake folder"));
-        AssetsBrowse.Click += async (_, _) => await Browse(AssetsBox, Loc.T("Choose the Assets folder"));
+        AssetsBrowse.Click += async (_, _) => await Browse(AssetsBox, Loc.T("Choose the Local assets folder"));
         CreateMissing.Click += (_, _) => CreateMissingFolders();
         SaveButton.Click += (_, _) => Save();
         CancelButton.Click += (_, _) => Cancelled?.Invoke();
@@ -47,8 +47,17 @@ public partial class SetupView : UserControl
         RescanSubfolders.Click += async (_, _) => await _host.OfferSubfolders(includeHandled: true);
         ShowAll.Click += (_, _) => _rows.ForEach(r => r.Visible = true);
         ShowDefaults.Click += (_, _) => _rows.ForEach(r => r.Visible = DefaultShown.Contains(r.Type.Id));
-        LanguageBox.ItemsSource = Loc.Languages;
-        LanguageBox.DisplayMemberBinding = new Avalonia.Data.Binding(nameof(Loc.Language.NativeName));
+        LanguageBox.ItemsSource = Loc.Languages;   // shown by name (Language.ToString)
+        ThemeBox.ItemsSource = Themes.All;
+        // The theme is applied as soon as it's picked; Cancel puts the saved one back (MainWindow).
+        ThemeBox.SelectionChanged += (_, _) =>
+        {
+            if (!_loading && ThemeBox.SelectedItem is Themes.Theme theme)
+                Themes.Apply(theme.Id);
+        };
+        LowerCaseButton.Click += async (_, _) => await Tools.ConvertToLowerCase(_host);
+        DuplicatesButton.Click += async (_, _) => await Tools.FindDuplicates(_host);
+        AssetCopiesButton.Click += async (_, _) => await Tools.FindAssetCopies(_host);
         KeyDown += (_, e) =>
         {
             if (e.Key == Key.Escape && CancelButton.IsVisible)
@@ -77,6 +86,12 @@ public partial class SetupView : UserControl
         AssetsBox.Text = settings.AssetsFolder;
         MapBox.Text = string.IsNullOrWhiteSpace(settings.Map) ? "dm4" : settings.Map;
         LanguageBox.SelectedItem = Loc.Languages.FirstOrDefault(l => l.Code == settings.Language) ?? Loc.Languages[0];
+        ThemeBox.SelectedItem = Themes.Find(settings.Theme);
+        ShowOnlineBox.IsChecked = settings.ShowOnline;
+        // The tools work on the saved folders, so they wait for a valid setup.
+        var ready = !mandatory && _host.Manager is not null;
+        LowerCaseButton.IsEnabled = DuplicatesButton.IsEnabled = AssetCopiesButton.IsEnabled = ready;
+        ToolsNote.IsVisible = !ready;
         _rows = AssetType.Known.Select(t => new TypeRow(t)).ToList();
         TypeList.ItemsSource = _rows;
         ConfigPath.Text = Loc.F("Configuration folder: {0}", _host.Config.Folder);
@@ -107,7 +122,11 @@ public partial class SetupView : UserControl
         Client = ClientBox.SelectedItem as string ?? "",
         Map = MapBox.Text?.Trim() ?? "",
         Language = (LanguageBox.SelectedItem as Loc.Language)?.Code ?? "en",
+        Theme = (ThemeBox.SelectedItem as Themes.Theme)?.Id ?? "rust",
+        ShowOnline = ShowOnlineBox.IsChecked == true,
+        ShowWelcome = _settings.ShowWelcome,
         ScannedQuakeFolders = _settings.ScannedQuakeFolders,
+        HandledSubfolders = _settings.HandledSubfolders,
     };
 
     private SettingsValidation Revalidate()
@@ -187,7 +206,7 @@ public partial class SetupView : UserControl
         {
             var create = await Dialogs.Confirm(_host, Loc.T("Missing game folders"),
                 Loc.T("These game folders don't exist:") + "\n" + string.Join("\n", missing.Select(t => "• " + t.ActiveRelativePath)) +
-                "\n\n" + Loc.T("Create them now? You can also create them later from each tab."), Loc.T("Create"));
+                "\n\n" + Loc.T("Create them now? You can also create them later from each tab."), Loc.T("Create"), cancelText: Loc.T("Not now"));
             if (create)
             {
                 foreach (var t in missing)
@@ -216,5 +235,7 @@ public partial class SetupView : UserControl
 
 #if DEBUG
     public void SnapshotTab(int index) => Tabs.SelectedIndex = index;
+
+    public void SnapshotTheme(string id) => ThemeBox.SelectedItem = Themes.Find(id);
 #endif
 }

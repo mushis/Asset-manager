@@ -13,7 +13,7 @@
       </Grid>
     </Border>
     <Border DockPanel.Dock="Top" Classes="help">
-      <TextBlock x:Name="HelpText" Text="{local:T 'Online: assets from gfx.quakeworld.nu for this tab. Select one to see its details, then Download to assets. Nothing is added until you press OK in the summary.'}" />
+      <TextBlock x:Name="HelpText" Text="{local:T 'Online: browse alternatives for this tab on gfx.quakeworld.nu. Select one to see its details, then download it to your Local assets. You confirm before anything is added.'}" />
     </Border>
 
     <Border x:Name="MessagePanel" DockPanel.Dock="Top" Classes="missing" IsVisible="False">

@@ -12,30 +12,39 @@ namespace QuakeAssetManager;
 /// <summary>Dialogs added in 0.4: where unclear files go, subfolders found at scan time, and Delete.</summary>
 public static partial class Dialogs
 {
-    /// <summary>An entry in a type dropdown: an asset type, or Skip (null).</summary>
-    private sealed record TypeChoice(AssetType? Type)
+    /// <summary>An entry in a type dropdown: an asset type, Other (assets/other), or Skip (null).</summary>
+    private sealed record TypeChoice(AssetType? Type, bool IsOther = false)
     {
-        public override string ToString() => Type is null
-            ? Loc.T("Skip")
-            : $"{Type.DisplayName} ({Type.ActiveRelativePath}){(Type.Visible ? "" : " · " + Loc.T("hidden"))}";
+        /// <summary>The answer passed to the importer: a type id, "other", or null for Skip.</summary>
+        public string? Answer => IsOther ? Importer.Other : Type?.Id;
+
+        public override string ToString() => IsOther
+            ? Loc.T("Other (not managed, kept in assets/other)")
+            : Type is null
+                ? Loc.T("Skip")
+                : $"{Type.DisplayName} ({Type.ActiveRelativePath}){(Type.Visible ? "" : " · " + Loc.T("hidden"))}";
     }
 
     /// <summary>
-    /// "Where should these files go?": one row per folder that no rule could place, with a type dropdown.
-    /// The type the file names point to is pre-selected; otherwise Skip. Returns null when cancelled.
+    /// "Where should these files go?": one row per folder that no rule could place, with a type dropdown, plus the
+    /// Assets subfolder they go to (the archive's name to start with). The type the file names point to is
+    /// pre-selected; otherwise Skip. Returns the answers (type id, "other" or null per question) and the folder,
+    /// or null when cancelled.
     /// </summary>
-    public static async Task<IReadOnlyDictionary<string, AssetType?>?> WhereShouldTheseGo(Window owner, string title, IReadOnlyList<ImportQuestion> questions)
+    public static async Task<(IReadOnlyDictionary<string, string?> Answers, string? Folder)?> WhereShouldTheseGo(
+        Window owner, string title, IReadOnlyList<ImportQuestion> questions, string? suggestedFolder)
     {
         var w = NewWindow(Loc.T("Where should these files go?"), 680);
         var choices = new List<TypeChoice> { new(null) };
         choices.AddRange(AssetType.Known.OrderBy(t => t.Visible ? 0 : 1).Select(t => new TypeChoice(t)));
-        Dictionary<string, AssetType?>? result = null;
+        choices.Add(new TypeChoice(null, IsOther: true));
+        (IReadOnlyDictionary<string, string?>, string?)? result = null;
 
         var content = new StackPanel { Margin = new Thickness(20), Spacing = 8 };
         content.Children.Add(new TextBlock { Text = Loc.T("Where should these files go?"), FontSize = 16, FontWeight = FontWeight.SemiBold });
         content.Children.Add(new TextBlock
         {
-            Text = Loc.F("{0} has files in folders the app can't place by itself. Pick an asset type for each folder, or Skip.", title),
+            Text = Loc.F("{0} has files in folders the app can't place by itself. Pick an asset type for each folder, Other, or Skip.", title),
             TextWrapping = TextWrapping.Wrap,
             Classes = { "muted" },
         });
@@ -59,9 +68,9 @@ public static partial class Dialogs
                 TextTrimming = TextTrimming.CharacterEllipsis,
             });
             if (q.Suggested is not null)
-                label.Children.Add(new TextBlock { Text = Loc.T("suggested from the file names"), FontSize = 11, Foreground = new SolidColorBrush(Color.Parse("#30A46C")) });
+                label.Children.Add(new TextBlock { Text = Loc.T("suggested from the file names"), FontSize = 11, Foreground = Themes.Brush("ThemeInGameBrush", "#30A46C") });
             var box = new ComboBox { ItemsSource = choices, HorizontalAlignment = HorizontalAlignment.Stretch, VerticalAlignment = VerticalAlignment.Center };
-            box.SelectedItem = choices.First(c => c.Type?.Id == q.Suggested?.Id);
+            box.SelectedItem = choices.First(c => !c.IsOther && c.Type?.Id == q.Suggested?.Id);
             Grid.SetColumn(box, 1);
             grid.Children.Add(label);
             grid.Children.Add(box);
@@ -70,17 +79,36 @@ public static partial class Dialogs
                 Child = grid,
                 Padding = new Thickness(0, 4),
                 BorderThickness = new Thickness(0, 0, 0, 1),
-                BorderBrush = new SolidColorBrush(Color.Parse("#30808080")),
+                BorderBrush = Themes.Brush("ThemeBorderBrush", "#30808080"),
             });
             boxes.Add((q, box));
         }
-        content.Children.Add(new ScrollViewer { Content = rows, MaxHeight = 380 });
+        content.Children.Add(new ScrollViewer { Content = rows, MaxHeight = 340 });
+
+        // The Assets subfolder, e.g. assets/models/<folder>. Files kept in assets/other keep their own path.
+        TextBox? folderBox = null;
+        if (suggestedFolder is not null)
+        {
+            content.Children.Add(Label(Loc.T("Folder in Local assets for these files")));
+            folderBox = new TextBox { Text = suggestedFolder };
+            ToolTip.SetTip(folderBox, Loc.T("The files go to assets/<type>/<this folder>. Files kept in assets/other keep their path from the archive."));
+            content.Children.Add(folderBox);
+        }
+        var error = new TextBlock { Classes = { "error" }, IsVisible = false };
+        content.Children.Add(error);
 
         var ok = new Button { Content = Loc.T("Continue"), IsDefault = true };
         var cancel = new Button { Content = Loc.T("Cancel"), IsCancel = true };
         ok.Click += (_, _) =>
         {
-            result = boxes.ToDictionary(b => b.Question.Key, b => (b.Box.SelectedItem as TypeChoice)?.Type);
+            var folder = folderBox?.Text?.Trim();
+            if (folder is not null && AssetManager.NameError(folder) is { } problem)
+            {
+                error.Text = Loc.T("Folder:") + " " + Loc.T(problem);
+                error.IsVisible = true;
+                return;
+            }
+            result = (boxes.ToDictionary(b => b.Question.Key, b => (b.Box.SelectedItem as TypeChoice)?.Answer), folder);
             w.Close();
         };
         cancel.Click += (_, _) => w.Close();
@@ -114,7 +142,8 @@ public static partial class Dialogs
         content.Children.Add(new TextBlock { Text = Loc.T("Folders with alternative assets were found"), FontSize = 16, FontWeight = FontWeight.SemiBold });
         content.Children.Add(new TextBlock
         {
-            Text = Loc.T("The game doesn't load subfolders, so these are usually alternative versions. Tick the ones to copy to Assets; each keeps its name."),
+            Text = Loc.T("The game doesn't load subfolders, so these are usually alternative versions. Tick the ones to bring into Local assets; each keeps its name.") + "\n\n" +
+                   Loc.T("Recommended: Move. It cleans up your Quake subfolders, and the assets end up organised in your Local assets folder, in one place. Copy leaves the originals where they are."),
             TextWrapping = TextWrapping.Wrap,
             Classes = { "muted" },
         });
@@ -137,9 +166,10 @@ public static partial class Dialogs
         var dontAsk = new CheckBox { Content = Loc.T("Don't ask again about the folders I leave unticked") };
         content.Children.Add(dontAsk);
 
-        var copy = new Button { Content = Loc.T("Copy"), IsDefault = true };
-        var copyDelete = new Button { Content = Loc.T("Copy and delete") };
-        ToolTip.SetTip(copyDelete, Loc.T("Copy, then move the original folders from your Quake folder to the Recycle Bin"));
+        var copy = new Button { Content = Loc.T("Copy") };
+        ToolTip.SetTip(copy, Loc.T("Copy to Local assets and leave the original folders in your Quake folder"));
+        var copyDelete = new Button { Content = Loc.T("Move"), IsDefault = true, Classes = { "accent" } };
+        ToolTip.SetTip(copyDelete, Loc.T("Copy to Local assets, then move the original folders from your Quake folder to the Recycle Bin"));
         var skip = new Button { Content = Loc.T("Skip"), IsCancel = true };
         void Finish(bool delete)
         {
@@ -149,9 +179,9 @@ public static partial class Dialogs
         copy.Click += (_, _) => Finish(false);
         copyDelete.Click += (_, _) => Finish(true);
         skip.Click += (_, _) => w.Close();
-        content.Children.Add(Footer(Loc.F("Enter: {0}", Loc.T("Copy")) + " · " + Loc.F("Esc: {0}", Loc.T("Skip")), skip, copyDelete, copy));
+        content.Children.Add(Footer(Loc.F("Enter: {0}", Loc.T("Move")) + " · " + Loc.F("Esc: {0}", Loc.T("Skip")), skip, copy, copyDelete));
         w.Content = content;
-        w.Opened += (_, _) => copy.Focus();
+        w.Opened += (_, _) => copyDelete.Focus();
         await w.ShowDialog(owner);
         return result;
     }
@@ -174,13 +204,13 @@ public static partial class Dialogs
             var folders = copiesInAssets.Select(c => System.IO.Path.GetRelativePath(assetsRoot, System.IO.Path.GetDirectoryName(c)!)).Distinct();
             also = new CheckBox
             {
-                Content = new TextBlock { Text = Loc.F("Also delete the copies in Assets ({0})", string.Join(", ", folders)), TextWrapping = TextWrapping.Wrap },
+                Content = new TextBlock { Text = Loc.F("Also delete the copies in Local assets ({0})", string.Join(", ", folders)), TextWrapping = TextWrapping.Wrap },
             };
             content.Children.Add(also);
         }
         else
         {
-            content.Children.Add(new TextBlock { Text = Loc.T("There's no copy of this file in Assets: this is the only copy."), Foreground = new SolidColorBrush(Color.Parse("#E8A33D")), TextWrapping = TextWrapping.Wrap });
+            content.Children.Add(new TextBlock { Text = Loc.T("There's no copy of this file in Local assets: this is the only copy."), Foreground = Themes.Brush("ThemeWarnBrush", "#E8A33D"), TextWrapping = TextWrapping.Wrap });
         }
         ok.Click += (_, _) => { confirmed = true; w.Close(); };
         cancel.Click += (_, _) => w.Close();

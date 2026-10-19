@@ -16,299 +16,397 @@
 15|# Autres types de ressources (masqués par défaut, activez-les dans les Paramètres)
 16|• **Crosshairs** (`qw/crosshairs`) : n’importe quel nom d’image, choisi avec `crosshairimage`.
 17|• **Skyboxes** (`qw/env`, aussi `gfx/env`) : `<sky>` plus `rt`, `bk`, `lf`, `ft`, `up`, `dn` (les 6 faces). Le `_wind.cfg` d’un ciel n’est lu que depuis `gfx/env`.
+18|• **Gfx** (`qw/gfx`) : le fond de la console (`conback`, ou le nom dans `scr_conpicture`), les images des menus et le curseur. `gfx/conback.lmp` doit exister, sinon le jeu ne démarre pas.
 19|• **Charsets** (`qw/textures/charsets`) : polices de la console, n’importe quel nom, choisi avec `gl_consolefont`.
 20|• **Levelshots** (`qw/textures/levelshots`) : l’image de chargement de chaque carte, nommée d’après la carte.
 21|• **Skins** (`qw/skins`) : skins de joueurs, n’importe quel nom. Essaie `.tga`, `.png`, `.jpg`, puis `.pcx` ; à défaut, utilise `base`.
+22|• **Progs** (`qw/progs`) : modèles et sprites, n’importe quel nom. Un `.md3` du même nom remplace le `.mdl`.
 23|# Non gérés par l’application
 24|• **Sounds** (`qw/sound`) : chemins exacts avec sous-dossiers ; un `.ogg` ne remplace jamais un `.wav` demandé.
+25|• **Maps** (`qw/maps`) : `<map>.bsp` plus des fichiers annexes ; les caisses d’objets (`b_*.bsp`) sont aussi ici.
+26|• **Lits et Locs** (`qw/lits`, `qw/locs`) : éclairage coloré (`<map>.lit`) et noms des lieux pour le jeu en équipe (`<map>.loc`).
 27|• **Map textures** (`qw/textures/<map>/`) : cherchées par carte, puis par groupe de cartes, puis dans `textures/`.
 28|Erreur inattendue :
 29|lecture…
 30|Impossible de lire {0} :
-31|Choisissez une archive à gauche pour voir son contenu.
-32|{0} fichiers ici appartiennent à un type de ressource connu et peuvent être copiés dans {1}. Maintenez Ctrl ou Maj pour en sélectionner plusieurs, puis faites un clic droit.
-33|Cette archive ne contient aucun fichier reconnu par l’application.
-34|Consultation seulement. Seules les archives du dossier qw peuvent être copiées dans Assets.
-35|Trop grand pour l’aperçu.
-36|masqué
-37|Consultation seulement : seules les archives du dossier qw peuvent être copiées dans Assets
-38|Copier {0} dans Assets
-41|Copier dans leurs dossiers de ressources ({0})
-42|Copier seulement {0} ({1})
-44|Aucun type de ressource connu pour les fichiers sélectionnés
+31|masqué
+32|vous choisirez
+33|Choisissez une archive à gauche pour voir son contenu.
+34|{0} fichiers ici appartiennent à un type de ressource connu et vont dans {1}. Les fichiers des dossiers que l’application ne gère pas vont dans {2} ; pour le reste, vous choisissez le type. Maintenez Ctrl ou Maj pour en sélectionner plusieurs, puis clic droit.
+35|Aucun fichier ici n’appartient à un type de ressource connu. Les fichiers des dossiers que l’application ne gère pas vont dans {0} ; pour le reste, vous choisissez le type.
+36|Trop grand pour l’aperçu.
+37|autres
+38|à choisir : {0}
+39|Copier {0} dans Assets
+40|non géré par l’application
+41|vous choisirez le type de ressource
+42|Copier dans leurs dossiers de ressources ({0})
+43|Copier seulement {0} ({1})
+44|les fichiers non gérés par l’application
 45|Copier dans Assets
-46|Seules les archives du dossier qw peuvent être copiées dans Assets.
-47|Sélectionnez d’abord les fichiers à copier.
-48|Corbeille
-49|corbeille
-50|{0} créé.
-51|Actif
+46|Sélectionnez d’abord les fichiers à copier.
+47|Corbeille
+48|corbeille
+49|{0} créé.
+50|Actif
+51|Vos copies locales des ressources de ce type (le dossier Assets) :
 52|Impossible de lire les dossiers :
 53|Le dossier du jeu {0} n’existe pas encore, rien n’est donc chargé pour {1}.
-55|{0} fichiers ou dossiers non valides masqués dans le dossier du jeu
-56|{0} fichiers se trouvent directement dans {1} ; déplacez-les dans un dossier
-57|{0} contient {1}. Le jeu ne charge pas les sous-dossiers.
-58|Rien dans le dossier du jeu ; le jeu utilise sa texture intégrée.
-59|Déplacer vers Assets…
-60|Supprimer
-61|Ouvrir le dossier
-62|Déplacer {0} vers la {1} ?
-65|{0} déplacé vers la {1}.
-66|Utiliser ceux-ci
-67|Renommer…
-68|Utiliser ce fichier
-69|{0} est maintenant dans le jeu.
-70|Déplacer vers un dossier…
-71|Un problème est survenu
-72|Déplacer {0} vers Assets
-73|Déplacer
-74|{0} déplacé vers {1}.
-75|Déplacer {0}
-76|Renommer {0}
-77|Renommer
-78|Le jeu ne charge jamais « {0} », ce fichier ne sera donc plus utilisable. Renommer quand même ?
-79|{0} renommé en {1}.
-80|Créez d’abord le dossier du jeu {0}.
-81|« {0} » ne contient aucun fichier {1} valide à utiliser.
-83|{0} copié(s) de {1} dans le jeu.
-84|Nouveau dossier
-85|Ce dossier existe déjà.
-86|Créer
-87|Entrée : {0}
-88|Échap : annuler
-89|Tab : suivant
-90|Annuler
-91|OK
-92|Entrée ou Échap : fermer
-93|Nom actuel : {0}
-94|Nouveau nom
-95|Nom
-96|Suggéré à partir du nom valide le plus proche
-97|Nom du dossier
-98|Dossier :
-99|Nom du fichier :
-100|Dossier (choisissez-en un ou tapez un nouveau nom)
-101|Nom du fichier
-102|Ajouté depuis {0}
-104|Déjà dans Assets
-105|{0} ignoré(s)
-106|Non géré par l’application
-107|Ignorés
-108|Erreur :
-109|Afficher les fichiers ignorés
-110|Rien n’a été ajouté : aucun fichier ne correspond à un nom que le jeu charge pour les types de ressources affichés.
-111|Annuler l’import
-112|Ne pas ajouter ces fichiers à Assets
-113|le nom correspond à plusieurs types de ressources
-114|À propos de Quake Asset Manager
-115|Fermer
-116|Version {0}
-117|Vibe-codé avec Claude
-118|Le but de l’application est d’aider à gérer les ressources de Quake qui ne sont pas configurables dans le client. Les ressources comme les icônes du HUD, les textures des modèles et d’autres exigent un nom de fichier précis placé dans un dossier précis. Cette application les gère en créant et en conservant une copie des ressources alternatives dans un autre dossier, et en remplaçant celles de votre dossier Quake en un clic.
-119|J’espère qu’elle vous sera utile.
-120|Fait avec amour par mushi
-122|Détails sur les ressources de QuakeWorld
-138|Fichier introuvable
-139|trop grand pour l’aperçu
-140|Pointe vers {0}
-141|Pas d’aperçu : la palette de Quake (gfx/palette.lmp) est introuvable.
-142|Impossible de lire cette image.
-143|Pas d’aperçu pour ce type de fichier.
-145|non chargé
-146|non valide
-147|Les sous-dossiers ne sont pas chargés par le jeu. Clic droit pour le déplacer vers Assets ou le supprimer.
-148|Le jeu ne charge jamais ce nom. Clic droit pour le déplacer vers Assets ou le supprimer.
-151|imbriqué · inutilisable
-152|dans le jeu
-153|Un dossier d’options. Clic droit pour utiliser tous ses fichiers, le renommer ou le supprimer.
-154|Les fichiers des dossiers imbriqués ne peuvent pas être utilisés. Déplacez-les dans un dossier d’options.
-155|Clic droit puis « Utiliser ce fichier » pour le copier dans le jeu.
-156|Le jeu ne charge jamais ce nom. Clic droit pour le renommer, le déplacer ou le supprimer.
-157|copier dans Assets
-158|consultation seulement
-159|élément WAD
-160|Les fichiers PAK n’enregistrent pas de dates
-161|Hier
-162|La semaine dernière
-163|Le mois dernier
-164|L’an dernier
-165|1 fichier
-168|{0} fichiers
-169|Tester
-170|Paramètres
-171|Impossible d’enregistrer vos paramètres :
-172|Impossible de lire le dossier Quake
-173|La palette de Quake est introuvable, les images PAK ne peuvent donc pas être prévisualisées.
-174|Configuration
-175|Import inachevé
-176|Un import depuis « {0} » n’a pas été confirmé avant la fermeture de l’application ({1}). Ajouter les fichiers à Assets ?
-177|Ajouter à Assets
-178|Lecture des fichiers…
-179|Rien n’a été ajouté depuis {0}.
-180|Importer
-181|Impossible de lire les fichiers :
-182|{0} ajouté(s) depuis {1} à Assets.
-183|Certains fichiers n’ont pas pu être déplacés dans Assets :
-186|{0} copié(s) dans Assets ({1} déjà présents).
-187|Première analyse de ce dossier Quake :
-188|Analyse :
-189|tout est déjà dans Assets.
-190|Nouveaux dossiers : {0}.
-191|{0} copié(s) du dossier du jeu vers Assets.
-192|Impossible de copier les nouveaux fichiers dans Assets :
-193|Vérifiez d’abord vos paramètres :
-194|{0} démarré
-195|Impossible de démarrer {0} :
-196|En ligne : ressources {0} de {1}. Sélectionnez-en une pour voir ses détails, puis Télécharger dans Assets. Rien n’est ajouté avant que vous appuyiez sur OK dans le récapitulatif.
-197|Sélectionnez un élément pour voir ses détails.
-198|Pas encore de source en ligne pour {0}.
-199|{0} n’a pas de liste pour {1}. Des listes peuvent être ajoutées à « online » pour ce type dans asset-types.json.
-200|Rien pour l’instant.
-201|Cette liste du site est vide.
-202|Chargement des détails…
-203|Ouvrir la page dans le navigateur
-204|{0} téléchargements
-205|Télécharger à nouveau dans Assets
-206|Télécharger dans Assets
-207|Téléchargement de {0}…
-208|Télécharger
-209|{0} est injoignable pour le moment.
-210|Vérifiez votre connexion Internet et réessayez.
-211|{0} a renvoyé une page que l’application ne reconnaît pas.
-212|Le site a peut-être changé ; l’application doit être mise à jour pour le lire.
-213|Sélectionnez un fichier pour l’afficher.
-214|Modifié le {0}
-215|Dossier du jeu : {0} · Dossier Assets : {1} · Noms : {2}
-216|Afficher ce type de ressource comme onglet
-217|Choisissez votre dossier Quake
-218|Choisissez le dossier Assets
-219|Configurer Quake Asset Manager
-220|Tous les paramètres sont obligatoires. Vous pourrez utiliser l’application une fois tous les champs remplis.
-221|Tous les paramètres sont obligatoires.
-222|Enregistrer et continuer
-223|Dossier de configuration : {0}
-224|Chaque type de ressource a ici son propre dossier.
-225|Ce dossier sera créé à l’enregistrement.
-226|Aucun programme trouvé dans le dossier Quake.
-227|Lance : {0} +map {1}
-228|Ces dossiers du jeu n’existent pas encore, leurs onglets ne peuvent donc rien afficher :
-229|1 paramètre doit encore être renseigné.
-230|{0} paramètres doivent encore être renseignés.
-231|Impossible de créer les dossiers :
-232|Impossible de créer ce dossier :
-233|Dossiers du jeu manquants
-234|Ces dossiers du jeu n’existent pas :
-235|Les créer maintenant ? Vous pourrez aussi les créer plus tard depuis chaque onglet.
-236|Archives
-237|Archives : les fichiers PAK et PK3 de votre dossier Quake. Ils sont en lecture seule ici. Les fichiers des archives qw peuvent être copiés dans Assets : sélectionnez-les puis faites un clic droit.
-238|Choisissez une archive
-239|Filtrer, p. ex. textures/
-240|N’afficher que les entrées dont le chemin contient ce texte
-241|Copier la sélection
-242|Copier les fichiers sélectionnés dans les dossiers de leur type dans Assets
-243|Tout copier dans Assets
-244|Copier dans Assets chaque fichier de cette archive qui appartient à un type de ressource affiché
-245|Fichiers de l’archive sélectionnée. Les images et les fichiers à palette Quake (skins .mdl, .lmp, éléments WAD) peuvent être prévisualisés. La copie place les fichiers dans assets\<type>\<archive name>, ignore ceux déjà dans Assets et affiche d’abord un récapitulatif.
-246|Ouvrir ce dossier dans l’explorateur de fichiers
-247|Afficher les non valides
-248|Afficher aussi les fichiers que le jeu ne charge jamais, et les sous-dossiers
-249|Actif : c’est votre dossier Quake. Les fichiers ici sont utilisés par le jeu. L’étiquette colorée indique l’origine de chaque fichier : original (déjà présent), de <folder> (placé par l’application) ou non valide.
-250|Créer le dossier
-251|Local
-252|Vos copies locales des ressources de ce type (le dossier Assets)
-253|En ligne
-254|Parcourir et télécharger des ressources de ce type sur gfx.quakeworld.nu
-255|Créer un dossier d’options
-256|Assets : votre réserve d’options. Le jeu ne les charge pas. Faites un clic droit ou utilisez les boutons sous l’aperçu : Utiliser ce fichier, Utiliser ceux-ci (un dossier entier), Renommer, Supprimer. Vous pouvez aussi déposer des fichiers zip/rar/7z, des dossiers ou des images sur la fenêtre.
-257|Parcourir les fichiers PAK et PK3. Copier des fichiers des archives qw dans Assets.
-258|Lancer le client sur la carte des Paramètres pour voir vos modifications.
-259|Paramètres : dossier Quake, dossier Assets, client et carte.
-260|Aide : explique chaque zone de la fenêtre.
-261|Chaque onglet de type de ressource gère un dossier depuis lequel le jeu charge des fichiers. Archives : parcourir les fichiers PAK et PK3. Déposez n’importe où des fichiers zip/rar/7z, des dossiers ou des images pour les ajouter à Assets.
-262|Tester : lance votre client sur la carte des Paramètres, pour voir vos modifications dans le jeu.
-263|Paramètres : votre dossier Quake, le dossier Assets, le client et la carte de test.
-264|Lecture des données du jeu…
-265|Déposer pour ajouter à Assets
-266|zip, pk3, rar, 7z, tar.gz, dossiers ou images. Vous verrez un récapitulatif avant que quoi que ce soit soit ajouté.
-267|Quelle liste du site parcourir
-268|Page précédente
-269|Page suivante
-270|En ligne : ressources de gfx.quakeworld.nu pour cet onglet. Sélectionnez-en une pour voir ses détails, puis Télécharger dans Assets. Rien n’est ajouté avant que vous appuyiez sur OK dans le récapitulatif.
-271|Réessayer
-272|Ouvrir le site dans le navigateur
-273|Chargement…
-274|Déjà téléchargé
-275|Aperçu
-276|Aperçu du fichier sélectionné, avec les actions possibles. Quand vous sélectionnez une option dans Assets, la version que le jeu utilise actuellement s’affiche en dessous.
-277|Actuellement dans le jeu
-278|Général
+54|Aucun nom de fichier ne commence par « {0} ».
+55|1 fichier ou dossier non valide masqué dans le dossier du jeu
+56|{0} fichiers ou dossiers non valides masqués dans le dossier du jeu
+57|{0} fichiers se trouvent directement dans {1} ; déplacez-les dans un dossier
+58|Plus grand que 128×128 : unezQuake ne chargera pas ce spray.
+59|{0} sélectionnés.
+60|{0} contient {1}. Le jeu ne charge pas les sous-dossiers.
+61|Rien dans le dossier du jeu ; le jeu utilise sa texture intégrée.
+62|Déplacer vers Assets…
+63|Marquer comme valide
+64|Supprimer
+65|Renommer…
+66|Afficher les alternatives
+67|Ouvrir le dossier
+68|Utiliser ces fichiers
+69|Déplacer vers un dossier…
+70|Utiliser ceux-ci
+71|Déplacer à la racine
+72|Utiliser ce fichier
+73|Copier dans le dossier du jeu
+74|Un problème est survenu
+75|Affichage de toutes les versions de {0} dans Assets.
+76|{0} ajouté à {1}.
+77|Ces noms étaient déjà dans la liste.
+78|Toujours non valides : {0}. Ce type de ressource n’utilise pas ces extensions, ou les fichiers sont directement dans le dossier Assets du type.
+79|Renommer {0}
+80|Renommer
+81|Le jeu ne charge jamais « {0} », il n’utilisera donc pas ce fichier. Renommer quand même ?
+82|{0} renommé en {1}.
+83|Déplacer {0} vers la {1} ?
+84|{0} déplacé vers la {1}.
+85|Déplacer {0} vers la {1} ? Le jeu utilisera sa version intégrée.
+86|{0} et {1} dans Assets déplacés vers la {2}.
+87|Déplacer {0} vers Assets
+88|Déplacer
+89|{0} déplacé vers {1}.
+90|Déplacer {0}
+91|{0} copié dans le dossier du jeu. Renommez-le là-bas avec un nom que le jeu charge.
+92|{0} est maintenant dans le jeu.
+93|{0} copiés dans le jeu.
+94|Le jeu ne charge jamais « {0} », ce fichier ne sera donc plus utilisable. Renommer quand même ?
+95|Créez d’abord le dossier du jeu {0}.
+96|« {0} » ne contient aucun fichier {1} valide à utiliser.
+97|non valides, ignorés : {0}
+98|{0} copié(s) de {1} dans le jeu.
+99|Nouveau dossier
+100|Ce dossier existe déjà.
+101|Créer
+102|Entrée : {0}
+103|Échap : annuler
+104|Tab : suivant
+105|Annuler
+106|OK
+107|Entrée ou Échap : fermer
+108|Nom actuel : {0}
+109|Nouveau nom
+110|Nom
+111|Suggéré à partir du nom valide le plus proche
+112|Nom du dossier
+113|Renommer le fichier en
+114|Dossier :
+115|Nom du fichier :
+116|Dossier (choisissez-en un ou tapez un nouveau nom)
+117|Ajouté depuis {0}
+118|{0} avec des noms que le jeu ne charge pas (marqués non valides)
+119|Non géré par l’application
+120|Déjà dans Assets
+121|{0} ignoré(s)
+122|Ignorés
+123|Erreur :
+124|Afficher les fichiers ignorés
+125|Rien n’a été ajouté : tout était déjà dans Assets, ignoré ou non pris en charge.
+126|Annuler l’import
+127|Ne pas ajouter ces fichiers à Assets
+128|le nom correspond à plusieurs types de ressources
+129|À propos de Quake Asset Manager
+130|Fermer
+131|Version {0}
+132|Vibe-codé avec Claude
+133|Le but de l’application est d’aider à gérer les ressources de Quake qui ne sont pas configurables dans le client. Les ressources comme les icônes du HUD, les textures des modèles et d’autres exigent un nom de fichier précis placé dans un dossier précis. Cette application les gère en créant et en conservant une copie des ressources alternatives dans un autre dossier, et en remplaçant celles de votre dossier Quake en un clic.
+134|J’espère qu’elle vous sera utile.
+135|Fait avec amour par mushi
+136|Détails sur les ressources de QuakeWorld
+137|Autre (non géré, conservé dans assets/other)
+138|Ignorer
+139|Où placer ces fichiers ?
+140|{0} contient des fichiers dans des dossiers que l’application ne peut pas placer seule. Choisissez un type de ressource pour chaque dossier, Autre ou Ignorer.
+141|(racine de l’archive)
+142|suggéré d’après les noms de fichiers
+143|Dossier dans Assets pour ces fichiers
+144|Les fichiers vont dans assets/<type>/<ce dossier>. Ceux conservés dans assets/other gardent leur chemin dans l’archive.
+145|Continuer
+146|Des dossiers de ressources alternatives ont été trouvés
+147|Le jeu ne charge pas les sous-dossiers : ce sont donc généralement des versions alternatives. Cochez ceux à ramener dans Assets ; chacun garde son nom.
+148|Recommandé : Déplacer. Vos sous-dossiers Quake sont nettoyés et les ressources se retrouvent organisées dans votre dossier Assets local, en un seul endroit. Copier laisse les originaux en place.
+149|Ne plus demander pour les dossiers que je laisse décochés
+150|Copier
+151|Copier dans Assets et laisser les dossiers d’origine dans votre dossier Quake
+152|Copier dans Assets, puis déplacer les dossiers d’origine de votre dossier Quake vers la Corbeille
+153|Échap : {0}
+154|Supprimer aussi les copies dans Assets ({0})
+155|Il n’y a aucune copie de ce fichier dans Assets : c’est la seule copie.
+156|Bienvenue dans Quake Asset Manager
+157|Changez de modèles, de HUD et plus en un clic.
+158|Un explorateur de fichiers conçu pour les ressources de Quake : modèles, HUD, tracker, charsets et plus. Voyez ce que le jeu utilise à côté de toutes vos alternatives, appliquez-en une d’un clic et lancez le jeu pour la tester. Vos fichiers sont toujours sauvegardés d’abord, tous dans un seul dossier Assets local.
+159|Sauvegarde automatiquement vos fichiers, tous dans un seul dossier Assets local
+160|Afficher les alternatives : toutes les versions d’un fichier d’un coup d’œil
+161|Téléchargez depuis gfx.quakeworld.nu, ou glissez-déposez, directement dans vos Assets
+162|Et bien plus encore
+163|Ne plus afficher
+164|Commencer
+165|Fichier introuvable
+166|trop grand pour l’aperçu
+167|Pointe vers {0}
+168|Pas d’aperçu : la palette de Quake (gfx/palette.lmp) est introuvable.
+169|Impossible de lire cette image.
+170|Pas d’aperçu pour ce type de fichier.
+171|Impossible d’ouvrir ce dossier : {0}
+172|non chargé
+173|non valide
+174|Le jeu ne charge pas les sous-dossiers. Clic droit pour le renommer, le déplacer vers Assets ou le supprimer.
+175|Le jeu ne charge jamais ce nom. Clic droit pour le renommer, le marquer comme valide, le déplacer vers Assets ou le supprimer.
+176|Disponible pour le jeu (le réglage du client décide quel fichier est utilisé).
+177|Utilisé par le jeu.
+178|Pas encore dans Assets.
+179|Une copie est dans le dossier « {0} » d’Assets.
+180|imbriqué
+181|dans le jeu
+182|Un dossier d’alternatives. Clic droit pour utiliser tous ses fichiers, le renommer ou le supprimer.
+183|Un dossier dans un dossier d’alternatives. Clic droit pour utiliser ses fichiers ou le déplacer à la racine.
+184|Clic droit puis « Utiliser ce fichier » pour le copier dans le jeu.
+185|Le jeu ne charge jamais ce nom. Clic droit pour le renommer, le marquer comme valide, le copier dans le dossier du jeu ou le supprimer.
+186|élément WAD
+187|Les fichiers PAK n’enregistrent pas de dates
+188|Hier
+189|La semaine dernière
+190|Le mois dernier
+191|L’an dernier
+192|1 fichier
+195|{0} fichiers
+196|Archives
+197|Tester
+198|Paramètres
+199|Impossible d’enregistrer vos paramètres :
+200|Impossible de lire le dossier Quake
+201|La palette de Quake est introuvable, les images PAK ne peuvent donc pas être prévisualisées.
+202|Configuration
+203|Import inachevé
+204|Un import depuis « {0} » n’a pas été confirmé avant la fermeture de l’application ({1}). Ajouter les fichiers à Assets ?
+205|Ajouter à Assets
+206|Lecture des fichiers…
+207|Rien n’a été ajouté depuis {0}.
+208|Importer
+209|Impossible de lire les fichiers :
+210|{0} ajouté(s) depuis {1} à Assets.
+211|Certains fichiers n’ont pas pu être déplacés dans Assets :
+212|Aucun sous-dossier trouvé dans les dossiers du jeu.
+213|Après la copie, ces dossiers seront déplacés de votre dossier Quake vers la Corbeille :
+214|{0} copié(s) dans Assets ({1} déjà présents).
+215|Première analyse de ce dossier Quake :
+216|Analyse :
+217|tout est déjà dans Assets.
+218|Nouveaux dossiers : {0}.
+219|{0} copié(s) du dossier du jeu vers Assets.
+220|Impossible de copier les nouveaux fichiers dans Assets :
+221|Vérifiez d’abord vos paramètres :
+222|{0} démarré
+223|Impossible de démarrer {0} :
+225|Sélectionnez un élément pour voir ses détails.
+226|Pas encore de source en ligne pour {0}.
+227|{0} n’a pas de liste pour {1}. Des listes peuvent être ajoutées à « online » pour ce type dans asset-types.json.
+228|Rien pour l’instant.
+229|Cette liste du site est vide.
+230|Chargement des détails…
+231|Ouvrir la page dans le navigateur
+232|{0} téléchargements
+233|Télécharger à nouveau dans Assets
+234|Télécharger dans Assets
+235|Téléchargement de {0}…
+236|Télécharger
+237|{0} est injoignable pour le moment.
+238|Vérifiez votre connexion Internet et réessayez.
+239|{0} a renvoyé une page que l’application ne reconnaît pas.
+240|Le site a peut-être changé ; l’application doit être mise à jour pour le lire.
+241|Sélectionnez un fichier pour l’afficher.
+242|Modifié le {0}
+243|Choisi avec {0}
+244|Affiché quand {0} vaut {1}
+245|Dessiné quand {0} vaut {1}
+246|Utilisé quand {0} vaut {1}
+247|Dossier du jeu : {0} · Dossier Assets : {1} · Noms : {2}
+248|Afficher ce type de ressource comme onglet
+249|Choisissez votre dossier Quake
+250|Choisissez le dossier Assets
+251|Configurer Quake Asset Manager
+252|Tous les paramètres sont obligatoires. Vous pourrez utiliser l’application une fois tous les champs remplis.
+253|Tous les paramètres sont obligatoires.
+254|Enregistrer et continuer
+255|Dossier de configuration : {0}
+256|Chaque type de ressource a ici son propre dossier.
+257|Ce dossier sera créé à l’enregistrement.
+258|Aucun programme trouvé dans le dossier Quake.
+259|Lance : {0} +map {1}
+260|Ces dossiers du jeu n’existent pas encore, leurs onglets ne peuvent donc rien afficher :
+261|1 paramètre doit encore être renseigné.
+262|{0} paramètres doivent encore être renseignés.
+263|Impossible de créer les dossiers :
+264|Impossible de créer ce dossier :
+265|Dossiers du jeu manquants
+266|Ces dossiers du jeu n’existent pas :
+267|Les créer maintenant ? Vous pourrez aussi les créer plus tard depuis chaque onglet.
+268|Pas maintenant
+269|Recherche des noms de fichiers en majuscules…
+270|Convertir en minuscules
+271|Tous les noms de fichiers sont déjà en minuscules.
+272|{0} ont des majuscules. Cochez ceux à renommer ; un fichier est ignoré si le nom en minuscules est déjà pris.
+273|Tous
+274|Convertir
+275|{0} renommés en minuscules.
+276|{0} renommés. {1} ignorés, car un fichier portant le nom en minuscules existe déjà :
+277|Certains fichiers n’ont pas pu être renommés :
+278|Assets
 279|Dossier Quake
-280|Le dossier qui contient id1 et qw.
-281|Parcourir…
-282|id1 et qw trouvés.
-283|Créer les dossiers manquants
-284|Dossier Assets (archive)
-285|Où l’application garde une copie de chaque ressource. Le jeu ne charge pas ce dossier.
-286|Client
-287|Choisissez un client…
-288|Programmes trouvés dans le dossier Quake.
-289|Carte à ouvrir
-290|Langue
-291|La langue de l’application. Les noms de dossiers, de fichiers et de types de ressources restent tels quels.
-292|Types de ressources
-293|Choisissez quels types de ressources ont un onglet. Les types masqués sont quand même reconnus quand vous déposez des fichiers. Tout ce qui concerne un type (dossiers, extensions, noms valides, listes en ligne) se trouve dans les fichiers de configuration ci-dessous ; redémarrez l’application après les avoir modifiés.
-294|Ouvrir le dossier de configuration
-295|Tout afficher
-296|Seulement les cinq par défaut
-299|Entrée : enregistrer · Tab : champ suivant
-300|Choisissez votre dossier Quake.
-301|Ce dossier n’existe pas.
-302|Ce n’est pas un dossier Quake. Il doit contenir les dossiers id1 et qw.
-303|Choisissez où garder les copies de vos ressources.
-304|Utilisez un chemin complet.
-305|Le dossier Assets ne peut pas être dans qw\textures, sinon le jeu le chargerait.
-306|Choisissez le programme à lancer quand vous appuyez sur Tester.
-307|Ce programme n’est plus dans le dossier Quake.
-308|Tapez un nom de carte, p. ex. dm4.
-309|Un nom de carte ne peut pas contenir d’espaces.
-311|Saisissez un nom.
-312|Ce nom n’est pas autorisé.
-313|Un nom ne peut pas contenir / \ : * ? " < > |
-314|le jeu ne charge pas ce nom
-315|type de fichier non pris en charge
-316|introuvable
-18|• **Gfx** (`qw/gfx`) : le fond de la console (`conback`, ou le nom dans `scr_conpicture`), les images des menus et le curseur. `gfx/conback.lmp` doit exister, sinon le jeu ne démarre pas.
-22|• **Progs** (`qw/progs`) : modèles et sprites, n’importe quel nom. Un `.md3` du même nom remplace le `.mdl`.
-25|• **Maps** (`qw/maps`) : `<map>.bsp` plus des fichiers annexes ; les caisses d’objets (`b_*.bsp`) sont aussi ici.
-26|• **Lits et Locs** (`qw/lits`, `qw/locs`) : éclairage coloré (`<map>.lit`) et noms des lieux pour le jeu en équipe (`<map>.loc`).
-39|vous choisirez le type de ressource
-40|à choisir : {0}
-43|{0} dans des dossiers non gérés par l’application (ignorés)
-54|1 fichier ou dossier non valide masqué dans le dossier du jeu
-63|Déplacer {0} vers la {1} ? Le jeu utilisera sa version intégrée.
-64|{0} et {1} dans Assets déplacés vers la {2}.
-82|non valides, ignorés : {0}
-103|{0} avec des noms que le jeu ne charge pas (marqués non valides)
-121|Icône : {0}
-123|Ignorer
-124|Où placer ces fichiers ?
-125|{0} contient des fichiers dans des dossiers que l’application ne sait pas placer seule. Choisissez un type de ressource pour chaque dossier, ou Ignorer.
-126|(racine de l’archive)
-127|suggéré d’après les noms de fichiers
-128|Continuer
-129|Des dossiers de ressources alternatives ont été trouvés
-130|Le jeu ne charge pas les sous-dossiers, ce sont donc généralement des versions alternatives. Cochez ceux à copier dans Assets ; chacun garde son nom.
-131|Ne plus demander pour les dossiers que je laisse décochés
-132|Copier
-133|Copier et supprimer
-134|Copier, puis déplacer les dossiers d’origine de votre dossier Quake vers la Corbeille
-135|Échap : {0}
-136|Supprimer aussi les copies dans Assets ({0})
-137|Il n’y a aucune copie de ce fichier dans Assets : c’est la seule copie.
-144|Impossible d’ouvrir ce dossier : {0}
-149|Utilisé par le jeu. Pas encore dans Assets.
-150|Utilisé par le jeu. Une copie se trouve dans le dossier Assets « {0} ».
-184|Aucun sous-dossier trouvé dans les dossiers du jeu.
-185|Après la copie, ces dossiers seront déplacés de votre dossier Quake vers la Corbeille :
-297|Rechercher à nouveau les sous-dossiers
-298|Proposer à nouveau les sous-dossiers trouvés dans les dossiers du jeu, y compris ceux que vous avez ignorés
+280|Dans votre dossier Assets local
+281|Dans votre dossier Quake : le jeu le charge d’ici
+282|Trouver les doublons dans le dossier Quake actif
+283|Recherche des doublons dans le dossier Quake…
+284|Aucun doublon : chaque chemin des dossiers du jeu n’existe qu’une fois.
+285|{0} chemins existent à plusieurs endroits ({1} au contenu identique). Le jeu n’en utilise qu’un de chaque.
+286|Celui marqué ✓ est la copie que le jeu charge : qw avant ezquake avant id1, et dans un dossier un fichier libre avant un pk3 ou pak.
+287|Exporter…
+288|Enregistrer cette liste dans un fichier texte
+289|identiques
+290|différents
+291|Aperçu
+292|Afficher toutes les copies côte à côte
+293|utilisé par le jeu
+294|{0} copies de {1}.
+295|Doublons dans {0}
+296|Enregistrer la liste des doublons
+297|Fichier texte
+298|La liste n’a pas pu être enregistrée :
+299|Trouver les doublons dans les dossiers Assets locaux
+300|Recherche des copies dans les dossiers Assets locaux…
+301|Aucune copie : chaque fichier de vos dossiers Assets locaux n’y est qu’une fois.
+302|{0} fichiers sont stockés plusieurs fois ({1} copies en trop). Les copies ont le même nom, la même taille et le même contenu. Cochez les copies à garder (la plus ancienne est cochée) ; Supprimer déplace les autres vers la {2}. Au moins une copie de chaque fichier est toujours gardée.
+303|Supprimer…
+304|Affiche la liste des fichiers à supprimer et demande confirmation
+305|Toutes les copies sont cochées pour être gardées : il n’y a rien à supprimer.
+306|Certains fichiers n’ont pas pu être supprimés :
+307|Échap : fermer
+308|{0} copies
+309|Coché : garder cette copie. Décoché : la supprimer.
+310|Supprimer ces copies ?
+311|Ces {0} seront déplacés vers la {1}. Les copies cochées restent dans Assets. Vous pouvez restaurer les fichiers supprimés depuis la {1}.
+312|Supprimer {0}
+313|Entrée ou Échap : annuler
+315|Choisissez une archive
+316|Filtrer, p. ex. textures/
+317|N’afficher que les entrées dont le chemin contient ce texte
+318|Copier la sélection
+319|Copier les fichiers sélectionnés dans les dossiers de leur type dans Assets
+320|Tout copier dans Assets
+321|Copier tous les fichiers de cette archive dans Assets. Un résumé, avec Annuler l’ajout, s’affiche avant tout ajout.
+323|Ouvrir ce dossier dans l’explorateur de fichiers
+324|Afficher les non valides
+325|Afficher aussi les fichiers que le jeu ne charge jamais, et les sous-dossiers. N’affecte que cette liste : la liste Local affiche toujours tous les fichiers.
+326|Actif : c’est le dossier Quake sélectionné. Les fichiers d’ici sont utilisés par le jeu.
+327|Créer le dossier
+328|Local
+329|En ligne
+330|Parcourir et télécharger des ressources de ce type sur gfx.quakeworld.nu
+331|Filtrer…
+332|N’afficher que les fichiers dont le nom commence par ce texte, dans tous les dossiers de ce type de ressource
+333|Effacer le filtre
+334|Nouveau dossier : créer un dossier d’alternatives dans Assets pour ce type
+335|Assets locaux : votre archive de ressources alternatives. Le jeu ne les charge pas. Glissez-déposez ici vos propres zip ou dossiers : ils seront automatiquement rangés dans les différents types de ressources.
+336|Parcourir les fichiers PAK et PK3 de votre dossier Quake et en copier des fichiers dans Assets.
+337|Lancer le client sur la carte des Paramètres pour voir vos modifications.
+338|Paramètres : dossiers, client, carte, langue, thème, types de ressources et outils.
+339|Aide : explique chaque zone de la fenêtre.
+340|Les types de ressources sont en haut. Gérez-les dans les Paramètres. Archives : parcourir les fichiers PAK et PK3 de votre dossier Quake actif.\nDéposez des fichiers zip/rar/7z dans cette fenêtre pour les importer dans vos assets locaux !
+343|Lecture des données du jeu…
+344|Déposer pour ajouter à Assets
+345|zip, pk3, rar, 7z, tar.gz, dossiers ou images. Vous verrez un récapitulatif avant que quoi que ce soit soit ajouté.
+346|Quelle liste du site parcourir
+347|Page précédente
+348|Page suivante
+350|Réessayer
+351|Ouvrir le site dans le navigateur
+352|Chargement…
+353|Déjà téléchargé
+355|Le réglage du client qui décide si ce fichier est utilisé. Définissez-le dans la configuration du client ou la console.
+356|Actuellement dans le jeu
+357|Général
+358|Le dossier qui contient id1 et qw.
+359|Parcourir…
+360|id1 et qw trouvés.
+361|Créer les dossiers manquants
+362|Dossier Assets (archive)
+363|Où l’application garde une copie de chaque ressource. Le jeu ne charge pas ce dossier.
+364|Client
+365|Choisissez un client…
+366|Programmes trouvés dans le dossier Quake.
+367|Carte à ouvrir
+368|Langue
+369|La langue de l’application. Les noms de dossiers, de fichiers et de types de ressources restent tels quels.
+370|Thème
+371|Les couleurs et le style de l’application. Ils changent dès que vous choisissez ; Annuler revient en arrière.
+372|Afficher l’onglet En ligne
+373|Afficher le choix Local/En ligne au-dessus de la liste Assets, pour parcourir gfx.quakeworld.nu. Désactivé, seules vos copies locales sont affichées.
+374|Types de ressources
+375|Choisissez quels types de ressources ont un onglet. Les types masqués sont quand même reconnus quand vous déposez des fichiers. Tout ce qui concerne un type (dossiers, extensions, noms valides, listes en ligne) se trouve dans les fichiers de configuration ci-dessous ; redémarrez l’application après les avoir modifiés.
+376|Ouvrir le dossier de configuration
+377|Ouvrir le dossier contenant asset-types.json et les fichiers de noms
+378|Tout afficher
+379|Cocher tous les types de ressources
+380|Seulement les cinq par défaut
+381|Models, BModels, HUD, Tracker et Particles
+382|Rechercher à nouveau les sous-dossiers
+383|Proposer à nouveau les sous-dossiers trouvés dans les dossiers du jeu, y compris ceux que vous avez ignorés
+384|Outils
+385|Enregistrez d’abord vos paramètres : les outils ont besoin de vos dossiers Quake et Assets.
+386|Sous Linux, le jeu ne trouve que les fichiers dont le nom correspond exactement, et il demande des noms en minuscules. Cet outil cherche les fichiers avec des majuscules aux deux endroits : les dossiers du jeu de tous les types de ressources dans votre dossier Quake, et votre dossier Assets local. Chaque fichier indique où il se trouve, et seuls ceux que vous cochez sont renommés.
+387|Trouver les noms en majuscules…
+388|Analyse uniquement le dossier Quake défini dans Général (ses dossiers de jeu et les fichiers .pak et .pk3 qu’ils contiennent). Le même chemin peut exister à plusieurs endroits, par exemple id1/textures/abc.png et qw/textures/abc.png, ou un fichier libre et un autre dans un pak/pk3, et le jeu n’en utilise qu’un. La liste indique lequel, permet de prévisualiser les copies et peut être enregistrée dans un fichier texte. Rien n’est modifié.
+389|Trouver les doublons…
+390|Analyse tous les dossiers de votre dossier Assets local, pour tous les types de ressources, à la recherche de copies exactes : fichiers de même nom, extension et taille dont le contenu est aussi identique. Vous choisissez quelle copie garder ; les autres peuvent être déplacées vers la Corbeille, après une liste finale de ce qui sera supprimé.
+391|Trouver les copies dans Assets…
+392|Page du projet sur GitHub
+393|Wiki sur QuakeWorld.nu
+394|Entrée : enregistrer · Tab : champ suivant
+395|Choisissez votre dossier Quake.
+396|Ce dossier n’existe pas.
+397|Ce n’est pas un dossier Quake. Il doit contenir les dossiers id1 et qw.
+398|Choisissez où garder les copies de vos ressources.
+399|Utilisez un chemin complet.
+400|Le dossier Assets ne peut pas être dans qw\textures, sinon le jeu le chargerait.
+401|Choisissez le programme à lancer quand vous appuyez sur Tester.
+402|Ce programme n’est plus dans le dossier Quake.
+403|Tapez un nom de carte, p. ex. dm4.
+404|Un nom de carte ne peut pas contenir d’espaces.
+406|Saisissez un nom.
+407|Ce nom n’est pas autorisé.
+408|Un nom ne peut pas contenir / \ : * ? " < > |
+409|le jeu ne charge pas ce nom
+410|type de fichier non pris en charge
+411|introuvable
+412|Rouille
+413|Ardoise
+414|Parchemin
+224|En ligne : parcourez les alternatives {0} sur {1}. Sélectionnez-en une pour voir ses détails, puis téléchargez-la dans vos Assets locaux. Vous confirmez avant tout ajout.
+314|Archives : les fichiers PAK et PK3 de votre dossier Quake actif. Ils ne sont jamais modifiés. Sélectionnez des fichiers et faites un clic droit pour les copier dans vos Assets locaux.
+322|Fichiers de l’archive sélectionnée. Les images, skins de modèles et images WAD peuvent être prévisualisés. Les fichiers copiés sont rangés dans vos Assets locaux par type de ressource ; sons, cartes et autres fichiers vont dans assets\other. Un résumé s’affiche d’abord.
+341|Tester : lancez votre client sur la carte définie dans les Paramètres et voyez vos changements dans le jeu.
+342|Paramètres : dossiers, client, carte de test, langue et thème. Choisissez les types de ressources à afficher et utilisez les outils pour corriger les noms de fichiers et trouver les doublons.
+349|En ligne : parcourez les alternatives pour cet onglet sur gfx.quakeworld.nu. Sélectionnez-en une pour voir ses détails, puis téléchargez-la dans vos Assets locaux. Vous confirmez avant tout ajout.
+354|Aperçu du fichier sélectionné et de ce que vous pouvez en faire. Pour une alternative, la version utilisée actuellement par le jeu s’affiche en dessous, pour comparer.

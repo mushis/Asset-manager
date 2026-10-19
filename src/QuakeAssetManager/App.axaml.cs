@@ -16,7 +16,9 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // The language must be set before any window is built: XAML texts are translated as they load.
-            Loc.Set(AppSettings.Load().Language);
+            var settings = AppSettings.Load();
+            Loc.Set(settings.Language);
+            Themes.Apply(settings.Theme);
             _window = new MainWindow();
             desktop.MainWindow = _window;
             // Last line of defence: report unexpected errors instead of closing the app.

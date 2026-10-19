@@ -12,14 +12,14 @@
       <StackPanel>
         <Grid ColumnDefinitions="*,Auto">
           <WrapPanel x:Name="Tabs" Orientation="Horizontal">
-            <ToggleButton x:Name="TabArchives" Classes="tab" Content="{local:T 'Archives'}" Tag="archives"
-                          ToolTip.Tip="{local:T 'Browse PAK and PK3 files. Copy files from qw archives to Assets.'}" />
+            <ToggleButton x:Name="TabArchives" Classes="tab archives" Tag="archives"
+                          ToolTip.Tip="{local:T 'Browse the PAK and PK3 files in your Quake folder and copy files from them to Local assets.'}" />
           </WrapPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Top">
             <Button x:Name="TestButton" Content="▶  Test"
                     ToolTip.Tip="{local:T 'Start the client on the map from Settings so you can see your changes.'}" />
             <Button x:Name="SettingsButton" Classes="icon" Content="⚙"
-                    ToolTip.Tip="{local:T 'Settings: Quake folder, Assets folder, client and map.'}" />
+                    ToolTip.Tip="{local:T 'Settings: folders, client, map, language, theme, asset types and tools.'}" />
             <ToggleButton x:Name="HelpButton" Classes="icon" Content="?"
                           ToolTip.Tip="{local:T 'Help: explain each area of the window.'}" />
             <Button x:Name="AboutButton" Classes="icon" Content="ⓘ"
@@ -28,20 +28,20 @@
         </Grid>
         <WrapPanel HorizontalAlignment="Right">
           <Border Classes="help" MaxWidth="300">
-            <TextBlock Text="{local:T 'Each asset type tab manages one folder the game loads files from. Archives: browse PAK and PK3 files. Drop zip/rar/7z files, folders or images anywhere to add them to Assets.'}" />
+            <TextBlock Text="{local:T 'Asset types stay on top. Manage them from Settings. Archives: browse PAK and PK3 files in your active Quake folder.&#10;Drop zip/rar/7z files in this window to import them to your Local assets!'}" />
           </Border>
           <Border Classes="help" MaxWidth="260">
-            <TextBlock Text="{local:T 'Test: starts your client on the map from Settings, so you can see your changes in the game.'}" />
+            <TextBlock Text="{local:T 'Test: launch your client on the map from Settings and see your changes in the game.'}" />
           </Border>
           <Border Classes="help" MaxWidth="220">
-            <TextBlock Text="{local:T 'Settings: your Quake folder, Assets folder, client and test map.'}" />
+            <TextBlock Text="{local:T 'Settings: folders, client, test map, language and theme. Choose which asset types to show, and use the tools to fix file names and find duplicates.'}" />
           </Border>
         </WrapPanel>
       </StackPanel>
     </Border>
 
     <Border DockPanel.Dock="Bottom" Padding="10,4" BorderThickness="0,1,0,0"
-            BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+            Background="{DynamicResource ThemeHeaderBrush}" BorderBrush="{DynamicResource ThemeBorderBrush}">
       <Grid ColumnDefinitions="*,Auto">
         <TextBlock x:Name="StatusText" Classes="muted" TextTrimming="CharacterEllipsis" />
         <TextBlock x:Name="HintText" Grid.Column="1" Classes="muted" Margin="16,0,0,0" />
@@ -56,9 +56,9 @@
                  HorizontalAlignment="Center" VerticalAlignment="Center" Classes="muted" />
       <Border x:Name="DropOverlay" Classes="dropoverlay" IsVisible="False" IsHitTestVisible="False">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="6">
-          <TextBlock Text="{local:T 'Drop to add to Assets'}" FontSize="22" FontWeight="SemiBold" Foreground="White" HorizontalAlignment="Center" />
+          <TextBlock Text="{local:T 'Drop to add to Local assets'}" FontSize="22" FontWeight="SemiBold" HorizontalAlignment="Center" />
           <TextBlock Text="{local:T 'zip, pk3, rar, 7z, tar.gz, folders or image files. You’ll see a summary before anything is added.'}"
-                     Foreground="White" Opacity="0.8" HorizontalAlignment="Center" />
+                     Opacity="0.8" HorizontalAlignment="Center" />
         </StackPanel>
       </Border>
     </Panel>

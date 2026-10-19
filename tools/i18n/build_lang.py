@@ -13,6 +13,7 @@ for path in sorted(glob.glob(os.path.join(here, 'tr', '*.txt'))):
         if not line.strip():
             continue
         idx, _, text = line.partition('|')
+        text = text.replace('\\n', '\n')   # a line break inside a text is written as \n
         i = int(idx)
         key = keys[i]
         if set(re.findall(r'\{\d\}', key)) != set(re.findall(r'\{\d\}', text)):

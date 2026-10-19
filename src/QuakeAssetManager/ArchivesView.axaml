@@ -8,7 +8,7 @@
         <TextBlock Classes="header" Text="{local:T 'Archives'}" />
       </Border>
       <Border DockPanel.Dock="Top" Classes="help">
-        <TextBlock Text="{local:T 'Archives: PAK and PK3 files in your Quake folder. They’re read-only here. Files from qw archives can be copied to Assets: select them and right-click.'}" />
+        <TextBlock Text="{local:T 'Archives: the PAK and PK3 files in your active Quake folder. They’re never changed. Select files and right-click to copy them to your Local assets.'}" />
       </Border>
       <TreeView x:Name="ArchiveTree" SelectionMode="Single">
         <TreeView.ItemContainerTheme>
@@ -37,13 +37,13 @@
           <TextBox x:Name="FilterBox" Grid.Column="2" Width="170" Watermark="{local:T 'Filter, e.g. textures/'}"
                    Margin="8,0,0,0" ToolTip.Tip="{local:T 'Show only entries whose path contains this text'}" />
           <Button x:Name="ExtractSelected" Grid.Column="3" Content="{local:T 'Copy selected'}" Margin="6,0,0,0"
-                  ToolTip.Tip="{local:T 'Copy the selected files to their asset type folders in Assets'}" />
-          <Button x:Name="ExtractAll" Grid.Column="4" Content="{local:T 'Copy all to Assets'}" Margin="6,0,0,0"
-                  ToolTip.Tip="{local:T 'Copy every file of this archive that belongs to a shown asset type to Assets'}" />
+                  ToolTip.Tip="{local:T 'Copy the selected files to their asset type folders in Local assets'}" />
+          <Button x:Name="ExtractAll" Grid.Column="4" Content="{local:T 'Copy all to Local assets'}" Margin="6,0,0,0"
+                  ToolTip.Tip="{local:T 'Copy every file of this archive to Local assets. You see a summary, with Revert, before anything is added.'}" />
         </Grid>
       </Border>
       <Border DockPanel.Dock="Top" Classes="help">
-        <TextBlock Text="{local:T 'Files inside the selected archive. Images and Quake palette files (.mdl skins, .lmp, WAD lumps) can be previewed. Copying puts files in assets\&lt;type&gt;\&lt;archive name&gt;, skips files already in Assets, and shows a summary first.'}" />
+        <TextBlock Text="{local:T 'Files inside the selected archive. Images, model skins and WAD pictures can be previewed. Copied files are sorted into your Local assets by asset type; sounds, maps and other files go to assets\other. You see a summary first.'}" />
       </Border>
       <TextBlock x:Name="ExtractNote" DockPanel.Dock="Top" Classes="muted" Margin="10,6" TextWrapping="Wrap" />
       <ListBox x:Name="EntryList" SelectionMode="Multiple">

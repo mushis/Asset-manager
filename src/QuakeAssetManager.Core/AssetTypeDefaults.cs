@@ -1,4 +1,4 @@
-namespace QuakeAssetManager.Core;
+﻿namespace QuakeAssetManager.Core;
 
 /// <summary>
 /// The asset types the app knows about, written to asset-types.json on first run. The first five are shown;
@@ -9,6 +9,23 @@ public static class AssetTypeDefaults
     private static readonly List<string> Images = [".tga", ".png", ".jpg", ".pcx", ".link"];
     private const string Gfx = "https://gfx.quakeworld.nu/browse/";
 
+    /// <summary>Model and item-box textures: simple_* items and _luma glow maps depend on a setting.</summary>
+    private static readonly CvarHint[] ItemHints =
+    [
+        new("^simple_", "gl_simpleitems"),
+        new(@"_luma\.[^.]+$", "gl_lumatextures", "drawn"),
+    ];
+
+    /// <summary>The 62 images in unezQuake's emoticons.pk3 (names listed in its emoticons.json).</summary>
+    public static readonly string[] EmoticonNames =
+    [
+        "smile", "grin", "wink", "tongue", "sad", "cry", "heart", "surprised", "cool", "kiss", "neutral", "angry", "happy",
+        "laugh", "meh", "thumbsup", "thumbsdown", "clap", "fire", "skull", "rocket", "bomb", "trophy", "hundred", "eyes",
+        "thinking", "rofl", "joy", "sob", "sweat", "rage", "poop", "ghost", "party", "crown", "zap", "snail", "wave", "muscle",
+        "pray", "ok", "victory", "facepalm", "shrug", "sleeping", "clown", "nerd", "devil", "angel", "hearteyes", "confused",
+        "scream", "wow", "unamused", "pensive", "hug", "gun", "boom", "target", "medal", "swords",
+    ];
+
     public static List<AssetType> Create() =>
     [
         new()
@@ -18,7 +35,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/textures/models", AssetsFolderName = "models",
             Extensions = [.. Images], NamesFile = "names/models.json",
             NameSources = ["mdl-skins", "mdl-simple", "md3-simple"],
-            ArchivePrefixes = ["textures/models/"], FolderHints = ["models"],
+            ArchivePrefixes = ["textures/models/"], FolderHints = ["models"], Hints = [.. ItemHints],
             Online =
             [
                 new("Models (all)", Gfx + "models/"),
@@ -36,7 +53,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/textures/bmodels", AssetsFolderName = "bmodels",
             Extensions = [.. Images], NamesFile = "names/bmodels.json",
             NameSources = ["bsp-items", "bsp-items-simple"],
-            ArchivePrefixes = ["textures/bmodels/"], FolderHints = ["bmodels"],
+            ArchivePrefixes = ["textures/bmodels/"], FolderHints = ["bmodels"], Hints = [.. ItemHints],
             Notes = "Texture names inside maps/b_*.bsp ('*' becomes '#'), optional _luma, simple_<b_box>_0.",
         },
         new()
@@ -66,6 +83,7 @@ public static class AssetTypeDefaults
             Extensions = [.. Images], NamesFile = "names/tracker.json",
             NameSources = ["fragfile"],
             ArchivePrefixes = ["textures/tracker/"], FolderHints = ["tracker"],
+            Hints = [new(".*", "cl_useimagesinfraglog", "shown")],
             Notes = "Image names from WEAPON_CLASS lines in fragfile.dat, e.g. \\rl\\ loads textures/tracker/rl.",
         },
         new()
@@ -86,6 +104,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/crosshairs", AssetsFolderName = "crosshairs",
             Extensions = [.. Images, ".txt"], NamesFile = "names/crosshairs.json",
             ArchivePrefixes = ["crosshairs/"], FolderHints = ["crosshairs", "crosshair"],
+            Hints = [new(@"^crosshair\.txt$", "crosshair"), new(".*", "crosshairimage", "chosen", "")],
             Online = [new("Crosshairs", Gfx + "crosshairs/")],
             Notes = "Any name: the crosshairimage setting picks the file.",
         },
@@ -96,6 +115,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/env", AssetsFolderName = "skyboxes",
             Extensions = [.. Images], NamesFile = "names/skyboxes.json",
             ArchivePrefixes = ["env/", "gfx/env/"], FolderHints = ["env", "sky", "skybox", "skyboxes"],
+            Hints = [new(".*", "r_skyname", "chosen", "")],
             Notes = "Also read from gfx/env. A sky's _wind.cfg is only read from gfx/env.",
         },
         new()
@@ -105,6 +125,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/gfx", AssetsFolderName = "gfx",
             Extensions = [.. Images, ".lmp"], NamesFile = "names/gfx.json",
             ArchivePrefixes = ["gfx/"], FolderHints = ["gfx", "conback", "conbacks"],
+            Hints = [new("^conback", "scr_conpicture", "chosen", "")],
             Online = [new("Conbacks", Gfx + "conbacks/")],
             Notes = "gfx/<scr_conpicture> (default conback), menu pictures, cursor. Also a fallback for HUD pictures.",
         },
@@ -115,6 +136,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/textures/charsets", AssetsFolderName = "charsets",
             Extensions = [.. Images], NamesFile = "names/charsets.json",
             ArchivePrefixes = ["textures/charsets/"], FolderHints = ["charsets", "charset"],
+            Hints = [new(".*", "gl_consolefont", "chosen", "")],
             Online = [new("Charsets", Gfx + "charsets/")],
             Notes = "Any name: gl_consolefont picks it. Optional <name>-<NNN> and <name>-cyr alternates.",
         },
@@ -125,6 +147,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/textures/levelshots", AssetsFolderName = "levelshots",
             Extensions = [.. Images], NamesFile = "names/levelshots.json",
             ArchivePrefixes = ["textures/levelshots/"], FolderHints = ["levelshots"],
+            Hints = [new(".*", "scr_conback", "shown")],
             Notes = "textures/levelshots/<mapname>. Any map name, installed or not.",
         },
         new()
@@ -134,6 +157,7 @@ public static class AssetTypeDefaults
             ActiveFolderPath = "qw/skins", AssetsFolderName = "skins",
             Extensions = [".tga", ".png", ".jpg", ".pcx"], NamesFile = "names/skins.json",
             ArchivePrefixes = ["skins/"], FolderHints = ["skins"],
+            Hints = [new(".*", "skin, teamskin, enemyskin", "chosen", "")],
             Online = [new("Skins", Gfx + "skins/")],
             Notes = "Any name. Tries tga, png, jpg, then pcx; falls back to base.pcx.",
         },
@@ -145,7 +169,28 @@ public static class AssetTypeDefaults
             Extensions = [".mdl", ".md3", ".spr", ".png", ".tga", ".jpg", ".pcx", ".skin"], NamesFile = "names/progs.json",
             RecognizeBy = "extension",
             ArchivePrefixes = ["progs/"], FolderHints = ["progs"],
+            Hints = [new("^(w_|vwplayer)", "cl_novweps", "used", "0")],
             Notes = "Any model name (the server decides). Images and .skin files next to .md3 models. Item boxes (b_*.bsp) belong in maps/, not here.",
+        },
+        new()
+        {
+            Id = "sprays", DisplayName = "Sprays",
+            Description = "Spray decals (unezQuake, cl_spray_image)",
+            ActiveFolderPath = "qw/sprays", AssetsFolderName = "sprays",
+            Extensions = [".png", ".jpg", ".jpeg", ".tga", ".pcx"], NamesFile = "names/sprays.json",
+            ArchivePrefixes = ["sprays/"], FolderHints = ["sprays", "spray"],
+            Hints = [new(".*", "cl_spray_image", "chosen", "")],
+            Notes = "unezQuake only. Any name; at most 128x128. Every image in the folder is loaded at start-up.",
+        },
+        new()
+        {
+            Id = "emoticons", RecognizeBy = "names", DisplayName = "Emoticons",
+            Description = "Chat emoticons (unezQuake, cl_emoticons)",
+            ActiveFolderPath = "qw/textures/emoticons", AssetsFolderName = "emoticons",
+            Extensions = [.. Images, ".json"], NamesFile = "names/emoticons.json",
+            ArchivePrefixes = ["textures/emoticons/"], FolderHints = ["emoticons", "emoticon"],
+            Hints = [new(".*", "cl_emoticons")],
+            Notes = "unezQuake only. The images named in emoticons.json; a loose image replaces the one in emoticons.pk3.",
         },
     ];
 
@@ -181,6 +226,12 @@ public static class AssetTypeDefaults
         "progs" => new NamesConfig { Description = "Any model name.", Patterns = [".+"] },
         "charsets" => new NamesConfig { Description = "Any name (chosen with gl_consolefont).", Patterns = [".+"] },
         "skins" => new NamesConfig { Description = "Any name (chosen with skin, teamskin, enemyskin...). base is the fallback.", Names = ["base"], Patterns = [".+"] },
+        "sprays" => new NamesConfig { Description = "Any image name (chosen with cl_spray_image, default spray).", Names = ["spray"], Patterns = [".+"] },
+        "emoticons" => new NamesConfig
+        {
+            Description = "Images listed in emoticons.json (the names unezQuake ships), plus emoticons.json itself.",
+            Names = ["emoticons", .. EmoticonNames],
+        },
         _ => new NamesConfig { Description = "Extra names for this asset type. Names computed from the game data are added automatically." },
     };
 }

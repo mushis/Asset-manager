@@ -31,7 +31,6 @@ The app does the juggling:
   </tr>
 </table>
 
-
 ## Download
 
 Get the latest release from the [Releases](https://github.com/mushis/Asset-manager/releases) page.
@@ -39,24 +38,32 @@ Get the latest release from the [Releases](https://github.com/mushis/Asset-manag
 - **Windows:** `QuakeAssets-<version>-win-x64.zip`. Unzip it anywhere, e.g. `C:\QuakeAssets`, and run `QuakeAssetManager.exe`.
 - **Linux:** `QuakeAssets-<version>-linux-x64.tar.gz`. Extract it and run `QuakeAssets/QuakeAssetManager`. A `.desktop` file and an icon are included.
 
-You don't need to install .NET; the packages include everything. The app is portable: its settings live in
-`config/` next to the executable, so the whole app is one folder.
+You don't need to install .NET: the app is a single executable with everything included. It's portable: its
+settings live in `config/` next to the executable, so the whole app is one folder.
 
 ## Features
 
 - **Asset types:** Models, BModels, HUD, Tracker and Particles are shown by default. Crosshairs, Skyboxes, Gfx,
-  Charsets, Levelshots, Skins and Progs can be switched on in Settings.
-- **Configurable:** asset types, their folders, extensions and valid file names are JSON files you can edit
-  (see below).
+  Charsets, Levelshots, Skins, Progs, and unezQuake's Sprays and Emoticons can be switched on in Settings.
+- **Configurable:** asset types, their folders, extensions, valid file names and setting hints are JSON files you
+  can edit (see below).
 - **For each type:**
-  - **Active:** what the game loads now. Corresponds to the **currently selected game folder**.
-  - **Local:** your Assets folder, with the file that's in the game marked "in game". **This is your new archive of Quake assets.** Copy your stuff there.
-  - **Online:** browse and download from [gfx.quakeworld.nu](https://gfx.quakeworld.nu).
+  - **Active:** what the game loads now. Corresponds to the **currently selected game folder**. Rename, Show
+    alternatives, Mark as valid, Move to Local assets, Delete.
+  - **Local:** your Local assets folder, with the file that's in the game marked "in game", and a filter box.
+    **This is your new archive of Quake assets.** Copy your stuff there.
+  - **Online:** browse and download from [gfx.quakeworld.nu](https://gfx.quakeworld.nu). Can be switched off.
+- **Several files at once:** Ctrl+click and Shift+click in both lists.
 - **Thumbnails and previews:** PNG, JPG, TGA and PCX, and Quake palette images (`.mdl` skins, `.lmp`, WAD lumps).
+  The preview names the client setting that decides whether a file is used (e.g. `gl_simpleitems`).
 - **Drag and drop:** zip, pk3, pak, rar, 7z and tar.gz archives, folders and images. Each file goes to the right
   asset type. You're asked when it's unclear, and you see a summary with **Revert** before anything is added.
-- **Archives tab:** browse the PAK and PK3 files in your Quake folder, and copy files from the `qw` ones to Assets.
+  Files the app doesn't manage (sounds, maps…) are kept in `assets/other` with their game path.
+- **Archives tab:** browse the PAK and PK3 files in your Quake folder, and copy any file from them to Local assets.
+- **Tools:** convert file names to lower case (for Linux), find duplicates in your Quake folder, and find exact
+  copies in your Local assets.
 - **Test:** starts your client on a chosen map so you can check your changes.
+- **Themes:** Rust, Slate and Parchment.
 - **Languages:** English, French, Spanish, Portuguese, Swedish, Finnish and Russian.
 
 
@@ -69,8 +76,8 @@ The configuration files are in `config/` next to the app. **The app is fully con
 
 | File | What it holds |
 |---|---|
-| `settings.json` | Quake folder, Assets folder, client, map to open, language |
-| `asset-types.json` | One entry per asset type: shown or hidden, game folder, Assets folder name, extensions, name sources, how loose files are recognised, archive folders, online lists |
+| `settings.json` | Quake folder, Local assets folder, client, map to open, language, theme, Online tab on or off |
+| `asset-types.json` | One entry per asset type: shown or hidden, game folder, Local assets folder name, extensions, name sources, how loose files are recognised, archive folders, online lists, setting hints |
 | `names/<type>.json` | Extra valid file names (`names`) and patterns (`patterns`) for each type |
 | `app.json` | The online site's name and address |
 
@@ -81,13 +88,15 @@ The rules for which file names the game loads come from the ezQuake source code.
 
 ## Rules the app follows
 
-- **The Assets folder always keeps a copy.** Every scan copies new loose files from the game folders into a dated
-  folder (e.g. `16 Oct 2026`), skipping content that's already there. Subfolders of the game folders are offered
-  in a dialog instead.
+- **The Local assets folder always keeps a copy.** Every scan copies new loose files from the game folders into a
+  dated folder (e.g. `16 Oct 2026`), skipping content that's already there. Subfolders of the game folders are
+  offered in a dialog instead.
 - **No loose files in `assets/<type>/`:** files always go into a subfolder.
 - **Lower case:** files copied into the game are lower case, since Linux is case sensitive.
 - **Archives are never changed:** PAK and PK3 files are only read. Files copied from them go to
   `assets/<type>/<archive name>/`.
+- **Nothing is replaced in `assets/other`:** a different file with a path that's already there gets a number,
+  e.g. `abc (2).png`. Identical files are skipped.
 - **Delete is undoable:** it sends items to the Recycle Bin (Windows) or the trash (Linux).
 
 ## Building from source
@@ -97,10 +106,10 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```bash
 dotnet run --project src/QuakeAssetManager
 dotnet test
-python tools/release/make-release.py 0.4.0
+python tools/release/make-release.py 0.5.0
 ```
 
-The last command builds both release packages into `release/<version>/`.
+The last command builds both release packages into `release/<version>/`: one compressed, trimmed executable each.
 
 For testing, `QAM_SETTINGS=<file>` points the app at a different settings file. In Debug builds,
 `QAM_SNAPSHOT=<folder>` walks through the screens, saves a PNG of each and exits.
@@ -121,4 +130,5 @@ For testing, `QAM_SETTINGS=<file>` points the app at a different settings file. 
 ## Credits
 
 - Made with love by mushi. Vibe coded with Claude.
-- The icon is made by Samon, and downloaded from [gfx.quakeworld.nu](https://gfx.quakeworld.nu/files/650.jpg).
+- The QAM logo and icon were made for the app in 0.5. The earlier icon was made by Samon, and downloaded from
+  [gfx.quakeworld.nu](https://gfx.quakeworld.nu/files/650.jpg).

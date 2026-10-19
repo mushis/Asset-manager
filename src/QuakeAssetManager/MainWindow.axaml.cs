@@ -32,7 +32,8 @@ public partial class MainWindow : Window
         _watcher = new FolderWatcher(OnFoldersChanged);
 
         TabArchives.Click += (_, _) => SelectTab("archives");
-        TabArchives.Margin = new Avalonia.Thickness(0, 0, 4, 4);
+        TabArchives.Content = "🗜  " + Loc.T("Archives");
+        TabArchives.Margin = new Avalonia.Thickness(10, 0, 4, 4);
         TestButton.Content = "▶  " + Loc.T("Test");
         TestButton.Click += OnTest;
         SettingsButton.Click += (_, _) => ShowSetup(mandatory: false);
@@ -48,15 +49,21 @@ public partial class MainWindow : Window
         Assets.Init(this);
         Archives.Init(this);
         Setup.Saved += OnSettingsSaved;
-        Setup.Cancelled += () => SelectTab(_tab);
+        Setup.Cancelled += () =>
+        {
+            // The theme is previewed while choosing it; Cancel puts the saved one back.
+            Themes.Apply(_settings.Theme);
+            SelectTab(_tab);
+        };
 
         Opened += (_, _) =>
         {
-            Start();
 #if DEBUG
+            // First, so the walkthrough is ready to capture the welcome screen Start opens.
             if (Environment.GetEnvironmentVariable("QAM_SNAPSHOT") is { Length: > 0 } snapshots)
                 _ = RunSnapshots(snapshots);
 #endif
+            Start();
         };
         Closed += (_, _) => _watcher.Dispose();
     }
@@ -90,12 +97,17 @@ public partial class MainWindow : Window
 
     private IEnumerable<ToggleButton> AllTabs => Tabs.Children.OfType<ToggleButton>();
 
-    private void Start()
+    private async void Start()
     {
         LoadConfig();
         _settings = AppSettings.Load();
         if (string.IsNullOrWhiteSpace(_settings.Map))
             _settings.Map = "dm4";
+        if (_settings.ShowWelcome && await Dialogs.Welcome(this))
+        {
+            _settings.ShowWelcome = false;
+            try { _settings.Save(); } catch (Exception e) when (e is IOException or UnauthorizedAccessException) { }
+        }
         if (!SettingsValidator.Validate(_settings).IsValid)
             ShowSetup(mandatory: true);
         else
@@ -120,6 +132,7 @@ public partial class MainWindow : Window
     {
         var languageChanged = saved.Language != _settings.Language;
         _settings = saved;
+        Themes.Apply(saved.Theme);
         if (languageChanged)
         {
             try
@@ -192,8 +205,8 @@ public partial class MainWindow : Window
         foreach (var session in new Importer(Manager).FindLeftovers())
         {
             var keep = await Dialogs.Confirm(this, Loc.T("Unfinished import"),
-                Loc.F("An import from \"{0}\" wasn't confirmed before the app closed ({1}). Add the files to Assets?", session.Title, Loc.Files(session.Files.Count)),
-                Loc.T("Add to Assets"));
+                Loc.F("An import from \"{0}\" wasn't confirmed before the app closed ({1}). Add the files to Local assets?", session.Title, Loc.Files(session.Files.Count)),
+                Loc.T("Add to Local assets"));
             if (keep) session.Commit(); else session.Revert();
         }
         RefreshCurrent();
@@ -237,17 +250,19 @@ public partial class MainWindow : Window
         try
         {
             var plan = await Task.Run(() => prepare(manager));
-            IReadOnlyDictionary<string, AssetType?>? answers = null;
+            IReadOnlyDictionary<string, string?>? answers = null;
+            string? folder = null;
             if (plan.Questions.Count > 0)
             {
-                answers = await Dialogs.WhereShouldTheseGo(this, plan.Title, plan.Questions);
-                if (answers is null)
+                var reply = await Dialogs.WhereShouldTheseGo(this, plan.Title, plan.Questions, plan.FolderName);
+                if (reply is null)
                 {
                     SetStatus(Loc.F("Nothing was added from {0}.", plan.Title));
                     return false;
                 }
+                (answers, folder) = reply.Value;
             }
-            session = await Task.Run(() => new Importer(manager).Stage(plan, answers));
+            session = await Task.Run(() => new Importer(manager).Stage(plan, answers, folder));
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
         {
@@ -261,7 +276,7 @@ public partial class MainWindow : Window
             if (commit)
             {
                 var added = session.Commit();
-                SetStatus(Loc.F("Added {0} from {1} to Assets.", Loc.Files(added), session.Title));
+                SetStatus(Loc.F("Added {0} from {1} to Local assets.", Loc.Files(added), session.Title));
             }
             else
             {
@@ -271,7 +286,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            await Dialogs.Message(this, Loc.T("Import"), Loc.T("Some files couldn't be moved into Assets:") + " " + ex.Message);
+            await Dialogs.Message(this, Loc.T("Import"), Loc.T("Some files couldn't be moved into Local assets:") + " " + ex.Message);
         }
         if (commit && session.Busiest() is { } target)
         {
@@ -281,10 +296,12 @@ public partial class MainWindow : Window
         {
             if (commit && session.Files.Count > 0)
             {
-                // Everything went to hidden types: say where, since there's no tab to open.
-                var where = string.Join(", ", session.Files.Select(f => f.Kind).Distinct()
-                    .Select(k => AssetType.ById(k)).OfType<AssetType>().Select(t => $"assets{Path.DirectorySeparatorChar}{t.FolderName} ({t.DisplayName}, {Loc.T("hidden")})"));
-                SetStatus(Loc.F("Added {0} from {1} to Assets.", Loc.Files(session.Files.Count), session.Title) + " " + where);
+                // Everything went to hidden types or assets/other: say where, since there's no tab to open.
+                var kinds = session.Files.Select(f => f.Kind).Distinct().ToList();
+                var where = string.Join(", ", kinds
+                    .Select(k => AssetType.ById(k)).OfType<AssetType>().Select(t => $"assets{Path.DirectorySeparatorChar}{t.FolderName} ({t.DisplayName}, {Loc.T("hidden")})")
+                    .Concat(kinds.Contains(Importer.Other) ? [$"assets{Path.DirectorySeparatorChar}{Importer.Other} ({Loc.T("not managed by the app")})"] : []));
+                SetStatus(Loc.F("Added {0} from {1} to Local assets.", Loc.Files(session.Files.Count), session.Title) + " " + where);
             }
             RefreshCurrent();
         }
@@ -314,9 +331,9 @@ public partial class MainWindow : Window
         if (choice is null) return;
         var (selected, deleteOriginals, dontAskOthers) = choice.Value;
         if (deleteOriginals && selected.Count > 0 &&
-            !await Dialogs.Confirm(this, Loc.T("Copy and delete"),
+            !await Dialogs.Confirm(this, Loc.T("Move"),
                 Loc.T("After copying, these folders will be moved from your Quake folder to the Recycle Bin:") + "\n" +
-                string.Join("\n", selected.Select(f => "• " + Path.GetRelativePath(_settings.QuakeFolder, f.FullPath))), Loc.T("Copy and delete"), danger: true))
+                string.Join("\n", selected.Select(f => "• " + Path.GetRelativePath(_settings.QuakeFolder, f.FullPath))), Loc.T("Move")))
             return;
         var manager = Manager;
         try
@@ -325,7 +342,7 @@ public partial class MainWindow : Window
             if (dontAskOthers)
                 manager.MarkSubfoldersHandled(found.Except(selected));
             try { _settings.Save(); } catch (IOException) { }
-            SetStatus(Loc.F("copied {0} to Assets ({1} already there).", Loc.Files(result.Copied), result.Skipped));
+            SetStatus(Loc.F("copied {0} to Local assets ({1} already there).", Loc.Files(result.Copied), result.Skipped));
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
         {
@@ -338,9 +355,9 @@ public partial class MainWindow : Window
     {
         var prefix = firstTime ? Loc.T("First scan of this Quake folder:") + " " : Loc.T("Scan:") + " ";
         if (r.Copied == 0)
-            return prefix + Loc.T("everything is already in Assets.");
+            return prefix + Loc.T("everything is already in Local assets.");
         var folders = r.CreatedFolders.Count > 0 ? " " + Loc.F("New folders: {0}.", string.Join(", ", r.CreatedFolders.Distinct())) : "";
-        return prefix + Loc.F("copied {0} to Assets ({1} already there).", Loc.Files(r.Copied), r.Skipped) + folders;
+        return prefix + Loc.F("copied {0} to Local assets ({1} already there).", Loc.Files(r.Copied), r.Skipped) + folders;
     }
 
     public void WatchFolders()
@@ -362,11 +379,11 @@ public partial class MainWindow : Window
             {
                 var result = await Task.Run(() => changedActive.Aggregate(ImportResult.Empty, (acc, t) => acc + manager.Import(t, DateTime.Now)));
                 if (result.Copied > 0)
-                    SetStatus(Loc.F("Copied {0} from the game folder to Assets.", Loc.Files(result.Copied)));
+                    SetStatus(Loc.F("Copied {0} from the game folder to Local assets.", Loc.Files(result.Copied)));
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException)
             {
-                SetStatus(Loc.T("Couldn't copy new files to Assets:") + " " + e.Message);
+                SetStatus(Loc.T("Couldn't copy new files to Local assets:") + " " + e.Message);
             }
         }
         RefreshCurrent();

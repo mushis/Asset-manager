@@ -1,4 +1,4 @@
-namespace QuakeAssetManager.Core.Import;
+﻿namespace QuakeAssetManager.Core.Import;
 
 /// <param name="Type">The asset type the file goes to (shown or hidden), or null.</param>
 /// <param name="RelativePath">Where it goes inside the Assets folder chosen for the type.</param>
@@ -7,9 +7,10 @@ namespace QuakeAssetManager.Core.Import;
 /// <param name="Invalid">It's in a type's folder but the game doesn't load that name; it's copied, marked invalid.</param>
 /// <param name="NeedsChoice">No folder or name decides: the user picks the type (or skips).</param>
 /// <param name="Suggested">For <paramref name="NeedsChoice"/>: the one type the name points to, if any.</param>
+/// <param name="OtherPath">For <paramref name="OtherFolder"/>: where it goes inside assets/other (e.g. sound/weapons/coilgun.wav).</param>
 public sealed record Classification(
     AssetType? Type, string RelativePath, string? OtherFolder, string? Reason,
-    bool Invalid = false, bool NeedsChoice = false, AssetType? Suggested = null);
+    bool Invalid = false, bool NeedsChoice = false, AssetType? Suggested = null, string? OtherPath = null);
 
 /// <summary>
 /// Decides where a file goes (docs/version-0.4-plan.md, sections 10 and 11):
@@ -74,7 +75,11 @@ public static class FileClassifier
             return new Classification(typeMatch.Type, relative, null, null, Invalid: true);
         }
         if (otherMatch is not null)
-            return new Classification(null, name, otherMatch.Trim('/'), null);
+        {
+            // Kept in assets/other with the same path from that folder on, e.g. sound/weapons/coilgun.wav.
+            var at = lower.LastIndexOf(otherMatch, StringComparison.Ordinal);
+            return new Classification(null, name, otherMatch.Trim('/'), null, OtherPath: p[at..]);
+        }
 
         // 2/3. No known folder: what does the name say?
         var suggested = ByName(name, manager);
@@ -91,7 +96,7 @@ public static class FileClassifier
 
         // 4. Not something the app manages.
         if (OtherByExtension.TryGetValue(ext, out var byExt))
-            return new Classification(null, name, byExt, null);
+            return new Classification(null, name, byExt, null, OtherPath: $"{byExt}/{name}");
         return new Classification(null, name, null, "unsupported file type");
     }
 

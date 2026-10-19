@@ -11,6 +11,12 @@ public sealed class AppSettings
     public string Map { get; set; } = "dm4";
     /// <summary>UI language code: en, fr, es, pt, sv, fi, ru.</summary>
     public string Language { get; set; } = "en";
+    /// <summary>Colour theme: rust, slate or parchment.</summary>
+    public string Theme { get; set; } = "rust";
+    /// <summary>Show the Local/Online switch above the Assets list.</summary>
+    public bool ShowOnline { get; set; } = true;
+    /// <summary>Show the welcome screen at start (until "Don't show this again" is ticked).</summary>
+    public bool ShowWelcome { get; set; } = true;
     /// <summary>Quake folders that have been scanned at least once (full paths).</summary>
     public List<string> ScannedQuakeFolders { get; set; } = [];
 
@@ -20,15 +26,21 @@ public sealed class AppSettings
     /// <summary>Folders found inside the game folders that were already imported or dismissed, per Quake folder.</summary>
     public Dictionary<string, List<string>> HandledSubfolders { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
-    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
-
     public static AppSettings Load(string? path = null)
     {
         path ??= DefaultPath;
         try
         {
-            if (File.Exists(path))
-                return JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path)) ?? new AppSettings();
+            if (File.Exists(path) && JsonSerializer.Deserialize(File.ReadAllText(path), PlainJson.Files.AppSettings) is { } settings)
+            {
+                // Folder keys ignore case, as on Windows; a key that differs only in case is merged into the first.
+                var handled = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+                foreach (var (folder, names) in settings.HandledSubfolders ?? [])
+                    if (!handled.TryAdd(folder, names ?? []))
+                        handled[folder].AddRange(names ?? []);
+                settings.HandledSubfolders = handled;
+                return settings;
+            }
         }
         catch (Exception)
         {
@@ -41,7 +53,7 @@ public sealed class AppSettings
     {
         path ??= DefaultPath;
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        File.WriteAllText(path, JsonSerializer.Serialize(this, JsonOptions));
+        File.WriteAllText(path, JsonSerializer.Serialize(this, PlainJson.Files.AppSettings));
     }
 
     public AppSettings Clone() => new()
@@ -51,6 +63,9 @@ public sealed class AppSettings
         Client = Client,
         Map = Map,
         Language = Language,
+        Theme = Theme,
+        ShowOnline = ShowOnline,
+        ShowWelcome = ShowWelcome,
         HandledSubfolders = new(HandledSubfolders, StringComparer.OrdinalIgnoreCase),
         ScannedQuakeFolders = [.. ScannedQuakeFolders],
     };

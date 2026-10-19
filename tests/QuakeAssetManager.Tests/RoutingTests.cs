@@ -51,6 +51,7 @@ public class RoutingTests : IDisposable
         Assert.Null(c.Type);
         Assert.False(c.NeedsChoice);
         Assert.Equal(folder, c.OtherFolder);
+        Assert.Equal(path, c.OtherPath);   // kept in assets/other with the same path
     }
 
     [Fact]
@@ -97,11 +98,46 @@ public class RoutingTests : IDisposable
         var root = plan.Questions.Single(q => q.Folder == "");
         Assert.Equal("models", root.Suggested?.Id);
         var widgets = plan.Questions.Single(q => q.Folder == "hud/widgets");
-        var session = importer.Stage(plan, new Dictionary<string, AssetType?> { [root.Key] = root.Suggested, [widgets.Key] = null });
+        var session = importer.Stage(plan, new Dictionary<string, string?> { [root.Key] = root.Suggested?.Id, [widgets.Key] = null });
         Assert.Equal(2, session.AddedCount("models"));
         Assert.Equal(1, session.AddedCount("wad"));
         Assert.Contains(session.Ignored, i => i.Contains("hud/widgets/box.tga"));
         session.Revert();
+
+        // 0.5: "Other" keeps the files in assets/other with their path, and a chosen folder replaces the archive name.
+        var again = importer.Stage(importer.Prepare("pack.pk3", "pack", files),
+            new Dictionary<string, string?> { [root.Key] = "models", [widgets.Key] = Importer.Other }, folder: "my pack");
+        Assert.Equal(1, again.AddedCount(Importer.Other));
+        Assert.Contains(again.Files, f => f.FinalPath == Path.Combine(m.OtherFolder, "hud", "widgets", "box.tga"));
+        Assert.Contains(again.Files, f => f.Kind == "models" && f.Folder == "my pack");
+        again.Revert();
+    }
+
+    [Fact]
+    public void Files_the_app_does_not_manage_go_to_assets_other_with_a_number_on_clashes()
+    {
+        using var dir = new TempDir();
+        AssetType.Configure(AssetTypeDefaults.Create());
+        var m = new AssetManager(new AppSettings { QuakeFolder = dir.Path, AssetsFolder = Path.Combine(dir.Path, "assets") }, new GameData());
+        var importer = new Importer(m);
+        SourceFile F(string path, string text) => new(path, () => System.Text.Encoding.ASCII.GetBytes(text), InArchive: true);
+
+        var first = importer.StageFiles("a.pk3", "a", [F("sound/weapons/coilgun.wav", "A"), F("textures/abc.png", "B")]);
+        Assert.Equal(2, first.AddedCount(Importer.Other));
+        first.Commit();
+        Assert.True(File.Exists(Path.Combine(m.OtherFolder, "sound", "weapons", "coilgun.wav")));
+
+        // Same path, different content: "abc (2).png", then "abc (3).png". Same content: skipped.
+        var second = importer.StageFiles("b.pk3", "b", [F("textures/abc.png", "C"), F("sound/weapons/coilgun.wav", "A")]);
+        Assert.Equal(1, second.Duplicates);
+        second.Commit();
+        importer.StageFiles("c.pk3", "c", [F("textures/abc.png", "D")]).Commit();
+        Assert.Equal("C", File.ReadAllText(Path.Combine(m.OtherFolder, "textures", "abc (2).png")));
+        Assert.Equal("D", File.ReadAllText(Path.Combine(m.OtherFolder, "textures", "abc (3).png")));
+        Assert.Equal("B", File.ReadAllText(Path.Combine(m.OtherFolder, "textures", "abc.png")));
+
+        // A loose dropped file of a known kind goes to its folder there too.
+        Assert.Equal("sound/beep.wav", FileClassifier.Classify("beep.wav", m).OtherPath);
     }
 
     /// <summary>Every file of the real nQuake archives, read-only. Skipped when the install isn't there.</summary>

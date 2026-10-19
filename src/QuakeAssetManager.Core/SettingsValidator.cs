@@ -34,7 +34,7 @@ public static class SettingsValidator
         else if (!Path.IsPathFullyQualified(s.AssetsFolder))
             assetsError = "Use a full path.";
         else if (quakeError is null && IsInside(s.AssetsFolder, Path.Combine(s.QuakeFolder, "qw", "textures")))
-            assetsError = "The assets folder can't be inside qw\\textures, or the game would load it.";
+            assetsError = "The Local assets folder can't be inside qw\\textures, or the game would load it.";
 
         string? clientError = null;
         if (string.IsNullOrWhiteSpace(s.Client))

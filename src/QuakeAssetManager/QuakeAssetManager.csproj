@@ -9,7 +9,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <AssemblyName>QuakeAssetManager</AssemblyName>
-    <Version>0.4.0</Version>
+    <Version>0.5.0</Version>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
@@ -27,6 +27,8 @@
   <ItemGroup>
     <None Include="lang\*.json" CopyToOutputDirectory="PreserveNewest" />
     <AvaloniaResource Include="Assets\icon.ico" />
+    <AvaloniaResource Include="Assets\logo.png" />
+    <AvaloniaResource Include="Assets\icon.png" />
     <None Include="Assets\icon.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 

@@ -46,6 +46,22 @@ public static partial class Dialogs
         catch (Exception) { return null; }
     });
 
+    /// <summary>A dialog for the Settings tools (long lists), built by <see cref="Tools"/>.</summary>
+    /// <remarks>
+    /// A fixed, resizable height: with "size to content" a long list gets unlimited height and can't scroll.
+    /// </remarks>
+    public static Window ToolWindow(string title, double width, double height)
+    {
+        var w = NewWindow(title, width);
+        w.SizeToContent = SizeToContent.Manual;
+        w.Height = height;
+        w.MinHeight = 320;
+        w.CanResize = true;
+        return w;
+    }
+
+    public static Grid ToolFooter(string hint, params Button[] buttons) => Footer(hint, buttons);
+
     private static TextBlock Hint(string text) => new() { Text = text, Classes = { "muted" }, VerticalAlignment = VerticalAlignment.Center };
 
     private static TextBlock Label(string text) => new() { Text = text, Classes = { "muted" }, Margin = new Thickness(0, 8, 0, 4) };
@@ -64,12 +80,13 @@ public static partial class Dialogs
     private static string KeyHint(string action, bool tab = false) =>
         Loc.F("Enter: {0}", action.ToLower(CultureInfo.CurrentCulture)) + " · " + Loc.T("Esc: cancel") + (tab ? " · " + Loc.T("Tab: next") : "");
 
-    public static async Task<bool> Confirm(Window owner, string title, string message, string okText, bool danger = false)
+    /// <param name="cancelText">The other button (Esc), "Cancel" unless given.</param>
+    public static async Task<bool> Confirm(Window owner, string title, string message, string okText, bool danger = false, string? cancelText = null)
     {
         var w = NewWindow(title, 440);
         var ok = new Button { Content = okText, IsDefault = true };
         if (danger) ok.Classes.Add("danger");
-        var cancel = new Button { Content = Loc.T("Cancel"), IsCancel = true };
+        var cancel = new Button { Content = cancelText ?? Loc.T("Cancel"), IsCancel = true };
         var result = false;
         ok.Click += (_, _) => { result = true; w.Close(); };
         cancel.Click += (_, _) => w.Close();
@@ -145,10 +162,14 @@ public static partial class Dialogs
         return result;
     }
 
-    /// <summary>Pick an assets subfolder and optionally a file name. Returns null when cancelled.</summary>
+    /// <summary>
+    /// Pick an assets subfolder. With <paramref name="currentFileName"/>, the file keeps its name unless "Rename file to"
+    /// is ticked; the name box then starts with <paramref name="suggestedFileName"/>. Returns null when cancelled;
+    /// FileName is null when the name is kept.
+    /// </summary>
     public static async Task<(string Folder, string? FileName)?> ChooseDestination(
         Window owner, string title, string actionText, IReadOnlyList<string> folders, string suggestedFolder,
-        string? suggestedFileName, Func<string, string?> validateName)
+        string? currentFileName, string? suggestedFileName, Func<string, string?> validateName)
     {
         var w = NewWindow(title, 460);
         var folderBox = new AutoCompleteBox
@@ -159,7 +180,17 @@ public static partial class Dialogs
             MinimumPrefixLength = 0,
             Watermark = Loc.T("Folder name"),
         };
-        var fileBox = new TextBox { Text = suggestedFileName ?? "" };
+        var rename = new CheckBox { Content = Loc.T("Rename file to"), Margin = new Thickness(0, 10, 0, 4) };
+        var fileBox = new TextBox { Text = suggestedFileName ?? currentFileName ?? "", IsEnabled = false };
+        rename.IsCheckedChanged += (_, _) =>
+        {
+            fileBox.IsEnabled = rename.IsChecked == true;
+            if (fileBox.IsEnabled)
+            {
+                fileBox.Focus();
+                fileBox.SelectAll();
+            }
+        };
         var error = new TextBlock { Classes = { "error" }, IsVisible = false, Margin = new Thickness(0, 6, 0, 0) };
         var ok = new Button { Content = actionText, IsDefault = true };
         var cancel = new Button { Content = Loc.T("Cancel"), IsCancel = true };
@@ -167,7 +198,7 @@ public static partial class Dialogs
         ok.Click += (_, _) =>
         {
             var folder = folderBox.Text?.Trim() ?? "";
-            var file = suggestedFileName is null ? null : fileBox.Text?.Trim() ?? "";
+            var file = currentFileName is not null && rename.IsChecked == true ? fileBox.Text?.Trim() ?? "" : null;
             var message = validateName(folder) is { } fe ? Loc.T("Folder:") + " " + fe
                 : file is not null && validateName(file) is { } ne ? Loc.T("File name:") + " " + ne : null;
             if (message is not null)
@@ -183,11 +214,12 @@ public static partial class Dialogs
         var content = new StackPanel { Margin = new Thickness(20) };
         content.Children.Add(Label(Loc.T("Folder (pick one or type a new name)")));
         content.Children.Add(folderBox);
-        if (suggestedFileName is not null)
+        if (currentFileName is not null)
         {
-            content.Children.Add(Label(Loc.T("File name")));
+            content.Children.Add(rename);
             content.Children.Add(fileBox);
-            content.Children.Add(new TextBlock { Text = Loc.T("Suggested from the closest valid name"), Classes = { "muted" }, Margin = new Thickness(0, 4, 0, 0) });
+            if (suggestedFileName is not null && suggestedFileName != currentFileName)
+                content.Children.Add(new TextBlock { Text = Loc.T("Suggested from the closest valid name"), Classes = { "muted" }, Margin = new Thickness(0, 4, 0, 0) });
         }
         content.Children.Add(error);
         content.Children.Add(Footer(KeyHint(actionText, tab: true), cancel, ok));
@@ -236,10 +268,11 @@ public static partial class Dialogs
             if (invalid > 0) value += " · " + Loc.F("{0} with names the game doesn't load (marked invalid)", invalid);
             Row(label, value, muted: n == 0);
         }
-        Row(Loc.T("Already in Assets"), Loc.F("{0} skipped", session.Duplicates), muted: true);
-        var notManaged = session.NotManaged.Values.Sum();
-        Row(Loc.T("Not managed by the app"), notManaged == 0 ? "0"
-            : $"{notManaged} (" + string.Join(", ", session.NotManaged.Select(kv => $"{kv.Key.Replace(" (hidden)", " (" + Loc.T("hidden") + ")")}: {kv.Value}")) + ")", muted: true);
+        // Files the app doesn't manage are kept in assets/other with their game path.
+        var other = session.AddedCount(Importer.Other);
+        Row(Loc.T("Not managed by the app"), other == 0 ? "0"
+            : Loc.Files(other) + $" → assets{sep}{Importer.Other} (" + string.Join(", ", session.NotManaged.Select(kv => $"{kv.Key}: {kv.Value}")) + ")", muted: other == 0);
+        Row(Loc.T("Already in Local assets"), Loc.F("{0} skipped", session.Duplicates), muted: true);
         Row(Loc.T("Ignored"), session.Ignored.Count.ToString(CultureInfo.CurrentCulture), muted: true);
         content.Children.Add(grid);
 
@@ -259,11 +292,11 @@ public static partial class Dialogs
             });
         }
         if (session.Files.Count == 0)
-            content.Children.Add(new TextBlock { Text = Loc.T("Nothing was added: no file matched a name the game loads for the shown asset types."), Classes = { "muted" }, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) });
+            content.Children.Add(new TextBlock { Text = Loc.T("Nothing was added: everything was already in Local assets, skipped or not supported."), Classes = { "muted" }, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) });
 
         var ok = new Button { Content = Loc.T("OK"), IsDefault = true };
         var revert = new Button { Content = Loc.T("Revert"), IsVisible = session.Files.Count > 0 };
-        ToolTip.SetTip(revert, Loc.T("Don't add these files to Assets"));
+        ToolTip.SetTip(revert, Loc.T("Don't add these files to Local assets"));
         ok.Click += (_, _) => { decided = true; committed = true; w.Close(); };
         revert.Click += (_, _) => { decided = true; w.Close(); };
         content.Children.Add(Footer(Loc.F("Enter: {0}", Loc.T("OK")), revert, ok));
@@ -299,7 +332,7 @@ public static partial class Dialogs
         var w = NewWindow(Loc.T("About Quake Asset Manager"), 600);
         var ok = new Button { Content = Loc.T("Close"), IsDefault = true, IsCancel = true };
         ok.Click += (_, _) => w.Close();
-        var accent = new SolidColorBrush(Color.Parse("#F07B2B"));
+        var accent = Themes.Brush("ThemeAccentBrush", "#F07B2B");
         var content = new StackPanel { Margin = new Thickness(22), Spacing = 6 };
         content.Children.Add(new TextBlock { Text = "Quake Asset Manager", FontSize = 22, FontWeight = FontWeight.Bold, Foreground = accent });
         content.Children.Add(new TextBlock { Text = Loc.F("Version {0}", version) + (when.Length > 0 ? " · " + when : ""), FontWeight = FontWeight.SemiBold });
@@ -312,7 +345,6 @@ public static partial class Dialogs
         });
         content.Children.Add(new TextBlock { Text = Loc.T("I hope you find it useful."), TextWrapping = TextWrapping.Wrap });
         content.Children.Add(new TextBlock { Text = Loc.T("Made with love by mushi"), FontStyle = FontStyle.Italic, Foreground = accent, Margin = new Thickness(0, 4, 0, 0) });
-        content.Children.Add(new TextBlock { Text = Loc.F("Icon: {0}", "gfx.quakeworld.nu/files/650.jpg"), Classes = { "muted" }, FontSize = 11 });
         content.Children.Add(new Expander
         {
             Header = Loc.T("Details about QuakeWorld assets"),
@@ -335,7 +367,7 @@ public static partial class Dialogs
     /// </summary>
     private static SelectableTextBlock FormattedFacts(IBrush accent)
     {
-        var codeBrush = new SolidColorBrush(Color.Parse("#4FB3D9"));
+        var codeBrush = Themes.Brush("ThemeCodeBrush", "#4FB3D9");
         var block = new SelectableTextBlock { FontSize = 12.5, TextWrapping = TextWrapping.Wrap, LineHeight = 19 };
         var first = true;
         foreach (var raw in AboutFacts.Lines)
