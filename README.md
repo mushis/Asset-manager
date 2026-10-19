@@ -41,6 +41,9 @@ Get the latest release from the [Releases](https://github.com/mushis/Asset-manag
 You don't need to install .NET: the app is a single executable with everything included. It's portable: its
 settings live in `config/` next to the executable, so the whole app is one folder.
 
+## First run
+Enter the path of your main Quake folder, it will get scanned for assets. You can also drag and drop your collection of assets that are outside your Quake folder, they will get organized in the Assets folder and displayed on the app.
+
 ## Features
 
 - **Asset types:** Models, BModels, HUD, Tracker and Particles are shown by default. Crosshairs, Skyboxes, Gfx,
