@@ -40,6 +40,11 @@ public partial class AssetView : UserControl
         OpenActive.Click += async (_, _) => await Shell.OpenFolder(Owner, Manager.ActiveFolder(_type));
         OpenAssets.Click += async (_, _) => await Shell.OpenFolder(Owner, Manager.AssetsFolder(_type));
         NewFolder.Click += async (_, _) => await CreatePackFolder();
+        ImportButton.Click += (_, _) => OpenMenu(
+        [
+            new(Loc.T("Import files…"), () => _ = ImportPicked(folders: false)),
+            new(Loc.T("Import folders…"), () => _ = ImportPicked(folders: true)),
+        ], ImportButton);
         AssetsTab.Click += (_, _) => SetOnline(false);
         OnlineTab.Click += (_, _) => SetOnline(true);
         FilterBox.TextChanged += (_, _) =>
@@ -97,7 +102,7 @@ public partial class AssetView : UserControl
         OnlineTab.IsChecked = online;
         AssetsPanel.IsVisible = !online;
         Online.IsVisible = online;
-        OpenAssets.IsVisible = NewFolder.IsVisible = FilterBox.IsVisible = !online;
+        OpenAssets.IsVisible = NewFolder.IsVisible = ImportButton.IsVisible = FilterBox.IsVisible = !online;
         if (online)
         {
             AssetsTree.SelectedItems?.Clear();
@@ -258,6 +263,7 @@ public partial class AssetView : UserControl
         IsValid = file.IsValid,
         IsActive = file.IsActive,
         Modified = file.Modified,
+        DuplicateOf = file.DuplicateOf,
     };
 
     private static IEnumerable<AssetNode> Flatten(IEnumerable<AssetNode> nodes) =>
@@ -321,7 +327,11 @@ public partial class AssetView : UserControl
         }
         var main = Previews.FromFile(node.FullPath, Manager.GameData.Palette);
         Preview? compare = null;
-        if (node.IsValid && !node.IsActive && Manager.ActiveFolderExists(_type))
+        if (node.IsActive)
+        {
+            compare = new Preview(null, Loc.T("This is the file the game uses now."));
+        }
+        else if (node.IsValid && Manager.ActiveFolderExists(_type))
         {
             var baseName = Path.GetFileNameWithoutExtension(node.Name);
             var inGame = Directory.EnumerateFiles(Manager.ActiveFolder(_type))
@@ -331,7 +341,8 @@ public partial class AssetView : UserControl
                 ? new Preview(null, Loc.T("Nothing in the game folder; the game uses its built-in texture."))
                 : Previews.FromFile(inGame, Manager.GameData.Palette);
         }
-        Preview.Show(main, compare, node.Modified, actions, hint: node.IsValid ? Hint(node.Name) : null, warning: Warning(main));
+        Preview.Show(main, compare, node.Modified, actions, hint: node.IsValid ? Hint(node.Name) : null, warning: Warning(main),
+            copies: node.DuplicateOf, copiesRoot: Manager.Settings.AssetsFolder);
     }
 
     private List<PreviewAction> ActiveActions(IReadOnlyList<ActiveItem> items)
@@ -673,6 +684,31 @@ public partial class AssetView : UserControl
         });
     }
 
+    /// <summary>Import assets…: pick files (archives, images) or folders, then the same flow as drag and drop.</summary>
+    private async Task ImportPicked(bool folders)
+    {
+        var storage = Owner.StorageProvider;
+        IEnumerable<Avalonia.Platform.Storage.IStorageItem> picked = folders
+            ? await storage.OpenFolderPickerAsync(new Avalonia.Platform.Storage.FolderPickerOpenOptions { Title = Loc.T("Import folders…"), AllowMultiple = true })
+            : await storage.OpenFilePickerAsync(new Avalonia.Platform.Storage.FilePickerOpenOptions
+            {
+                Title = Loc.T("Import files…"),
+                AllowMultiple = true,
+                FileTypeFilter =
+                [
+                    new Avalonia.Platform.Storage.FilePickerFileType(Loc.T("Archives and images"))
+                    {
+                        Patterns = ["*.zip", "*.pk3", "*.pak", "*.rar", "*.7z", "*.tar", "*.tar.gz", "*.tgz",
+                                    "*.png", "*.tga", "*.jpg", "*.jpeg", "*.pcx", "*.lmp", "*.wad", "*.mdl", "*.md3", "*.spr", "*.bsp"],
+                    },
+                    new Avalonia.Platform.Storage.FilePickerFileType(Loc.T("All files")) { Patterns = ["*"] },
+                ],
+            });
+        var paths = picked.Select(p => Avalonia.Platform.Storage.StorageProviderExtensions.TryGetLocalPath(p)).OfType<string>().ToList();
+        if (paths.Count > 0)
+            await _host.ImportWithSummary(paths);
+    }
+
     private async Task CreatePackFolder()
     {
         var name = await Dialogs.Rename(Owner, Loc.T("New folder"), "", Manager.NewDatedFolderName(_type), n =>
@@ -703,6 +739,17 @@ public partial class AssetView : UserControl
     public void SnapshotFilter(string text) => FilterBox.Text = text;
 
     public Task SnapshotMoveDialog() => MoveActiveToAssets(SelectedActive);
+
+    public void SnapshotPreviewFile(string path) => Preview.Show(Previews.FromFile(path, Manager.GameData.Palette));
+
+    public void SnapshotSelectDuplicate()
+    {
+        if (AssetsTree.ItemsSource is not IEnumerable<AssetNode> nodes) return;
+        var dup = Flatten(nodes).FirstOrDefault(n => n.IsDuplicate);
+        if (dup is null) return;
+        foreach (var folder in nodes.Where(n => Flatten([n]).Contains(dup))) folder.IsExpanded = true;
+        AssetsTree.SelectedItem = dup;
+    }
 
     public void SnapshotShowInvalid(bool on) => ShowInvalid.IsChecked = on;
 

@@ -60,6 +60,14 @@
               <ComboBox x:Name="ThemeBox" HorizontalAlignment="Stretch"
                         ToolTip.Tip="{local:T 'The colours and style of the app. It changes as you pick; Cancel goes back.'}" />
 
+              <TextBlock Classes="muted" Text="{local:T 'Updates'}" Margin="0,14,0,4" />
+              <StackPanel Orientation="Horizontal" Spacing="10">
+                <Button x:Name="CheckUpdatesButton" Content="{local:T 'Check for updates'}"
+                        ToolTip.Tip="{local:T 'Look for a newer version on GitHub and install it'}" />
+                <TextBlock x:Name="VersionText" Classes="muted" VerticalAlignment="Center" />
+              </StackPanel>
+              <CheckBox x:Name="UpdatesAtStartBox" Content="{local:T 'Check for updates when the app starts'}" Margin="0,6,0,0" />
+
               <CheckBox x:Name="ShowOnlineBox" Content="{local:T 'Show the Online tab'}" Margin="0,14,0,0"
                         ToolTip.Tip="{local:T 'Show the Local/Online switch above the Local assets list, to browse gfx.quakeworld.nu. When it is off, only your local copies are shown.'}" />
             </StackPanel>

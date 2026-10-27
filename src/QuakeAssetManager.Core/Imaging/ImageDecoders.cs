@@ -11,7 +11,7 @@ public static class ImageDecoders
     public static bool IsNativeFormat(string extension) => extension.ToLowerInvariant() is ".png" or ".jpg" or ".jpeg" or ".bmp";
 
     public static bool CanPreview(string extension) =>
-        IsNativeFormat(extension) || extension.ToLowerInvariant() is ".tga" or ".pcx" or ".lmp" or ".mdl" or ".wadlump";
+        IsNativeFormat(extension) || extension.ToLowerInvariant() is ".tga" or ".pcx" or ".lmp" or ".mdl" or ".md3" or ".wadlump";
 
     /// <summary>Decode by extension. Returns null when the format isn't handled here or the data is broken.</summary>
     public static RgbaImage? Decode(string extension, byte[] data, QuakePalette? palette, string? lumpName = null, byte lumpType = 0)

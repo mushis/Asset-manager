@@ -19,7 +19,10 @@ public sealed class ImportSession
     public required string Title { get; init; }
     public required string StagingDir { get; init; }
     public List<Staged> Files { get; set; } = [];
+    /// <summary>Files skipped because Local assets already has the same contents.</summary>
     public int Duplicates { get; set; }
+    /// <summary>Files added although Local assets already had the same contents (marked duplicate in the list).</summary>
+    public int AddedDuplicates { get; set; }
     /// <summary>Files in known folders the app doesn't manage (sound, maps, map textures...), by folder.</summary>
     public SortedDictionary<string, int> NotManaged { get; set; } = new(StringComparer.OrdinalIgnoreCase);
     /// <summary>"path — reason" for every file that was left out.</summary>
@@ -207,7 +210,9 @@ public sealed class Importer(AssetManager manager)
     /// or null (or missing) to skip. <paramref name="folder"/> replaces the archive or folder name as the Assets subfolder.
     /// Call Commit or Revert on the result.
     /// </summary>
-    public ImportSession Stage(ImportPlan plan, IReadOnlyDictionary<string, string?>? answers = null, string? folder = null)
+    /// <param name="addDuplicates">Add files whose contents are already in Local assets, instead of skipping them.</param>
+    public ImportSession Stage(ImportPlan plan, IReadOnlyDictionary<string, string?>? answers = null, string? folder = null,
+                               bool addDuplicates = false)
     {
         var session = new ImportSession
         {
@@ -219,6 +224,7 @@ public sealed class Importer(AssetManager manager)
         session.Errors.AddRange(plan.Errors);
         var indexes = AssetType.Known.ToDictionary(t => t.Id, t => manager.BuildIndex(t).Keys.ToHashSet(), StringComparer.OrdinalIgnoreCase);
         var otherIndex = manager.BuildOtherIndex().Keys.ToHashSet();
+        var seen = new HashSet<string>();   // contents already staged in this import
         var reserved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var chosenFolder = string.IsNullOrWhiteSpace(folder) ? null : SafeFolderName(folder.Trim());
 
@@ -272,10 +278,19 @@ public sealed class Importer(AssetManager manager)
                 var hash = Convert.ToHexString(SHA256.HashData(data));
                 if (!indexes.TryGetValue(type.Id, out var index))
                     indexes[type.Id] = index = [];
+                if (!seen.Add(type.Id + "|" + hash))
+                {
+                    session.Duplicates++;   // the same file twice in one import
+                    continue;
+                }
                 if (!index.Add(hash))
                 {
-                    session.Duplicates++;
-                    continue;
+                    if (!addDuplicates)
+                    {
+                        session.Duplicates++;
+                        continue;
+                    }
+                    session.AddedDuplicates++;
                 }
 
                 if (!folderByKind.TryGetValue(type.Id, out var target))

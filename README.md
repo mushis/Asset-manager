@@ -64,7 +64,9 @@ Enter the path of your main Quake folder, it will get scanned for assets. You ca
   Files the app doesn't manage (sounds, maps…) are kept in `assets/other` with their game path.
 - **Archives tab:** browse the PAK and PK3 files in your Quake folder, and copy any file from them to Local assets.
 - **Tools:** convert file names to lower case (for Linux), find duplicates in your Quake folder, and find exact
-  copies in your Local assets.
+  copies in your Local assets (by SHA-256). Duplicates are also marked in the Local list.
+- **MD3 models:** a 3D preview you can turn with the mouse.
+- **Updates:** check for a new version on GitHub and install it from Settings.
 - **Test:** starts your client on a chosen map so you can check your changes.
 - **Themes:** Rust, Slate and Parchment.
 - **Languages:** English, French, Spanish, Portuguese, Swedish, Finnish and Russian.
@@ -109,7 +111,7 @@ You need the [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```bash
 dotnet run --project src/QuakeAssetManager
 dotnet test
-python tools/release/make-release.py 0.5.0
+python tools/release/make-release.py 0.6.0
 ```
 
 The last command builds both release packages into `release/<version>/`: one compressed, trimmed executable each.

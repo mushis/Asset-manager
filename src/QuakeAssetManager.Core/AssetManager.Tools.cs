@@ -32,7 +32,8 @@ public sealed record DuplicateGroup(string Path, IReadOnlyList<DuplicateLocation
 /// <param name="Folder">Its folder relative to the Assets folder, e.g. "models/16 Oct 2026".</param>
 public sealed record AssetCopy(string FullPath, string Folder, DateTime Modified);
 
-/// <summary>Files in the Assets folder with the same name, size and contents: exact copies of each other.</summary>
+/// <summary>Files in the Local assets folder with the same contents (SHA-256), whatever their names.</summary>
+/// <param name="Name">The first copy's name; the others may be named differently.</param>
 public sealed record AssetCopyGroup(string Name, long Size, IReadOnlyList<AssetCopy> Copies);
 
 /// <summary>Settings &gt; Tools: convert file names to lower case, and find files that hide or repeat each other.</summary>
@@ -263,16 +264,17 @@ public sealed partial class AssetManager
         if (!Directory.Exists(Settings.AssetsFolder))
             return [];
         var staging = Path.Combine(Settings.AssetsFolder, ".qam");
+        // Only files of the same size can be identical, so only those are hashed.
         var candidates = Directory.EnumerateFiles(Settings.AssetsFolder, "*", SearchOption.AllDirectories)
             .Where(f => !Inside(f, staging))
             .Select(f => new FileInfo(f))
-            .GroupBy(f => (Name: f.Name.ToLowerInvariant(), f.Length))
+            .GroupBy(f => f.Length)
             .Where(g => g.Count() > 1);
         var groups = new List<AssetCopyGroup>();
         foreach (var g in candidates)
         {
             ct.ThrowIfCancellationRequested();
-            // Same name and size isn't enough: the contents must match too.
+            // Same size isn't enough: the contents must match (SHA-256).
             foreach (var same in g.GroupBy(f => { try { return Hash(f.FullName); } catch (IOException) { return "?" + f.FullName; } }).Where(s => s.Count() > 1))
             {
                 var copies = same
@@ -280,7 +282,7 @@ public sealed partial class AssetManager
                     .ThenBy(f => f.FullName, StringComparer.OrdinalIgnoreCase)
                     .Select(f => new AssetCopy(f.FullName, Path.GetRelativePath(Settings.AssetsFolder, f.DirectoryName!), f.LastWriteTime))
                     .ToList();
-                groups.Add(new AssetCopyGroup(same.First().Name, g.Key.Length, copies));
+                groups.Add(new AssetCopyGroup(Path.GetFileName(copies[0].FullPath), g.Key, copies));
             }
         }
         return groups.OrderBy(g => g.Name, StringComparer.OrdinalIgnoreCase).ToList();

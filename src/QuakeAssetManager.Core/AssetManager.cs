@@ -15,7 +15,9 @@ public sealed record FoundSubfolder(AssetType Type, string FullPath, string Name
     public string Key => $"{Type.Id}/{Name}";
 }
 
-public sealed record AssetFileEntry(string Name, string FullPath, bool IsValid, bool IsActive, DateTime Modified);
+/// <param name="DuplicateOf">Other files in this type's Local assets with the same contents (SHA-256).</param>
+public sealed record AssetFileEntry(string Name, string FullPath, bool IsValid, bool IsActive, DateTime Modified,
+    IReadOnlyList<string>? DuplicateOf = null);
 
 public sealed record AssetFolderEntry(
     string Name,
@@ -124,24 +126,30 @@ public sealed partial class AssetManager
         if (!Directory.Exists(root))
             return new AssetsListing([], []);
         var activeHashes = ActiveHashesByName(type);
+        var copies = BuildIndex(type);
         var packs = Directory.EnumerateDirectories(root).Order(StringComparer.OrdinalIgnoreCase)
-            .Select(d => ListFolder(type, d, isPack: true, activeHashes)).ToList();
+            .Select(d => ListFolder(type, d, isPack: true, activeHashes, copies)).ToList();
         var rootFiles = Directory.EnumerateFiles(root).Order(StringComparer.OrdinalIgnoreCase)
             .Select(f => new AssetFileEntry(Path.GetFileName(f), f, false, false, File.GetLastWriteTime(f))).ToList();
         return new AssetsListing(packs, rootFiles);
     }
 
-    private AssetFolderEntry ListFolder(AssetType type, string dir, bool isPack, Dictionary<string, string> activeHashes)
+    private AssetFolderEntry ListFolder(AssetType type, string dir, bool isPack, Dictionary<string, string> activeHashes,
+                                        Dictionary<string, List<string>> copies)
     {
         // 0.5: files in nested folders can be used too ("Use these" copies a folder's own files).
         var folders = Directory.EnumerateDirectories(dir).Order(StringComparer.OrdinalIgnoreCase)
-            .Select(d => ListFolder(type, d, isPack: false, activeHashes)).ToList();
+            .Select(d => ListFolder(type, d, isPack: false, activeHashes, copies)).ToList();
         var files = Directory.EnumerateFiles(dir).Order(StringComparer.OrdinalIgnoreCase).Select(f =>
         {
             var name = Path.GetFileName(f);
             var valid = IsValid(type, name);
-            var active = valid && activeHashes.TryGetValue(name.ToLowerInvariant(), out var h) && h == Hash(f);
-            return new AssetFileEntry(name, f, valid, active, File.GetLastWriteTime(f));
+            var hash = Hash(f);
+            var active = valid && activeHashes.TryGetValue(name.ToLowerInvariant(), out var h) && h == hash;
+            var others = copies.TryGetValue(hash, out var same) && same.Count > 1
+                ? same.Where(p => !p.Equals(f, StringComparison.OrdinalIgnoreCase)).ToList()
+                : null;
+            return new AssetFileEntry(name, f, valid, active, File.GetLastWriteTime(f), others);
         }).ToList();
         return new AssetFolderEntry(Path.GetFileName(dir), dir, isPack, folders, files, NewestWrite(dir));
     }

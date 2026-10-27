@@ -58,6 +58,7 @@ public partial class SetupView : UserControl
         LowerCaseButton.Click += async (_, _) => await Tools.ConvertToLowerCase(_host);
         DuplicatesButton.Click += async (_, _) => await Tools.FindDuplicates(_host);
         AssetCopiesButton.Click += async (_, _) => await Tools.FindAssetCopies(_host);
+        CheckUpdatesButton.Click += async (_, _) => await Dialogs.CheckForUpdates(_host, quiet: false);
         KeyDown += (_, e) =>
         {
             if (e.Key == Key.Escape && CancelButton.IsVisible)
@@ -88,6 +89,8 @@ public partial class SetupView : UserControl
         LanguageBox.SelectedItem = Loc.Languages.FirstOrDefault(l => l.Code == settings.Language) ?? Loc.Languages[0];
         ThemeBox.SelectedItem = Themes.Find(settings.Theme);
         ShowOnlineBox.IsChecked = settings.ShowOnline;
+        UpdatesAtStartBox.IsChecked = settings.CheckUpdatesAtStart;
+        VersionText.Text = Loc.F("Version {0}", Updates.Current.ToString(3));
         // The tools work on the saved folders, so they wait for a valid setup.
         var ready = !mandatory && _host.Manager is not null;
         LowerCaseButton.IsEnabled = DuplicatesButton.IsEnabled = AssetCopiesButton.IsEnabled = ready;
@@ -125,6 +128,7 @@ public partial class SetupView : UserControl
         Theme = (ThemeBox.SelectedItem as Themes.Theme)?.Id ?? "rust",
         ShowOnline = ShowOnlineBox.IsChecked == true,
         ShowWelcome = _settings.ShowWelcome,
+        CheckUpdatesAtStart = UpdatesAtStartBox.IsChecked == true,
         ScannedQuakeFolders = _settings.ScannedQuakeFolders,
         HandledSubfolders = _settings.HandledSubfolders,
     };

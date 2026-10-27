@@ -432,7 +432,7 @@ public static class Tools
             {
                 var keep = new CheckBox { IsChecked = r.Keep, Margin = new Thickness(12, 0, 0, 0) };
                 var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("*,Auto") };
-                var path = new TextBlock { Text = Path.Combine("assets", r.Copy.Folder, g.Name), TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center };
+                var path = new TextBlock { Text = Path.Combine("assets", r.Copy.Folder, Path.GetFileName(r.Copy.FullPath)), TextTrimming = TextTrimming.CharacterEllipsis, VerticalAlignment = VerticalAlignment.Center };
                 ToolTip.SetTip(path, r.Copy.FullPath);
                 var date = new TextBlock { Text = Loc.F("Modified {0}", RelativeDate.Full(r.Copy.Modified)), Classes = { "muted" }, Margin = new Thickness(16, 0, 0, 0), VerticalAlignment = VerticalAlignment.Center };
                 Grid.SetColumn(date, 1);

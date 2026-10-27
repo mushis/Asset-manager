@@ -9,6 +9,7 @@ using Avalonia.Platform;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using QuakeAssetManager.Core;
+using QuakeAssetManager.Core.Formats;
 using QuakeAssetManager.Core.Imaging;
 
 namespace QuakeAssetManager;
@@ -33,7 +34,8 @@ public static class HelpMode
     }
 }
 
-public sealed record Preview(Bitmap? Image, string Info, string? Text = null);
+/// <param name="Turn">For 3D models: draws the model turned by (yaw, pitch) degrees, for dragging in the preview.</param>
+public sealed record Preview(Bitmap? Image, string Info, string? Text = null, Func<float, float, Bitmap>? Turn = null);
 
 public static class Previews
 {
@@ -46,6 +48,8 @@ public static class Previews
                 return new Preview(null, Loc.T("File not found"));
             if (info.Length > 64 * 1024 * 1024)
                 return new Preview(null, $"{Path.GetFileName(path)} · {Size(info.Length)} · " + Loc.T("too big to preview"));
+            if (info.Extension.Equals(".md3", StringComparison.OrdinalIgnoreCase))
+                return Md3(info.Name, File.ReadAllBytes(path), SkinFinder(path, palette));
             return FromBytes(Path.GetFileName(path), File.ReadAllBytes(path), palette);
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException)
@@ -58,6 +62,8 @@ public static class Previews
     {
         var ext = (extension ?? Path.GetExtension(name)).ToLowerInvariant();
         var size = Size(data.Length);
+        if (ext == ".md3")
+            return Md3(name, data, null);
         if (ext == ".link")
         {
             var target = System.Text.Encoding.ASCII.GetString(data).Split('\n')[0].Trim();
@@ -83,6 +89,85 @@ public static class Previews
             return new Preview(null, $"{name} · {size}", Loc.T("This image couldn't be read."));
         }
         return new Preview(null, $"{name} · {size}", Loc.T("No preview for this file type."));
+    }
+
+    /// <summary>A turnable 3D view of an .md3 model (first frame), textured when its skins are found.</summary>
+    public static Preview Md3(string name, byte[] data, Func<Md3Model.Surface, RgbaImage?>? skins)
+    {
+        var model = Md3Model.TryRead(data);
+        if (model is null)
+            return new Preview(null, $"{name} · {Size(data.Length)}", Loc.T("This model couldn't be read."));
+        var cache = new Dictionary<Md3Model.Surface, RgbaImage?>();
+        RgbaImage? Skin(Md3Model.Surface s)
+        {
+            if (skins is null) return null;
+            if (!cache.TryGetValue(s, out var img))
+                cache[s] = img = skins(s);
+            return img;
+        }
+        Bitmap Draw(float yaw, float pitch) => ToBitmap(model.Render(320, 320, yaw, pitch, Skin));
+        var textured = skins is not null && model.Surfaces.Any(s => Skin(s) is not null);
+        var info = $"{name} · MD3 · " + Loc.F("{0} triangles", model.TriangleCount) + $" · {Size(data.Length)}";
+        var text = Loc.T("Drag the picture to turn the model.") + (textured ? "" : " " + Loc.T("No skin found next to it: shown without textures."));
+        return new Preview(Draw(-35, 15), info, text, Draw);
+    }
+
+    /// <summary>
+    /// Finds a model surface's skin next to the .md3: the shader's image name, the surface name, the names in a
+    /// &lt;model&gt;*.skin file, or an image with the model's own name (tga, png, jpg, pcx).
+    /// </summary>
+    private static Func<Md3Model.Surface, RgbaImage?> SkinFinder(string md3Path, QuakePalette? palette)
+    {
+        var dir = Path.GetDirectoryName(md3Path)!;
+        var model = Path.GetFileNameWithoutExtension(md3Path);
+        var images = Directory.EnumerateFiles(dir)
+            .Where(f => Path.GetExtension(f).ToLowerInvariant() is ".tga" or ".png" or ".jpg" or ".jpeg" or ".pcx")
+            .ToList();
+        var skinMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var skin in Directory.EnumerateFiles(dir, model + "*.skin"))
+        {
+            try
+            {
+                foreach (var line in File.ReadAllLines(skin))
+                {
+                    var parts = line.Split(',', 2);
+                    if (parts.Length == 2 && parts[1].Trim().Length > 0)
+                        skinMap.TryAdd(parts[0].Trim(), Path.GetFileNameWithoutExtension(parts[1].Trim()));
+                }
+            }
+            catch (IOException) { }
+        }
+        string? Find(string stem) => stem.Length == 0 ? null
+            : images.FirstOrDefault(f => Path.GetFileNameWithoutExtension(f).Equals(stem, StringComparison.OrdinalIgnoreCase));
+        return s =>
+        {
+            var file = Find(Path.GetFileNameWithoutExtension(s.Shader.Replace('\\', '/')))
+                       ?? (skinMap.TryGetValue(s.Name, out var fromSkin) ? Find(fromSkin) : null)
+                       ?? Find(s.Name) ?? Find(model) ?? Find(model + "_0") ?? (images.Count == 1 ? images[0] : null);
+            return file is null ? null : DecodeToRgba(file, palette);
+        };
+    }
+
+    /// <summary>Any supported image as RGBA (png/jpg through Avalonia, the Quake formats through the decoders).</summary>
+    public static RgbaImage? DecodeToRgba(string path, QuakePalette? palette)
+    {
+        try
+        {
+            var ext = Path.GetExtension(path).ToLowerInvariant();
+            if (!ImageDecoders.IsNativeFormat(ext))
+                return ImageDecoders.Decode(ext, File.ReadAllBytes(path), palette);
+            using var bmp = new Bitmap(path);
+            int w = bmp.PixelSize.Width, h = bmp.PixelSize.Height;
+            var buf = new byte[w * h * 4];
+            var handle = GCHandle.Alloc(buf, GCHandleType.Pinned);
+            try { bmp.CopyPixels(new PixelRect(0, 0, w, h), handle.AddrOfPinnedObject(), buf.Length, w * 4); }
+            finally { handle.Free(); }
+            if (bmp.Format != PixelFormat.Rgba8888)
+                for (var i = 0; i < buf.Length; i += 4)
+                    (buf[i], buf[i + 2]) = (buf[i + 2], buf[i]);   // BGRA -> RGBA
+            return new RgbaImage(w, h, buf, ext.TrimStart('.').ToUpperInvariant());
+        }
+        catch (Exception) { return null; }
     }
 
     public static Bitmap ToBitmap(RgbaImage img)
@@ -120,6 +205,19 @@ public static class Shell
         {
             await Dialogs.Message(owner, Loc.T("Open folder"), Loc.F("This folder couldn't be opened: {0}", path) + "\n" + e.Message);
         }
+    }
+
+    /// <summary>Open the file manager with a file selected (Windows), or its folder (elsewhere).</summary>
+    public static void ShowFile(string path)
+    {
+        try
+        {
+            if (OperatingSystem.IsWindows())
+                Process.Start(new ProcessStartInfo("explorer.exe", ["/select,", path]) { UseShellExecute = false })?.Dispose();
+            else
+                Process.Start(new ProcessStartInfo(OperatingSystem.IsMacOS() ? "open" : "xdg-open", [Path.GetDirectoryName(path)!]) { UseShellExecute = false })?.Dispose();
+        }
+        catch (Exception e) when (e is System.ComponentModel.Win32Exception or IOException or InvalidOperationException) { }
     }
 
     /// <summary>Start the client from the Quake folder with +map &lt;map&gt;.</summary>

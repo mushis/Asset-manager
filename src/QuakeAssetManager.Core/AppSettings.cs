@@ -17,6 +17,8 @@ public sealed class AppSettings
     public bool ShowOnline { get; set; } = true;
     /// <summary>Show the welcome screen at start (until "Don't show this again" is ticked).</summary>
     public bool ShowWelcome { get; set; } = true;
+    /// <summary>Look for a new version on GitHub when the app starts.</summary>
+    public bool CheckUpdatesAtStart { get; set; }
     /// <summary>Quake folders that have been scanned at least once (full paths).</summary>
     public List<string> ScannedQuakeFolders { get; set; } = [];
 
@@ -66,6 +68,7 @@ public sealed class AppSettings
         Theme = Theme,
         ShowOnline = ShowOnline,
         ShowWelcome = ShowWelcome,
+        CheckUpdatesAtStart = CheckUpdatesAtStart,
         HandledSubfolders = new(HandledSubfolders, StringComparer.OrdinalIgnoreCase),
         ScannedQuakeFolders = [.. ScannedQuakeFolders],
     };

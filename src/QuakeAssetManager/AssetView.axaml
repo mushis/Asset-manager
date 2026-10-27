@@ -66,8 +66,12 @@
                       BorderThickness="0" IsVisible="False" ToolTip.Tip="{local:T 'Clear the filter'}" />
             </TextBox.InnerRightContent>
           </TextBox>
-          <Button x:Name="NewFolder" Grid.Column="4" Classes="icon" Content="📁✱"
+          <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4">
+          <Button x:Name="ImportButton" Classes="icon" Content="📥"
+                  ToolTip.Tip="{local:T 'Import assets: pick files or folders to add to Local assets, like drag and drop'}" />
+          <Button x:Name="NewFolder" Classes="icon" Content="📁✱"
                   ToolTip.Tip="{local:T 'New folder: create a folder of alternatives in Local assets for this type'}" />
+          </StackPanel>
         </Grid>
       </Border>
       <Panel>
@@ -97,7 +101,8 @@
                   <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center"
                              TextTrimming="CharacterEllipsis" Classes.invalid="{Binding IsInvalid}" />
                   <TextBlock Grid.Column="2" Text="{Binding Badge}" Classes="badge" Margin="8,0,0,0"
-                             Classes.ingame="{Binding BadgeIsInGame}" Classes.bad="{Binding BadgeIsBad}" />
+                             Classes.ingame="{Binding BadgeIsInGame}" Classes.bad="{Binding BadgeIsBad}"
+                             Classes.dup="{Binding BadgeIsDuplicate}" />
                   <TextBlock Grid.Column="3" Text="{Binding ModifiedText}" Classes="date" ToolTip.Tip="{Binding ModifiedTip}" />
                 </Grid>
               </TreeDataTemplate>

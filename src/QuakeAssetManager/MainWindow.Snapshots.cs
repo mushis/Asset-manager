@@ -82,6 +82,21 @@ public partial class MainWindow
         await Snap(folder, "models-filter");
         Assets.SnapshotFilter("");
 
+        SelectTab("wad");
+        await Task.Delay(1500);
+        Assets.SnapshotSelectDuplicate();
+        await Task.Delay(800);
+        await Snap(folder, "wad-duplicate");
+        SelectTab("models");
+        await Task.Delay(1000);
+        var md3 = Directory.EnumerateFiles(Settings.AssetsFolder, "*.md3", SearchOption.AllDirectories).FirstOrDefault();
+        if (md3 is not null)
+        {
+            Assets.SnapshotPreviewFile(md3);
+            await Task.Delay(800);
+            await Snap(folder, "md3-preview");
+        }
+
         foreach (var theme in new[] { "slate", "parchment" })
         {
             Themes.Apply(theme);

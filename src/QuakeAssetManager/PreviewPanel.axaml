@@ -21,6 +21,10 @@
         <TextBlock x:Name="HintInfo" Classes="hint" IsVisible="False"
                    ToolTip.Tip="{local:T 'The client setting that decides whether this file is used. Set it in your client config or console.'}" />
         <TextBlock x:Name="WarningInfo" Classes="warn" IsVisible="False" />
+        <StackPanel x:Name="CopiesBox" Spacing="2" IsVisible="False">
+          <TextBlock Classes="warn" Text="{local:T 'Duplicate: the same file is also here (click to show it):'}" TextWrapping="Wrap" />
+          <StackPanel x:Name="CopiesList" Spacing="2" />
+        </StackPanel>
         <TextBlock x:Name="MainText" TextWrapping="Wrap" />
         <StackPanel x:Name="Actions" Spacing="6" Margin="0,4,0,0" />
 

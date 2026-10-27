@@ -71,6 +71,7 @@
   <!-- Row labels: each kind keeps its own colour -->
   <Style Selector="TextBlock.badge.ingame"><Setter Property="Foreground" Value="{DynamicResource ThemeInGameBrush}" /></Style>
   <Style Selector="TextBlock.badge.bad"><Setter Property="Foreground" Value="{DynamicResource ThemeInvalidBrush}" /></Style>
+  <Style Selector="TextBlock.badge.dup"><Setter Property="Foreground" Value="{DynamicResource ThemeWarnBrush}" /></Style>
   <Style Selector="TextBlock.date">
     <Setter Property="FontSize" Value="10" />
     <Setter Property="Foreground" Value="{DynamicResource ThemeMutedBrush}" />

@@ -141,7 +141,7 @@ public class Version05Tests : IDisposable
     }
 
     [Fact]
-    public void Exact_copies_in_assets_need_the_same_name_size_and_contents()
+    public void Exact_copies_in_assets_need_the_same_contents()
     {
         var (dir, m, _) = NewQuake();
         using var __ = dir;
@@ -149,10 +149,10 @@ public class Version05Tests : IDisposable
         dir.File("assets/models/b/armor_0.png", "SAME");
         dir.File("assets/other/textures/armor_0.png", "SAME");
         dir.File("assets/models/c/armor_0.png", "DIFF");     // same size, other contents
-        dir.File("assets/models/d/armor_1.png", "SAME");     // other name
+        dir.File("assets/models/d/armor_1.png", "SAME");     // other name, same contents: a copy too (0.6)
         var g = Assert.Single(m.FindAssetCopies());
-        Assert.Equal(3, g.Copies.Count);
-        Assert.Equal(2, m.DeleteAssetCopies(g.Copies.Skip(1).Select(c => c.FullPath)));
+        Assert.Equal(4, g.Copies.Count);
+        Assert.Equal(3, m.DeleteAssetCopies(g.Copies.Skip(1).Select(c => c.FullPath)));
         Assert.Empty(m.FindAssetCopies());
     }
 

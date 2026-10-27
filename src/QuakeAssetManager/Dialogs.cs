@@ -234,7 +234,9 @@ public static partial class Dialogs
     /// Revert has no key, and Esc and the window's close button do nothing, so an import is never lost by accident.
     /// Returns true when the files were added.
     /// </summary>
-    public static async Task<bool> ImportSummary(Window owner, ImportSession session)
+    public enum ImportChoice { Revert, Ok, OkAddDuplicates }
+
+    public static async Task<ImportChoice> ImportSummary(Window owner, ImportSession session)
     {
         var title = Loc.F("Added from {0}", session.Title);
         var w = NewWindow(title, 520);
@@ -259,7 +261,8 @@ public static partial class Dialogs
             grid.Children.Add(v);
         }
         var sep = System.IO.Path.DirectorySeparatorChar;
-        foreach (var type in AssetType.Known.Where(t => t.Visible || session.AddedCount(t.Kind) > 0))
+        // Only the asset types that received files.
+        foreach (var type in AssetType.Known.Where(t => session.AddedCount(t.Kind) > 0))
         {
             var n = session.AddedCount(type.Kind);
             var invalid = session.InvalidCount(type.Kind);
@@ -270,10 +273,14 @@ public static partial class Dialogs
         }
         // Files the app doesn't manage are kept in assets/other with their game path.
         var other = session.AddedCount(Importer.Other);
-        Row(Loc.T("Not managed by the app"), other == 0 ? "0"
-            : Loc.Files(other) + $" → assets{sep}{Importer.Other} (" + string.Join(", ", session.NotManaged.Select(kv => $"{kv.Key}: {kv.Value}")) + ")", muted: other == 0);
-        Row(Loc.T("Already in Local assets"), Loc.F("{0} skipped", session.Duplicates), muted: true);
-        Row(Loc.T("Ignored"), session.Ignored.Count.ToString(CultureInfo.CurrentCulture), muted: true);
+        if (other > 0)
+            Row(Loc.T("Not managed by the app"), Loc.Files(other) + $" → assets{sep}{Importer.Other} (" + string.Join(", ", session.NotManaged.Select(kv => $"{kv.Key}: {kv.Value}")) + ")");
+        if (session.AddedDuplicates > 0)
+            Row(Loc.T("Duplicates"), Loc.F("{0} already in Local assets, added anyway", session.AddedDuplicates), muted: true);
+        if (session.Duplicates > 0)
+            Row(Loc.T("Already in Local assets"), Loc.F("{0} skipped", session.Duplicates), muted: true);
+        if (session.Ignored.Count > 0)
+            Row(Loc.T("Ignored"), session.Ignored.Count.ToString(CultureInfo.CurrentCulture), muted: true);
         content.Children.Add(grid);
 
         if (session.Ignored.Count > 0 || session.Errors.Count > 0)
@@ -294,6 +301,23 @@ public static partial class Dialogs
         if (session.Files.Count == 0)
             content.Children.Add(new TextBlock { Text = Loc.T("Nothing was added: everything was already in Local assets, skipped or not supported."), Classes = { "muted" }, TextWrapping = TextWrapping.Wrap, Margin = new Thickness(0, 8, 0, 0) });
 
+        // Files whose contents are already in Local assets: skip them (default) or add them anyway.
+        CheckBox? addDuplicates = null;
+        if (session.Duplicates > 0)
+        {
+            addDuplicates = new CheckBox
+            {
+                Margin = new Thickness(0, 8, 0, 0),
+                Content = new TextBlock
+                {
+                    Text = session.Duplicates == 1
+                        ? Loc.T("1 file is already in Local assets (same contents). Add it anyway, marked as a duplicate")
+                        : Loc.F("{0} are already in Local assets (same contents). Add them anyway, marked as duplicates", Loc.Files(session.Duplicates)),
+                    TextWrapping = TextWrapping.Wrap,
+                },
+            };
+            content.Children.Add(addDuplicates);
+        }
         var ok = new Button { Content = Loc.T("OK"), IsDefault = true };
         var revert = new Button { Content = Loc.T("Revert"), IsVisible = session.Files.Count > 0 };
         ToolTip.SetTip(revert, Loc.T("Don't add these files to Local assets"));
@@ -303,7 +327,7 @@ public static partial class Dialogs
         w.Content = content;
         w.Opened += (_, _) => ok.Focus();
         await w.ShowDialog(owner);
-        return committed;
+        return !committed ? ImportChoice.Revert : addDuplicates?.IsChecked == true ? ImportChoice.OkAddDuplicates : ImportChoice.Ok;
     }
 
     /// <summary>"path — reason": translate the reason part.</summary>

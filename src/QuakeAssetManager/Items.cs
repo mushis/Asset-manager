@@ -86,12 +86,18 @@ public sealed class AssetNode : ThumbItem
     public int FileCount { get; init; }
     /// <summary>Full path of the file or folder, shown in the tooltip.</summary>
     public string Location { get; init; } = "";
+    /// <summary>Other files in Local assets with the same contents; null when there are none.</summary>
+    public IReadOnlyList<string>? DuplicateOf { get; init; }
+    public bool IsDuplicate => DuplicateOf is { Count: > 0 };
 
     public string Icon => IsFolder ? "📁" : IsValid ? "🖼" : "⚠";
     public string Badge => IsFolder
         ? (IsPack ? Loc.Files(FileCount) : Loc.Files(FileCount) + " · " + Loc.T("nested"))
-        : IsActive ? Loc.T("in game") : IsValid ? "" : Loc.T("invalid");
+        : IsActive ? Loc.T("in game") + (IsDuplicate ? " · " + Loc.T("duplicate") : "")
+        : !IsValid ? Loc.T("invalid")
+        : IsDuplicate ? Loc.T("duplicate") : "";
     public bool BadgeIsInGame => !IsFolder && IsActive;
+    public bool BadgeIsDuplicate => !IsFolder && !IsActive && IsValid && IsDuplicate;
     public bool BadgeIsBad => IsInvalid;
     public string ModifiedText => RelativeDate.Format(Modified);
     public string ModifiedTip => RelativeDate.Full(Modified);

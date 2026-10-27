@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private readonly FolderWatcher _watcher;
     private AppSettings _settings = new();
     private string _tab = "models";
+    private static bool _checkedForUpdates;
 
     public AssetManager? Manager { get; private set; }
     public AppSettings Settings => _settings;
@@ -196,6 +197,11 @@ public partial class MainWindow : Window
         SelectTab(_tab);
         await OfferLeftoverImports();
         await OfferSubfolders();
+        if (_settings.CheckUpdatesAtStart && !_checkedForUpdates)
+        {
+            _checkedForUpdates = true;
+            await Dialogs.CheckForUpdates(this, quiet: true);
+        }
     }
 
     /// <summary>An import whose summary dialog was still open when the app closed: keep it or throw it away.</summary>
@@ -247,11 +253,12 @@ public partial class MainWindow : Window
         var manager = Manager;
         SetStatus(Loc.T("Reading the files…"));
         ImportSession session;
+        ImportPlan plan;
+        IReadOnlyDictionary<string, string?>? answers = null;
+        string? folder = null;
         try
         {
-            var plan = await Task.Run(() => prepare(manager));
-            IReadOnlyDictionary<string, string?>? answers = null;
-            string? folder = null;
+            plan = await Task.Run(() => prepare(manager));
             if (plan.Questions.Count > 0)
             {
                 var reply = await Dialogs.WhereShouldTheseGo(this, plan.Title, plan.Questions, plan.FolderName);
@@ -270,7 +277,22 @@ public partial class MainWindow : Window
             await Dialogs.Message(this, Loc.T("Import"), Loc.T("The files couldn't be read:") + " " + ex.Message);
             return false;
         }
-        var commit = await Dialogs.ImportSummary(this, session);
+        var choice = await Dialogs.ImportSummary(this, session);
+        if (choice == Dialogs.ImportChoice.OkAddDuplicates)
+        {
+            // Stage again, this time keeping the files whose contents are already in Local assets.
+            session.Revert();
+            try
+            {
+                session = await Task.Run(() => new Importer(manager).Stage(plan, answers, folder, addDuplicates: true));
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException)
+            {
+                await Dialogs.Message(this, Loc.T("Import"), Loc.T("The files couldn't be read:") + " " + ex.Message);
+                return false;
+            }
+        }
+        var commit = choice != Dialogs.ImportChoice.Revert;
         try
         {
             if (commit)
