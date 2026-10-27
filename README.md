@@ -16,7 +16,7 @@ The app does the juggling:
       <img src="https://github.com/user-attachments/assets/9078241c-eeee-4838-b6f0-2f46cab00da8" alt="Screenshot 1" width="100%">
     </td>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/d9f6257b-622e-47e7-9f3c-f987c845231a" alt="Screenshot 2" width="100%">
+      <img src="https://github.com/user-attachments/assets/62ec3f75-0603-49dd-936e-738ff10fff7b" alt="Screenshot 2" width="100%">
     </td>
   </tr>
   <tr>
