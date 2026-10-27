@@ -1,7 +1,6 @@
 # Quake Asset Manager
 
-A desktop app for Windows and Linux that manages QuakeWorld replacement assets: **model skins, item boxes,
-HUD pictures, frag tracker, particles and more**. 
+A desktop app for Windows and Linux that manages QuakeWorld replacement assets: **model skins, item boxes,HUD pictures, frag tracker, particles and more**. 
 
 ## Why
 **Organize your own collection of assets that you have been downloading over the years (maybe even creating your own), on ONE folder, which is read by this app, and the app does the copying to your Quake installation(s), while keeping your archive safe.**
@@ -14,18 +13,18 @@ The app does the juggling:
 <table>
   <tr>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/02a2c8cb-6c30-48a1-9d85-e85100a6746c" alt="Screenshot 1" width="100%">
+      <img src="https://github.com/user-attachments/assets/9078241c-eeee-4838-b6f0-2f46cab00da8" alt="Screenshot 1" width="100%">
     </td>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/64451e99-7778-48ee-bf21-158da5a13560" alt="Screenshot 2" width="100%">
+      <img src="https://github.com/user-attachments/assets/d9f6257b-622e-47e7-9f3c-f987c845231a" alt="Screenshot 2" width="100%">
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/e40d215b-55a8-4c7c-8e83-d885f216a2b2" alt="Screenshot 3" width="100%">
+      <img src="https://github.com/user-attachments/assets/b2cfc612-e68b-4df4-8bf9-6288d6e150c6" alt="Screenshot 3" width="100%">
     </td>
     <td width="50%">
-      <img src="https://github.com/user-attachments/assets/2930a888-03b8-4fc9-8c67-e0a323f33c53" alt="Screenshot 3" width="100%">
+      <img src="https://github.com/user-attachments/assets/60adf2a4-3833-4602-90e2-08cb60470486" alt="Screenshot 3" width="100%">
 ">
     </td>
   </tr>
